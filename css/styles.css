@@ -1,6 +1,7 @@
 @font-face { font-family: "Fredoka"; src: url("../assets/fonts/fredoka-600.ttf") format("truetype"); font-display: swap; font-weight: 600; }
 @font-face { font-family: "Fredoka"; src: url("../assets/fonts/fredoka-700.ttf") format("truetype"); font-display: swap; font-weight: 700; }
 @font-face { font-family: "Nunito Sans"; src: url("../assets/fonts/nunito-sans-400.ttf") format("truetype"); font-display: swap; font-weight: 400; }
+@font-face { font-family: "Nunito Sans"; src: url("../assets/fonts/nunito-sans-600.ttf") format("truetype"); font-display: swap; font-weight: 600; }
 @font-face { font-family: "Nunito Sans"; src: url("../assets/fonts/nunito-sans-700.ttf") format("truetype"); font-display: swap; font-weight: 700; }
 @font-face { font-family: "Nunito Sans"; src: url("../assets/fonts/nunito-sans-800.ttf") format("truetype"); font-display: swap; font-weight: 800; }
 
@@ -888,4 +889,77 @@ tbody tr:hover { background: linear-gradient(90deg, rgba(91, 218, 223, 0.055), r
 
 @media (prefers-reduced-motion: reduce) {
   #content, #content.view-leaving, #content.view-entering { opacity: 1; transform: none; filter: none; animation: none; }
+}
+
+/* Stabilisation finale v0.5 */
+.passive-tier-group.passive-tier-group--rank-5 {
+  border: 1px solid rgba(102, 244, 236, 0.2);
+  border-left: 2px solid #66f4ec;
+  border-radius: 5px 14px 6px 12px;
+  clip-path: none;
+}
+
+.passive-tier-group .passive-skill--rank-5,
+.passive-tier-group .passive-skill--rank-5:nth-child(even) {
+  overflow: hidden;
+  border-radius: 4px 11px 5px 10px;
+  clip-path: none;
+}
+
+.passive-skill {
+  transform-origin: center;
+  transition: transform 170ms cubic-bezier(0.2, 0.75, 0.25, 1), border-color 170ms ease, box-shadow 170ms ease, filter 170ms ease;
+}
+
+.passive-skill:hover {
+  z-index: 1;
+  transform: translateY(-2px) scale(1.008);
+  border-color: color-mix(in srgb, currentColor 30%, rgba(143, 222, 228, 0.24));
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.19), inset 0 0 18px rgba(109, 228, 226, 0.035);
+}
+
+.passive-skill__header { position: relative; }
+.passive-skill__header::after {
+  position: absolute;
+  right: 0;
+  bottom: -6px;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, currentColor);
+  content: "";
+  opacity: 0;
+  transition: width 190ms ease, opacity 190ms ease;
+}
+
+.passive-skill:hover .passive-skill__header::after { width: 44%; opacity: 0.48; }
+.passive-skill__rarity { transform-origin: center; transition: transform 170ms ease, filter 170ms ease; }
+.passive-skill:hover .passive-skill__rarity { transform: scaleY(0.82); filter: brightness(1.18); }
+.passive-skill__rank-icon { transition: transform 190ms cubic-bezier(0.2, 0.75, 0.25, 1), filter 190ms ease; }
+.passive-skill:hover .passive-skill__rank-icon { transform: translateX(-2px) rotate(-4deg) scale(1.08); filter: brightness(1.15) drop-shadow(0 0 4px currentColor); }
+
+.site-nav button.active::after { animation: active-tab-breathe 4.8s ease-in-out infinite; }
+.job-picker button.selected::after { animation: selected-job-breathe 5.2s ease-in-out infinite; }
+
+.partner-card h3 {
+  font-family: "Nunito Sans", "Segoe UI", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.008em;
+}
+
+@keyframes active-tab-breathe {
+  0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 2px rgba(242, 138, 194, 0.18)); }
+  50% { opacity: 0.86; filter: drop-shadow(0 0 5px rgba(242, 138, 194, 0.4)); }
+}
+
+@keyframes selected-job-breathe {
+  0%, 100% { opacity: 0.68; filter: brightness(0.95); }
+  50% { opacity: 1; filter: brightness(1.12) drop-shadow(0 0 3px var(--job-color)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-nav button.active::after,
+  .job-picker button.selected::after { animation: none; }
+  .passive-skill:hover,
+  .passive-skill:hover .passive-skill__rarity,
+  .passive-skill:hover .passive-skill__rank-icon { transform: none; }
 }

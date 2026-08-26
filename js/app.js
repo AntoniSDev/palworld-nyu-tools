@@ -97,7 +97,7 @@ const jobs = [
     name: "Pharmacie",
     shortName: "Pharmacie",
     icon: `${iconRoot}08.webp`,
-    color: "#bb83ef",
+    color: "#b8d86a",
     unit: "Capacité de travail",
     note: "Production de médicaments et travail dans les cliniques.",
     values: speedA,
