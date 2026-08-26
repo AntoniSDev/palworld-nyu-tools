@@ -136,6 +136,7 @@ const jobs = [
 
 const picker = document.querySelector("#job-picker");
 const content = document.querySelector("#content");
+const brand = document.querySelector(".brand");
 const singleButton = document.querySelector("#single-view");
 const infoButton = document.querySelector("#info-view");
 const formatter = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2 });
@@ -171,7 +172,7 @@ function tableTemplate(job) {
             <h2>${job.name}</h2>
           </div>
         </div>
-        <p class="work-card__note">${job.note}</p>
+        <p class="work-card__note"><span>Rôle</span>${job.note}</p>
       </header>
       <div class="table-scroll">
         <table>
@@ -220,9 +221,9 @@ function render() {
         <h3>Condensation des Pals</h3>
         <p>La condensation renforce un Pal en utilisant d’autres Pals de la même espèce. Chaque palier ajoute une étoile et améliore une ou plusieurs de ses aptitudes de travail.</p>
         <div class="condensation-steps">
-          <div><strong>1★</strong><span>4 Pals</span><p>+1 à sa meilleure aptitude de travail.</p></div>
-          <div><strong>2★</strong><span>8 Pals</span><p>+1 à sa deuxième meilleure aptitude.</p></div>
-          <div><strong>3★</strong><span>12 Pals</span><p>+1 à sa troisième meilleure aptitude.</p></div>
+          <div><strong>1★</strong><span>4 Pals</span><p>+1 à son aptitude de travail prioritaire.</p></div>
+          <div><strong>2★</strong><span>8 Pals</span><p>+1 à sa deuxième aptitude de travail prioritaire.</p></div>
+          <div><strong>3★</strong><span>12 Pals</span><p>+1 à sa troisième aptitude de travail prioritaire.</p></div>
           <div><strong>4★</strong><span>24 Pals</span><p>+1 à toutes ses aptitudes de travail.</p></div>
         </div>
         <p class="info-card__note">Il faut donc 48 Pals au total pour atteindre 4★. Les quantités indiquées correspondent au coût de chaque palier.</p>
@@ -238,6 +239,11 @@ picker.addEventListener("click", (event) => {
   const button = event.target.closest("[data-job]");
   if (!button) return;
   selectedId = button.dataset.job;
+  showInfo = false;
+  render();
+});
+
+brand.addEventListener("click", () => {
   showInfo = false;
   render();
 });

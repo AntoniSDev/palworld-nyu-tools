@@ -255,10 +255,24 @@ h1 {
 .work-card__note {
   max-width: 430px;
   margin: 0;
-  color: var(--muted);
+  padding: 11px 14px;
+  border-left: 2px solid rgba(164, 248, 245, 0.45);
+  border-radius: 0 9px 9px 0;
+  background: rgba(5, 20, 25, 0.3);
+  color: #bfd0d6;
   font-size: 0.84rem;
   line-height: 1.55;
-  text-align: right;
+  text-align: left;
+}
+
+.work-card__note span {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--sand);
+  font-size: 0.64rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .table-scroll { overflow-x: auto; }
