@@ -137,8 +137,7 @@ const jobs = [
 const passiveSkills = {
   demonsHand: {
     name: "Main du Démon",
-    rarity: "world-tree",
-    source: "Arbre-Monde",
+    rarity: "rank-5",
     effects: [
       "Vitesse de travail +90 %",
       "Chute des points MEN accélérée +15 %",
@@ -187,8 +186,7 @@ const passiveSkills = {
   },
   worldTraverser: {
     name: "Traverse-Mondes",
-    rarity: "world-tree",
-    source: "Arbre-Monde",
+    rarity: "rank-5",
     effects: [
       "Vitesse de déplacement +50 %",
       "Chute du degré de satiété accélérée +15 %",
@@ -282,6 +280,7 @@ const brand = document.querySelector(".brand");
 const singleButton = document.querySelector("#single-view");
 const passiveButton = document.querySelector("#passive-view");
 const infoButton = document.querySelector("#info-view");
+const intro = document.querySelector(".intro");
 const pageEyebrow = document.querySelector("#page-eyebrow");
 const pageTitle = document.querySelector("#page-title");
 const pageCopy = document.querySelector("#page-copy");
@@ -356,14 +355,14 @@ function renderPicker() {
 
 function passiveSkillTemplate(skillId) {
   const skill = passiveSkills[skillId];
-  const source = skill.source ? `<span class="passive-skill__source">${skill.source}</span>` : "";
+  const rankIcon = skill.rarity === "rank-5" ? "" : `<span class="passive-skill__rank-icon" aria-hidden="true"></span>`;
 
   return `
     <article class="passive-skill passive-skill--${skill.rarity}">
       <header class="passive-skill__header">
         <span class="passive-skill__rarity" aria-hidden="true"></span>
         <h3>${skill.name}</h3>
-        ${source}
+        ${rankIcon}
       </header>
       <div class="passive-skill__effects">
         ${skill.effects.map((effect) => `<p>${effect}</p>`).join("")}
@@ -420,6 +419,8 @@ function passivePageTemplate() {
 }
 
 function updateIntro() {
+  intro.classList.toggle("hidden", currentView === "info");
+
   if (currentView === "passives") {
     pageEyebrow.textContent = "Aide à la Palbox";
     pageTitle.textContent = "Compétences passives";
@@ -443,18 +444,28 @@ function render() {
 
   if (currentView === "info") {
     content.innerHTML = `
-      <section class="info-card" aria-labelledby="info-title">
+      <section class="info-page" aria-labelledby="info-title">
         <p class="eyebrow">Mécaniques de Palworld</p>
         <h2 id="info-title">Infos utiles</h2>
-        <h3>Condensation des Pals</h3>
-        <p>La condensation renforce un Pal en utilisant d’autres Pals de la même espèce. Chaque palier ajoute une étoile et améliore une ou plusieurs de ses aptitudes de travail.</p>
-        <div class="condensation-steps">
-          <div><strong>1★</strong><span>4 Pals</span><p>+1 à son aptitude de travail prioritaire.</p></div>
-          <div><strong>2★</strong><span>8 Pals</span><p>+1 à sa deuxième aptitude de travail prioritaire.</p></div>
-          <div><strong>3★</strong><span>12 Pals</span><p>+1 à sa troisième aptitude de travail prioritaire.</p></div>
-          <div><strong>4★</strong><span>24 Pals</span><p>+1 à toutes ses aptitudes de travail.</p></div>
-        </div>
-        <p class="info-card__note">Il faut donc 48 Pals au total pour atteindre 4★. Les quantités indiquées correspondent au coût de chaque palier.</p>
+        <nav class="info-tabs" aria-label="Sujets des infos utiles">
+          <button class="active" type="button" aria-current="page">Condensation des Pals</button>
+        </nav>
+        <article class="info-card" aria-labelledby="condensation-title">
+          <header class="info-card__header">
+            <img src="assets/structures/pal-essence-condenser.jpg" alt="Condensateur d’essence de Pal" />
+            <div>
+              <h3 id="condensation-title">Condensation des Pals</h3>
+              <p>La condensation renforce un Pal en utilisant d’autres Pals de la même espèce. Chaque palier ajoute une étoile et améliore une ou plusieurs de ses aptitudes de travail.</p>
+            </div>
+          </header>
+          <div class="condensation-steps">
+            <div><strong>1★</strong><span>4 Pals</span><p>+1 à son aptitude de travail prioritaire.</p></div>
+            <div><strong>2★</strong><span>8 Pals</span><p>+1 à sa deuxième aptitude de travail prioritaire.</p></div>
+            <div><strong>3★</strong><span>12 Pals</span><p>+1 à sa troisième aptitude de travail prioritaire.</p></div>
+            <div><strong>4★</strong><span>24 Pals</span><p>+1 à toutes ses aptitudes de travail.</p></div>
+          </div>
+          <p class="info-card__note">Il faut donc 48 Pals au total pour atteindre 4★. Les quantités indiquées correspondent au coût de chaque palier.</p>
+        </article>
       </section>`;
     return;
   }
@@ -483,9 +494,11 @@ content.addEventListener("click", (event) => {
   render();
 });
 
-brand.addEventListener("click", () => {
+brand.addEventListener("click", (event) => {
+  event.preventDefault();
   currentView = "jobs";
   render();
+  window.scrollTo(0, 0);
 });
 
 singleButton.addEventListener("click", () => {

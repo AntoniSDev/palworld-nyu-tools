@@ -322,6 +322,25 @@ tbody tr:last-child td { border-bottom: 0; }
 .value-cell { color: white; font-weight: 760; }
 .ratio-cell { color: var(--sand); font-weight: 720; }
 
+.info-page > h2 { margin: 0 0 18px; font-size: clamp(1.8rem, 4vw, 2.6rem); }
+
+.info-tabs {
+  display: flex;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.info-tabs button {
+  padding: 9px 12px;
+  border: 0;
+  border-bottom: 2px solid var(--cyan-bright);
+  background: transparent;
+  color: var(--cyan-bright);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
 .info-card {
   padding: clamp(24px, 4vw, 40px);
   border: 1px solid rgba(143, 222, 228, 0.17);
@@ -330,9 +349,24 @@ tbody tr:last-child td { border-bottom: 0; }
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
 }
 
-.info-card h2 { margin: 0 0 28px; font-size: clamp(1.8rem, 4vw, 2.6rem); }
 .info-card h3 { margin: 0 0 8px; color: var(--cyan-bright); font-size: 1.15rem; }
-.info-card > p:not(.eyebrow) { max-width: 760px; color: var(--muted); line-height: 1.6; }
+.info-card p { color: var(--muted); line-height: 1.6; }
+
+.info-card__header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.info-card__header img {
+  width: 88px;
+  height: 88px;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  object-fit: cover;
+}
+
+.info-card__header p { max-width: 760px; margin: 0; }
 
 .condensation-steps {
   display: grid;
@@ -424,15 +458,13 @@ tbody tr:last-child td { border-bottom: 0; }
   line-height: 1.2;
 }
 
-.passive-skill__source {
-  padding: 3px 7px;
-  border: 1px solid rgba(137, 243, 241, 0.32);
-  border-radius: 999px;
-  color: var(--cyan-bright);
-  font-size: 0.6rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.passive-skill__rank-icon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  background: #71d58b;
+  -webkit-mask: url("../assets/passive-ranks/1.webp") center / contain no-repeat;
+  mask: url("../assets/passive-ranks/1.webp") center / contain no-repeat;
 }
 
 .passive-skill__effects { margin: 10px 0 0 14px; }
@@ -450,29 +482,28 @@ tbody tr:last-child td { border-bottom: 0; }
   line-height: 1.4;
 }
 
-.passive-skill--world-tree {
-  border-color: rgba(110, 226, 228, 0.3);
-  background: linear-gradient(135deg, rgba(62, 189, 195, 0.11), rgba(101, 82, 177, 0.08));
-}
+.passive-skill--rank-1 .passive-skill__rarity,
+.passive-skill--rank-1 .passive-skill__rank-icon { background: #71d58b; }
+.passive-skill--rank-1 h3 { color: #8be0a0; }
 
-.passive-skill--world-tree .passive-skill__rarity {
-  background: linear-gradient(#8cfff1, #74b9ff, #c99cff);
-  box-shadow: 0 0 10px rgba(116, 211, 255, 0.3);
+.passive-skill--rank-3 .passive-skill__rarity,
+.passive-skill--rank-3 .passive-skill__rank-icon { background: #fadc59; }
+.passive-skill--rank-3 .passive-skill__rank-icon {
+  -webkit-mask-image: url("../assets/passive-ranks/3.webp");
+  mask-image: url("../assets/passive-ranks/3.webp");
 }
+.passive-skill--rank-3 h3 { color: #fadc59; }
 
-.passive-skill--world-tree h3 { color: #aefbf4; }
-.passive-skill--rank-4 .passive-skill__rarity {
-  background: linear-gradient(#8ff5ff, #d4a7ff, #ffd177);
+.passive-skill--rank-4 .passive-skill__rarity { background: #26e0eb; }
+.passive-skill--rank-4 .passive-skill__rank-icon {
+  background: linear-gradient(#62fff1 15%, #69e6ff 58%, #b691ff 59%);
+  -webkit-mask-image: url("../assets/passive-ranks/4.webp");
+  mask-image: url("../assets/passive-ranks/4.webp");
 }
+.passive-skill--rank-4 h3 { color: #62f0dd; }
 
-.passive-skill--rank-4 h3 {
-  background: linear-gradient(90deg, #adf7ff, #dcb8ff 48%, #f3ce7f);
-  background-clip: text;
-  color: transparent;
-}
-
-.passive-skill--rank-3 .passive-skill__rarity { background: #e9c780; }
-.passive-skill--rank-3 h3 { color: #f1d69d; }
+.passive-skill--rank-5 .passive-skill__rarity { background: #f2f7f8; }
+.passive-skill--rank-5 h3 { color: #f2f7f8; }
 
 footer {
   padding: 24px 4px 0;
@@ -496,6 +527,8 @@ footer {
   .intro { align-items: stretch; flex-direction: column; gap: 20px; }
   .intro__copy { max-width: 31ch; line-height: 1.5; }
   .condensation-steps { grid-template-columns: 1fr; }
+  .info-card__header { align-items: flex-start; }
+  .info-card__header img { width: 72px; height: 72px; }
   .job-picker {
     display: flex;
     margin-inline: -12px;
