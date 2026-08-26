@@ -724,9 +724,9 @@ function condensationWorkGridTemplate(pal, stars) {
 
       return `
         <div class="condensation-work${ownsWork ? "" : " condensation-work--absent"}${stateClass}" style="--job-color:${job.color}" title="${escapeHtml(job.name)}" aria-label="${escapeHtml(job.name)} : ${ownsWork ? `niveau ${levels[index]}` : "aptitude absente"}">
+          ${ownsWork && (improvedNow || improvedBefore) ? '<span class="condensation-work__caret" aria-hidden="true">⌃</span>' : ""}
           <img src="${job.icon}" alt="" />
           <span class="condensation-work__level" aria-label="${ownsWork ? `Niveau ${levels[index]}` : "Aptitude absente"}">
-            ${ownsWork && (improvedNow || improvedBefore) ? '<span class="condensation-work__caret" aria-hidden="true">⌃</span>' : ""}
             ${ownsWork ? `<strong>${levels[index]}</strong>` : ""}
           </span>
         </div>`;

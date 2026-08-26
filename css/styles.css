@@ -1431,9 +1431,11 @@ body {
 .condensation-work__level strong { color: #eef8f7; font-size: 1.05rem; line-height: 1; }
 .condensation-work__caret {
   position: absolute;
-  bottom: 13px;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%);
   color: #50eaf0;
-  font-size: 0.9rem;
+  font-size: 1.05rem;
   font-weight: 900;
   line-height: 1;
 }
