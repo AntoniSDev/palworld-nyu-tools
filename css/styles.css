@@ -812,6 +812,153 @@ tbody tr:hover { background: linear-gradient(90deg, rgba(91, 218, 223, 0.055), r
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 
+/* Correction finale v0.5 — contours nets et dominante azur */
+body {
+  background:
+    radial-gradient(ellipse at 12% -8%, rgba(67, 205, 238, 0.22), transparent 36rem),
+    radial-gradient(ellipse at 94% 10%, rgba(66, 151, 226, 0.14), transparent 34rem),
+    radial-gradient(ellipse at 72% 86%, rgba(93, 225, 224, 0.08), transparent 32rem),
+    radial-gradient(ellipse at 98% 72%, rgba(165, 112, 222, 0.045), transparent 24rem),
+    linear-gradient(155deg, #071b28 0%, #06131d 48%, #07111b 100%);
+}
+
+.topbar { background: linear-gradient(100deg, rgba(5, 23, 34, 0.96), rgba(8, 28, 45, 0.94)); }
+.site-nav { background: rgba(5, 20, 31, 0.94); }
+.site-nav button.active { background: linear-gradient(180deg, rgba(74, 199, 230, 0.16), rgba(42, 112, 175, 0.11)); }
+
+.job-picker button.selected {
+  background: radial-gradient(circle at 20% 50%, color-mix(in srgb, var(--job-color) 23%, transparent), transparent 60%), linear-gradient(115deg, rgba(13, 51, 66, 0.97), rgba(12, 38, 65, 0.94));
+}
+
+.work-card,
+.info-card,
+.passive-results,
+.partner-results {
+  border-radius: 14px;
+  clip-path: none;
+  background: radial-gradient(circle at 90% -20%, rgba(77, 170, 228, 0.1), transparent 20rem), linear-gradient(145deg, rgba(12, 46, 59, 0.96), rgba(8, 26, 40, 0.97) 68%, rgba(8, 22, 35, 0.96));
+}
+
+.work-card { border-radius: 14px 14px 8px 14px; }
+.passive-results { border-radius: 14px 8px 14px 14px; }
+.info-card { border-radius: 16px 8px 16px 12px; }
+.partner-results { border-radius: 12px 16px 10px 16px; }
+.construction-page { border-radius: 18px 10px 18px 12px; clip-path: none; background: radial-gradient(circle at 22% 50%, rgba(236, 108, 178, 0.12), transparent 20rem), radial-gradient(circle at 88% 18%, rgba(77, 205, 235, 0.15), transparent 19rem), linear-gradient(135deg, rgba(10, 48, 65, 0.97), rgba(12, 34, 58, 0.97) 72%, rgba(8, 24, 37, 0.98)); }
+
+.job-picker button,
+.passive-tier-group,
+.passive-tier-group:nth-child(even),
+.passive-skill,
+.passive-tier-group .passive-skill:nth-child(even),
+.passive-tier-group .passive-skill--rank-5,
+.passive-tier-group .passive-skill--rank-5:nth-child(even),
+.condensation-steps div,
+.condensation-steps div:nth-child(even),
+.partner-card,
+.partner-card:nth-child(even) {
+  clip-path: none;
+}
+
+.job-picker button { border-radius: 9px; }
+.passive-tier-group { border-radius: 8px; }
+.passive-skill { border-radius: 7px; }
+.passive-tier-group .passive-skill--rank-5,
+.passive-tier-group .passive-skill--rank-5:nth-child(even) { border-radius: 7px; }
+.condensation-steps div,
+.condensation-steps div:nth-child(even) { border-radius: 9px; }
+.partner-card,
+.partner-card:nth-child(even) { border-radius: 9px; }
+
+.brand__mark,
+.brand__version,
+.eyebrow::before,
+.work-card__icon,
+.level-badge,
+.info-card__header img,
+.construction-page__visual { clip-path: none; }
+
+.brand__mark { border-radius: 9px 4px 9px 4px; }
+.brand__version { border-radius: 5px; }
+.work-card__icon { border-radius: 11px 5px 11px 5px; }
+.level-badge { border-radius: 6px; }
+.info-card__header img { border-radius: 11px; }
+.construction-page__visual { border-radius: 12px; }
+
+.work-card::before,
+.info-card::before,
+.passive-results::before,
+.partner-results::before,
+.construction-page::before {
+  left: 18px;
+  width: 104px;
+  border-radius: 2px;
+  transform: none;
+  background: linear-gradient(90deg, #59e7ee, #65aee9, transparent);
+}
+
+.work-card::after,
+.info-card::after,
+.passive-results::after,
+.partner-results::after { width: 2px; height: 34px; background: linear-gradient(transparent, rgba(93, 214, 236, 0.7)); }
+
+.partner-card::before,
+.condensation-steps div::after { border-radius: 2px; transform: none; }
+
+.passive-skill,
+.passive-skill:hover {
+  transform: none;
+  filter: none;
+}
+
+.passive-skill:hover {
+  border-color: rgba(121, 224, 234, 0.32);
+  background-color: rgba(18, 50, 61, 0.22);
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.16), inset 0 0 18px rgba(95, 206, 226, 0.045);
+}
+
+.passive-skill::before,
+.passive-skill--rank-5::before {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 14px;
+  right: auto;
+  width: 34px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #65e9ec, #6aa7e8);
+  content: "";
+  opacity: 0.5;
+  filter: none;
+  transition: width 180ms ease, transform 180ms ease, opacity 180ms ease, box-shadow 180ms ease;
+}
+
+.passive-skill--rank-5::before { background: linear-gradient(90deg, #69fff4, #a990ef); opacity: 0.82; box-shadow: 0 0 5px rgba(102, 247, 238, 0.3); }
+.passive-skill:hover::before { width: 48px; transform: translateX(7px); opacity: 0.9; box-shadow: 0 0 6px rgba(101, 233, 236, 0.34); }
+.passive-skill__header::after { display: none; }
+.passive-skill:hover .passive-skill__rarity,
+.passive-skill:hover .passive-skill__rank-icon { transform: none; }
+.passive-skill:hover .passive-skill__rarity { filter: brightness(1.08); }
+.passive-skill:hover .passive-skill__rank-icon { filter: brightness(1.1) drop-shadow(0 0 3px currentColor); }
+
+.site-nav button.active::after { animation-duration: 3.5s; }
+.job-picker button.selected::after { animation-duration: 3.8s; }
+
+@keyframes active-tab-breathe {
+  0%, 100% { opacity: 0.42; filter: drop-shadow(0 0 2px rgba(242, 138, 194, 0.18)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 7px rgba(242, 138, 194, 0.52)); }
+}
+
+@keyframes selected-job-breathe {
+  0%, 100% { opacity: 0.5; filter: brightness(0.92); }
+  50% { opacity: 1; filter: brightness(1.2) drop-shadow(0 0 5px var(--job-color)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .passive-skill::before { transition: none; }
+  .passive-skill:hover::before { width: 48px; transform: none; }
+}
+
 /* Finition v0.5 — organicité, lisibilité et transitions */
 .intro { margin-bottom: 24px; }
 .intro .eyebrow { margin-bottom: 0; color: #f3d79b; font-size: 0.82rem; }
@@ -963,3 +1110,70 @@ tbody tr:hover { background: linear-gradient(90deg, rgba(91, 218, 223, 0.055), r
   .passive-skill:hover .passive-skill__rarity,
   .passive-skill:hover .passive-skill__rank-icon { transform: none; }
 }
+
+/* Priorité finale des micro-interactions stabilisées */
+.passive-skill,
+.passive-skill:hover { transform: none; filter: none; }
+.passive-skill:hover { border-color: rgba(121, 224, 234, 0.32); background-color: rgba(18, 50, 61, 0.22); box-shadow: 0 7px 18px rgba(0, 0, 0, 0.16), inset 0 0 18px rgba(95, 206, 226, 0.045); }
+.passive-skill__header::after { display: none; }
+.passive-skill:hover .passive-skill__rarity,
+.passive-skill:hover .passive-skill__rank-icon { transform: none; }
+.passive-skill:hover .passive-skill__rarity { filter: brightness(1.08); }
+.passive-skill:hover .passive-skill__rank-icon { filter: brightness(1.1) drop-shadow(0 0 3px currentColor); }
+.site-nav button.active::after { animation-duration: 3.5s; }
+.job-picker button.selected::after { animation-duration: 3.8s; }
+
+@keyframes active-tab-breathe {
+  0%, 100% { opacity: 0.42; filter: drop-shadow(0 0 2px rgba(242, 138, 194, 0.18)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 7px rgba(242, 138, 194, 0.52)); }
+}
+
+@keyframes selected-job-breathe {
+  0%, 100% { opacity: 0.5; filter: brightness(0.92); }
+  50% { opacity: 1; filter: brightness(1.2) drop-shadow(0 0 5px var(--job-color)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-nav button.active::after,
+  .job-picker button.selected::after { animation: none; }
+  .passive-skill::before { transition: none; }
+  .passive-skill:hover::before { width: 48px; transform: none; }
+}
+
+/* Les contours finaux restent simples : aucune découpe sur les cartes. */
+.work-card,
+.info-card,
+.passive-results,
+.partner-results,
+.construction-page,
+.job-picker button,
+.passive-tier-group,
+.passive-tier-group:nth-child(even),
+.passive-skill,
+.passive-tier-group .passive-skill:nth-child(even),
+.passive-tier-group .passive-skill--rank-5,
+.passive-tier-group .passive-skill--rank-5:nth-child(even),
+.condensation-steps div,
+.condensation-steps div:nth-child(even),
+.partner-card,
+.partner-card:nth-child(even) { clip-path: none; }
+
+.work-card { border-radius: 14px 14px 8px 14px; }
+.passive-results { border-radius: 14px 8px 14px 14px; }
+.info-card { border-radius: 16px 8px 16px 12px; }
+.partner-results { border-radius: 12px 16px 10px 16px; }
+.construction-page { border-radius: 18px 10px 18px 12px; }
+.job-picker button,
+.condensation-steps div,
+.partner-card { border-radius: 9px; }
+.passive-tier-group { border-radius: 8px; }
+.passive-skill,
+.passive-tier-group .passive-skill--rank-5 { border-radius: 7px; }
+
+.work-card::before,
+.info-card::before,
+.passive-results::before,
+.partner-results::before,
+.construction-page::before,
+.partner-card::before,
+.condensation-steps div::after { border-radius: 2px; transform: none; }
