@@ -499,13 +499,13 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 .passive-skill--rank-4 h3 { color: #62f0dd; }
 
-.passive-skill--rank-5 .passive-skill__rarity { background: #26e0eb; }
+.passive-skill--rank-5 .passive-skill__rarity { background: #82fff2; }
 .passive-skill--rank-5 .passive-skill__rank-icon {
   background: linear-gradient(#62fff1 15%, #69e6ff 58%, #b691ff 59%);
   -webkit-mask-image: url("../assets/passive-ranks/5.webp");
   mask-image: url("../assets/passive-ranks/5.webp");
 }
-.passive-skill--rank-5 h3 { color: #62f0dd; }
+.passive-skill--rank-5 h3 { color: #b0fff7; }
 
 footer {
   padding: 24px 4px 0;
