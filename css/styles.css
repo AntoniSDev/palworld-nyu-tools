@@ -733,10 +733,11 @@ body::before {
   position: fixed;
   z-index: -1;
   inset: 0;
-  opacity: 0.23;
-  background-image: linear-gradient(rgba(117, 232, 232, 0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(117, 232, 232, 0.035) 1px, transparent 1px);
-  background-size: 52px 52px;
-  mask-image: linear-gradient(to bottom, black, transparent 72%);
+  opacity: 0.72;
+  background:
+    radial-gradient(ellipse at 34% 30%, rgba(65, 205, 215, 0.075), transparent 30rem),
+    radial-gradient(ellipse at 82% 58%, rgba(37, 137, 181, 0.08), transparent 34rem),
+    radial-gradient(ellipse at 20% 90%, rgba(51, 176, 166, 0.055), transparent 28rem);
   pointer-events: none;
   content: "";
 }
@@ -815,11 +816,12 @@ tbody tr:hover { background: linear-gradient(90deg, rgba(91, 218, 223, 0.055), r
 /* Correction finale v0.5 — contours nets et dominante azur */
 body {
   background:
-    radial-gradient(ellipse at 12% -8%, rgba(67, 205, 238, 0.22), transparent 36rem),
-    radial-gradient(ellipse at 94% 10%, rgba(66, 151, 226, 0.14), transparent 34rem),
-    radial-gradient(ellipse at 72% 86%, rgba(93, 225, 224, 0.08), transparent 32rem),
-    radial-gradient(ellipse at 98% 72%, rgba(165, 112, 222, 0.045), transparent 24rem),
-    linear-gradient(155deg, #071b28 0%, #06131d 48%, #07111b 100%);
+    radial-gradient(ellipse at 10% -6%, rgba(73, 218, 232, 0.27), transparent 38rem),
+    radial-gradient(ellipse at 94% 12%, rgba(54, 155, 211, 0.2), transparent 36rem),
+    radial-gradient(ellipse at 70% 82%, rgba(64, 202, 194, 0.12), transparent 36rem),
+    radial-gradient(ellipse at 2% 66%, rgba(35, 119, 153, 0.1), transparent 30rem),
+    radial-gradient(ellipse at 100% 76%, rgba(157, 105, 210, 0.035), transparent 25rem),
+    linear-gradient(155deg, #092634 0%, #071d2a 48%, #081824 100%);
 }
 
 .topbar { background: linear-gradient(100deg, rgba(5, 23, 34, 0.96), rgba(8, 28, 45, 0.94)); }
