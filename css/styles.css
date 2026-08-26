@@ -106,31 +106,38 @@ h1 {
   font-size: 1rem;
 }
 
-.view-actions {
-  display: flex;
-  padding: 4px;
-  border: 1px solid var(--line);
-  border-radius: 13px;
-  background: rgba(8, 26, 32, 0.76);
+.site-nav {
+  position: sticky;
+  top: 66px;
+  z-index: 19;
+  border-bottom: 1px solid var(--line);
+  background: rgba(7, 20, 25, 0.94);
+  backdrop-filter: blur(16px);
 }
 
-.view-actions button {
-  min-height: 39px;
-  padding: 0 14px;
+.site-nav__inner {
+  display: flex;
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.site-nav button {
+  min-height: 48px;
+  padding: 0 20px;
   border: 0;
-  border-radius: 9px;
+  border-bottom: 3px solid transparent;
   background: transparent;
   color: var(--muted);
   cursor: pointer;
-  font-size: 0.82rem;
-  font-weight: 750;
+  font-size: 0.88rem;
+  font-weight: 800;
 }
 
-.view-actions button:hover { color: var(--ink); }
-.view-actions button.active {
-  background: #173e48;
+.site-nav button:hover { color: var(--ink); }
+.site-nav button.active {
+  border-bottom-color: var(--cyan-bright);
+  background: rgba(55, 164, 172, 0.1);
   color: var(--cyan-bright);
-  box-shadow: inset 0 0 0 1px rgba(112, 233, 233, 0.18);
 }
 
 .job-picker {
@@ -297,12 +304,6 @@ tbody tr:last-child td { border-bottom: 0; }
 .value-cell { color: white; font-weight: 760; }
 .ratio-cell { color: var(--sand); font-weight: 720; }
 
-.all-tables {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
 .info-card {
   padding: clamp(24px, 4vw, 40px);
   border: 1px solid rgba(143, 222, 228, 0.17);
@@ -334,15 +335,6 @@ tbody tr:last-child td { border-bottom: 0; }
 .condensation-steps p { margin: 12px 0 0; color: var(--muted); font-size: 0.84rem; line-height: 1.45; }
 .info-card .info-card__note { margin-bottom: 0; font-size: 0.82rem; }
 
-.work-card--compact .work-card__header { padding: 14px 16px; }
-.work-card--compact .work-card__icon { width: 43px; height: 43px; border-radius: 12px; }
-.work-card--compact .work-card__icon img { width: 36px; height: 36px; }
-.work-card--compact .work-card__identity h2 { font-size: 1.05rem; }
-.work-card--compact .work-card__identity p { display: none; }
-.work-card--compact th,
-.work-card--compact td { padding: 7px 16px; }
-.work-card--compact .level-badge { width: 25px; height: 22px; }
-
 footer {
   padding: 24px 4px 0;
   color: #68828b;
@@ -352,18 +344,18 @@ footer {
 
 @media (max-width: 900px) {
   .job-picker { grid-template-columns: repeat(4, 1fr); }
-  .all-tables { grid-template-columns: 1fr; }
   .condensation-steps { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 650px) {
   .topbar { min-height: 58px; padding: 0 16px; }
+  .site-nav { top: 58px; }
+  .site-nav__inner { width: 100%; }
+  .site-nav button { flex: 1; padding-inline: 12px; }
   .version { display: none; }
   .page-shell { width: min(100% - 24px, 1180px); padding-top: 30px; }
   .intro { align-items: stretch; flex-direction: column; gap: 20px; }
   .intro__copy { max-width: 31ch; line-height: 1.5; }
-  .view-actions { width: 100%; }
-  .view-actions button { flex: 1; padding-inline: 8px; }
   .condensation-steps { grid-template-columns: 1fr; }
   .job-picker {
     display: flex;
@@ -386,39 +378,4 @@ footer {
   .work-card__note { max-width: none; text-align: left; }
   th, td { padding: 10px 14px; }
   th { font-size: 0.61rem; }
-}
-
-@media print {
-  @page { size: A4 portrait; margin: 7mm; }
-  body { background: white; color: #102027; }
-  .topbar, .intro, .job-picker, footer { display: none !important; }
-  .page-shell { width: 100%; padding: 0; }
-  .all-tables { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4mm; }
-  .work-card {
-    break-inside: avoid;
-    border: 1px solid #b9c8cc;
-    border-radius: 3mm;
-    background: white;
-    box-shadow: none;
-  }
-  .work-card__header { padding: 2mm 3mm; border-color: #d7e0e2; }
-  .work-card__icon { width: 9mm; height: 9mm; background: #edf4f5; }
-  .work-card__icon img { width: 8mm; height: 8mm; }
-  .work-card__identity h2 { color: #102027; font-size: 9pt; }
-  th, td {
-    padding: 1mm 3mm !important;
-    border-color: #e2e8ea;
-    font-size: 6.5pt;
-  }
-  th { background: #edf3f4; color: #465b63; }
-  .level-badge {
-    width: 5mm;
-    height: 4mm;
-    border: 0;
-    background: #dceced;
-    color: #163d46;
-    font-size: 6pt;
-  }
-  .value-cell { color: #102027; }
-  .ratio-cell { color: #75531d; }
 }

@@ -137,16 +137,13 @@ const jobs = [
 const picker = document.querySelector("#job-picker");
 const content = document.querySelector("#content");
 const singleButton = document.querySelector("#single-view");
-const allButton = document.querySelector("#all-view");
 const infoButton = document.querySelector("#info-view");
-const printButton = document.querySelector("#print-view");
 const formatter = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2 });
 
 let selectedId = jobs[0].id;
-let showAll = false;
 let showInfo = false;
 
-function tableTemplate(job, compact = false) {
+function tableTemplate(job) {
   const rows = job.values
     .map((value, index) => {
       const comparison = job.extra
@@ -163,7 +160,7 @@ function tableTemplate(job, compact = false) {
     .join("");
 
   return `
-    <article class="work-card ${compact ? "work-card--compact" : ""}">
+    <article class="work-card">
       <header class="work-card__header">
         <div class="work-card__identity">
           <span class="work-card__icon" style="--job-color:${job.color}">
@@ -174,7 +171,7 @@ function tableTemplate(job, compact = false) {
             <h2>${job.name}</h2>
           </div>
         </div>
-        ${compact ? "" : `<p class="work-card__note">${job.note}</p>`}
+        <p class="work-card__note">${job.note}</p>
       </header>
       <div class="table-scroll">
         <table>
@@ -198,8 +195,8 @@ function renderPicker() {
         <button
           type="button"
           data-job="${job.id}"
-          class="${selectedId === job.id && !showAll ? "selected" : ""}"
-          aria-pressed="${selectedId === job.id && !showAll}"
+          class="${selectedId === job.id && !showInfo ? "selected" : ""}"
+          aria-pressed="${selectedId === job.id && !showInfo}"
           style="--job-color:${job.color}"
         >
           <img src="${job.icon}" alt="" />
@@ -211,10 +208,8 @@ function renderPicker() {
 
 function render() {
   renderPicker();
-  singleButton.classList.toggle("active", !showAll && !showInfo);
-  allButton.classList.toggle("active", showAll);
+  singleButton.classList.toggle("active", !showInfo);
   infoButton.classList.toggle("active", showInfo);
-  printButton.classList.toggle("hidden", !showAll);
   picker.classList.toggle("hidden", showInfo);
 
   if (showInfo) {
@@ -235,13 +230,6 @@ function render() {
     return;
   }
 
-  if (showAll) {
-    content.innerHTML = `<section class="all-tables" aria-label="Toutes les aptitudes">
-      ${jobs.map((job) => tableTemplate(job, true)).join("")}
-    </section>`;
-    return;
-  }
-
   const selectedJob = jobs.find((job) => job.id === selectedId) || jobs[0];
   content.innerHTML = `<section class="single-table">${tableTemplate(selectedJob)}</section>`;
 }
@@ -250,29 +238,18 @@ picker.addEventListener("click", (event) => {
   const button = event.target.closest("[data-job]");
   if (!button) return;
   selectedId = button.dataset.job;
-  showAll = false;
   showInfo = false;
   render();
 });
 
 singleButton.addEventListener("click", () => {
-  showAll = false;
-  showInfo = false;
-  render();
-});
-
-allButton.addEventListener("click", () => {
-  showAll = true;
   showInfo = false;
   render();
 });
 
 infoButton.addEventListener("click", () => {
-  showAll = false;
   showInfo = true;
   render();
 });
-
-printButton.addEventListener("click", () => window.print());
 
 render();
