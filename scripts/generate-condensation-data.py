@@ -123,6 +123,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--helper-root", type=Path, required=True)
     parser.add_argument("--editor-root", type=Path, required=True)
     parser.add_argument("--project-root", type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument("--partner-source", type=Path)
     return parser.parse_args()
 
 
@@ -139,6 +140,9 @@ def main() -> None:
     )
     helper = json.loads(helper_file.read_text(encoding="utf-8"))
     editor = json.loads(editor_file.read_text(encoding="utf-8"))
+    partner_file = args.partner_source or args.project_root / "data" / "partner-skills-fr.json"
+    partner_source = json.loads(partner_file.read_text(encoding="utf-8"))
+    partner_skills = partner_source["skills"]
     pals = helper["pals"]
 
     if helper["meta"].get("game_version", "").split()[0] != "1.0":
@@ -158,6 +162,8 @@ def main() -> None:
         if code not in editor:
             raise KeyError(f"Missing editor entry for {code}")
         editor_pal = editor[code]
+        if code not in partner_skills:
+            raise KeyError(f"Missing partner skill entry for {code}")
         base = {
             internal: int(pal.get("works", {}).get(helper_name, 0))
             for helper_name, internal in WORK_TYPES
@@ -196,6 +202,7 @@ def main() -> None:
                 "elements": [ELEMENTS_FR[element] for element in pal.get("elements", [])],
                 "portrait": f"assets/pals/condensation/{icon_name}",
                 "levels": levels,
+                "partner": partner_skills[code],
                 "crossover": bool(pal.get("crossover")),
             }
         )
@@ -222,6 +229,8 @@ def main() -> None:
         "gameVersion": helper["meta"]["game_version"],
         "palCount": len(output),
         "terrariaCount": sum(1 for pal in output if pal["crossover"]),
+        "partnerSkillCount": sum(1 for pal in output if pal["partner"]["name"]),
+        "partnerScaledCount": sum(1 for pal in output if pal["partner"]["effects"]),
         "excluded": helper["meta"].get("excluded"),
         "palpediaAlgorithmDifferences": len(palpedia_differences),
     }

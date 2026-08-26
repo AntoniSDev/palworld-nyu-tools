@@ -32,10 +32,16 @@ def main() -> None:
     assert len({pal["id"] for pal in pals}) == len(pals), "Duplicate stable IDs"
     assert len({pal["portrait"] for pal in pals}) == len(pals), "Duplicate portraits"
     assert sum(bool(pal["crossover"]) for pal in pals) == 11
+    assert meta["partnerSkillCount"] == len(pals)
     assert "Astralym" in meta["excluded"]
 
     for pal in pals:
         assert len(pal["levels"]) == 5
+        assert pal["partner"]["name"]
+        assert pal["partner"]["description"]
+        for effect in pal["partner"]["effects"]:
+            assert effect["label"]
+            assert len(effect["values"]) == 5
         assert all(len(levels) == 12 for levels in pal["levels"])
         assert (PROJECT_ROOT / pal["portrait"]).is_file(), pal["portrait"]
         base = pal["levels"][0]
@@ -80,6 +86,19 @@ def main() -> None:
     terraria = by_code["YakushimaBoss001"]
     assert terraria["crossover"] and terraria["number"] is None
     assert [row[10] for row in terraria["levels"]] == [4, 5, 6, 7, 8]
+
+    # Partner-skill structures requested for the UI.
+    assert by_code["PinkCat"]["partner"]["effects"][0]["values"] == [
+        "+100", "+120", "+140", "+160", "+200"
+    ]
+    assert len(by_code["WingGolem"]["partner"]["effects"]) == 2
+    assert by_code["FireKirin"]["partner"]["effects"][0]["values"] == [
+        "+5%", "+7%", "+10%", "+14%", "+20%"
+    ]
+    assert by_code["LongCat"]["partner"]["effects"] == []
+    assert by_code["ThunderFluffyBird"]["partner"]["effects"][0]["values"] == [
+        "+20%", "+22%", "+26%", "+32%", "+40%"
+    ]
 
     assert len(list(PORTRAIT_ROOT.glob("*.webp"))) == len(pals)
     print(

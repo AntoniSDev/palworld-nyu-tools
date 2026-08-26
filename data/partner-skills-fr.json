@@ -1,0 +1,4468 @@
+{
+  "meta": {
+    "localizationSource": "paldb.cc/fr/Partner_Skill, retrieved 2026-08-26",
+    "scaleSource": "palworld-db.com/partner-skills, retrieved 2026-08-26"
+  },
+  "skills": {
+    "Alpaca": {
+      "name": "Paca-Laine",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, augmente la défense et la vitesse de déplacement de Kingpaca. À affecter à une Ferme pour une chance d'obtenir de la Laine.",
+      "effects": []
+    },
+    "AmaterasuWolf": {
+      "name": "Loup Solaire",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, réduit de (15~30)% les dégâts de type Glace subis par le joueur et les Pals, et immunise contre l'effet Gel. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Résistance aux dégâts de Glace",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        },
+        {
+          "label": "Résistance à l’effet Freeze",
+          "values": [
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%"
+          ]
+        },
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+12%",
+            "+15%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "AmaterasuWolf_Dark": {
+      "name": "Loup Morose",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, réduit de (15~30)% les dégâts de type Ténèbres subis par le joueur et les Pals, et immunise contre l'état Cécité. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Résistance aux dégâts de Ténèbres",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        },
+        {
+          "label": "Résistance à l’effet Darkness",
+          "values": [
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%"
+          ]
+        },
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+12%",
+            "+15%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "Anubis": {
+      "name": "Gardien du Désert",
+      "description": "Lorsqu'activé, Anubis transfère son pouvoir au joueur, convertissant ses attaques en Terre et augmentant son attaque de (30~50) %. En combat, esquive parfois les attaques grâce à des pas rapides.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+30%",
+            "+35%",
+            "+40%",
+            "+45%",
+            "+50%"
+          ]
+        }
+      ]
+    },
+    "BadCatgirl": {
+      "name": "Furie Féline",
+      "description": "Lorsqu'activée, Nyafia mitraille temporairement les ennemis proches avec un fusil à pompe. Lorsqu'il est dans l'équipe, augmente les dégâts des fusils à pompe utilisés par le joueur de (10~35)%. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Dégâts de l’arme équipée",
+          "values": [
+            "+10%",
+            "+15%",
+            "+20%",
+            "+25%",
+            "+35%"
+          ]
+        }
+      ]
+    },
+    "Baphomet": {
+      "name": "Chasseur aux Griffes Ardentes",
+      "description": "Lorsqu'activée, attaque l'ennemi ciblé avec Griffe Infernale. La puissance de Griffe Infernale utilisée par ce Pal est multipliée par (1.1~2.5).",
+      "effects": []
+    },
+    "Baphomet_Dark": {
+      "name": "Chasseur aux Griffes Noires",
+      "description": "Lorsqu'activée, attaque l'ennemi ciblé avec Griffe Cauchemardesque. La puissance de Griffe Cauchemardesque utilisée par ce Pal est multipliée par (1.1~2.5).",
+      "effects": []
+    },
+    "Bastet": {
+      "name": "Chercheur d'or",
+      "description": "À affecter à une Ferme pour une chance de déterrer des Pièce d'or.",
+      "effects": []
+    },
+    "Bastet_Ice": {
+      "name": "Douche Froide",
+      "description": "À affecter à une Ferme pour une chance d'obtenir un Organe de glace.",
+      "effects": []
+    },
+    "BerryGoat": {
+      "name": "Cueillette de baies",
+      "description": "Placé dans une Ferme, des Baie rouge tombent parfois de son dos. Dans l'équipe, il restaure (100~200) de satiété au Pal le plus affamé toutes les 5 min. (Non cumulable)",
+      "effects": [
+        {
+          "label": "Restauration de la satiété",
+          "values": [
+            "+100%",
+            "+120%",
+            "+140%",
+            "+160%",
+            "+200%"
+          ]
+        }
+      ]
+    },
+    "BerryGoat_Dark": {
+      "name": "Pince-Venin",
+      "description": "Placé dans une Ferme, de la Baie rouge tombe parfois de son dos. Dans l'équipe, il restaure (100~200) de satiété au Pal le plus affamé toutes les 5 min. (Non cumulable)",
+      "effects": [
+        {
+          "label": "Restauration de la satiété",
+          "values": [
+            "+100%",
+            "+120%",
+            "+140%",
+            "+160%",
+            "+200%"
+          ]
+        }
+      ]
+    },
+    "BirdDragon": {
+      "name": "Assaillant Céleste",
+      "description": "Peut être utilisé comme monture pour voler. Lorsqu'il est dans l'équipe, augmente de (20~40)% les dégâts infligés par le joueur aux points faibles ennemis. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Dégâts aux points faibles",
+          "values": [
+            "+20%",
+            "+22%",
+            "+26%",
+            "+32%",
+            "+40%"
+          ]
+        }
+      ]
+    },
+    "BirdDragon_Ice": {
+      "name": "Assaillant Céleste",
+      "description": "Peut être utilisé comme monture pour voler. Lorsqu'il est dans l'équipe, augmente de (30~50)% les dégâts infligés par le joueur aux points faibles ennemis. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Dégâts aux points faibles",
+          "values": [
+            "+30%",
+            "+32%",
+            "+36%",
+            "+42%",
+            "+50%"
+          ]
+        }
+      ]
+    },
+    "BlackCentaur": {
+      "name": "Chevalier Noir Abyssal",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet d'effectuer un double saut lorsqu'il est monté. Si un Paladius se trouve dans votre équipe, l'utilisation de Lance Double le fera apparaître pour combattre à vos côtés.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+12%",
+            "+15%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "BlackGriffon": {
+      "name": "Gènes modifiés",
+      "description": "Peut être utilisé comme monture pour voler. Lorsqu'il est monté, les attaques de type Ténèbres sont renforcées de (15~30)%. La vitesse de déplacement augmente pendant le vol.",
+      "effects": [
+        {
+          "label": "Dégâts de Ténèbres",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "BlackMetalDragon": {
+      "name": "Dragon en Armure Noire",
+      "description": "Peut être utilisé comme monture pour voler. Lorsqu'il est monté, les dégâts infligés aux minerais augmentent de (1100~3300)%, et la quantité de Minerai de métal obtenue augmente de (150~300)%.",
+      "effects": [
+        {
+          "label": "Efficacité d’extraction",
+          "values": [
+            "+1100%",
+            "+1500%",
+            "+2000%",
+            "+2600%",
+            "+3300%"
+          ]
+        },
+        {
+          "label": "Rendement de collecte",
+          "values": [
+            "+150%",
+            "+180%",
+            "+210%",
+            "+240%",
+            "+300%"
+          ]
+        }
+      ]
+    },
+    "BlackPuppy": {
+      "name": "Chien fidèle Smokie",
+      "description": "Lorsqu'activée, son odorat très développé permet de détecter le Chromite à proximité. Lorsqu'il combat à vos côtés, la quantité de Chromite obtenue augmente de +(100~200)%.",
+      "effects": [
+        {
+          "label": "Rendement de collecte",
+          "values": [
+            "+100%",
+            "+110%",
+            "+130%",
+            "+160%",
+            "+200%"
+          ]
+        }
+      ]
+    },
+    "BlackPuppy_Ice": {
+      "name": "Froide Bête",
+      "description": "Dans la base, le niveau de la capacité de travail Réfrigération des autres Pals du camp augmente de +1. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Capacité de travail — Réfrigération",
+          "values": [
+            "+1",
+            "+1",
+            "+1",
+            "+1",
+            "+1"
+          ]
+        }
+      ]
+    },
+    "BlueDragon": {
+      "name": "Danse de l'eau",
+      "description": "Peut être utilisé comme monture pour nager. Lorsqu'il est monté, les attaques du joueur deviennent de type Eau, et son attaque augmente de (5~20)%.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+5%",
+            "+7%",
+            "+10%",
+            "+14%",
+            "+20%"
+          ]
+        },
+        {
+          "label": "Vitesse de nage",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+14%",
+            "+18%",
+            "+25%"
+          ]
+        }
+      ]
+    },
+    "BlueDragon_Ice": {
+      "name": "Danse Glagla",
+      "description": "Peut être utilisé comme monture pour nager. Une fois monté, les attaques du joueur deviennent de type Glace et sa puissance d'attaque augmente de (5~20)%.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+5%",
+            "+7%",
+            "+10%",
+            "+14%",
+            "+20%"
+          ]
+        },
+        {
+          "label": "Vitesse de nage",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+14%",
+            "+18%",
+            "+25%"
+          ]
+        }
+      ]
+    },
+    "BluePlatypus": {
+      "name": "Coud'Surf",
+      "description": "Lorsqu'activée, Fuack fonce sur l'ennemi en faisant du bodyboard.",
+      "effects": []
+    },
+    "BluePlatypus_Fire": {
+      "name": "Tacle de Feu",
+      "description": "Lorsqu'activée, Fuack Ignis fonce sur l'ennemi en surfant sur des flammes.",
+      "effects": []
+    },
+    "BlueSkyDragon": {
+      "name": "Souverain du Ciel d'Azur",
+      "description": "Peut être utilisé comme monture pour voler. L'attaque de ce Pal augmente de (4~8)% pour chaque Pal de type Dragon présent dans l'équipe, à l'exception de Shaolong.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+4%",
+            "+5%",
+            "+6%",
+            "+7%",
+            "+8%"
+          ]
+        }
+      ]
+    },
+    "BlueThunderHorse": {
+      "name": "Charge Plasma",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet également d'effectuer une ruée aérienne pour se déplacer à grande vitesse.",
+      "effects": []
+    },
+    "BlueberryFairy": {
+      "name": "Prospérité Agricole",
+      "description": "Dans la base, les prières de Prunelia augmentent la quantité de récoltes de (18~35)%.",
+      "effects": [
+        {
+          "label": "Quantité récoltée",
+          "values": [
+            "+18%",
+            "+22%",
+            "+26%",
+            "+30%",
+            "+35%"
+          ]
+        }
+      ]
+    },
+    "Boar": {
+      "name": "Tête Dure",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est monté, l'efficacité contre les rochers augmente de (500~2000)%.",
+      "effects": [
+        {
+          "label": "Efficacité d’extraction",
+          "values": [
+            "+500%",
+            "+750%",
+            "+1100%",
+            "+1500%",
+            "+2000%"
+          ]
+        }
+      ]
+    },
+    "BrownRabbit": {
+      "name": "Terre Chérie",
+      "description": "Lorsqu'il est dans l'équipe, réduit de (50~65)% les dégâts subis par le joueur pendant les ruées. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Défense",
+          "values": [
+            "+50%",
+            "+52%",
+            "+55%",
+            "+59%",
+            "+65%"
+          ]
+        }
+      ]
+    },
+    "CactusDoll": {
+      "name": "Free Hug",
+      "description": "Augmente de (50~65) % les dégâts infligés par le joueur et les Pals aux ennemis affectés par l'état Entrave lorsqu'il est dans l'équipe. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Dégâts sur une cible affectée (ivy cling)",
+          "values": [
+            "+50%",
+            "+53%",
+            "+56%",
+            "+60%",
+            "+65%"
+          ]
+        }
+      ]
+    },
+    "CactusDoll_Dark": {
+      "name": "Câlin Piquant",
+      "description": "Lorsqu'il est dans l'équipe, ajoute une valeur d'accumulation d'état Entrave de (2~6) aux attaques du joueur. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Chance d’infliger l’effet Ivy Cling",
+          "values": [
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%",
+            "+6%"
+          ]
+        }
+      ]
+    },
+    "CandleGhost": {
+      "name": "Pille-Tombes",
+      "description": "Lorsqu'il est dans l'équipe, réduit de (15~30)% les dégâts de type Non élém. subis par le joueur et les Pals. (Effet non cumulable) Peut être assigné à une Ferme avec une chance de déterrer des Os.",
+      "effects": [
+        {
+          "label": "Résistance aux dégâts de Non élém.",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "CaptainPenguin": {
+      "name": "Guerrier des Mers",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (40~80)% la quantité d'objets obtenus en battant des Pals de type Feu. (Effet non cumulable)",
+      "effects": []
+    },
+    "CaptainPenguin_Black": {
+      "name": "Commandement Inflexible",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (25~40)% les dégâts de type Eau infligés aux points faibles. (effet non cumulable)",
+      "effects": []
+    },
+    "Carbunclo": {
+      "name": "Soutien de Lifmunk",
+      "description": "Lorsqu'activée, il monte sur la tête du joueur et accompagne ses attaques avec un pistolet-mitrailleur.",
+      "effects": []
+    },
+    "CatBat": {
+      "name": "Sixième Sens",
+      "description": "Lorsqu'activée, détecte grâce à des ultrasons l'emplacement des donjons, coffres et débris à proximité.",
+      "effects": []
+    },
+    "CatMage": {
+      "name": "Étrange Sorcellerie",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (40~80)% la quantité d'objets obtenus en battant des Pals de type Non élém.. De plus, les sphères de Pal lancées ont (10~50)% de chances de ne pas être consommées. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Récupération des Sphères",
+          "values": [
+            "+10%",
+            "+15%",
+            "+20%",
+            "+30%",
+            "+50%"
+          ]
+        }
+      ]
+    },
+    "CatMage_Fire": {
+      "name": "Passion Magie Noire",
+      "description": "Dans la base, augmente de +1 le niveau de la capacité de travail Allumage de feu des autres Pals du camp. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Capacité de travail — Allumage de feu",
+          "values": [
+            "+1",
+            "+1",
+            "+1",
+            "+1",
+            "+1"
+          ]
+        }
+      ]
+    },
+    "CatVampire": {
+      "name": "Vol de vie",
+      "description": "En combattant à ses côtés, confère au joueur et à Felbat un effet de Vol de vie permettant d'absorber (5~9)% des dégâts infligés pour restaurer leurs PV.",
+      "effects": [
+        {
+          "label": "Vol de vie",
+          "values": [
+            "+5%",
+            "+6%",
+            "+7%",
+            "+8%",
+            "+9%"
+          ]
+        }
+      ]
+    },
+    "ChickenPal": {
+      "name": "Production d'œufs",
+      "description": "À affecter à une Ferme pour une chance d'obtenir des Œuf.",
+      "effects": []
+    },
+    "ClioneTwins": {
+      "name": "Jumelage Magique",
+      "description": "Dans la base, le niveau de la capacité de travail Arrosage des autres Pals du camp augmente de +1. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Capacité de travail — Arrosage",
+          "values": [
+            "+1",
+            "+1",
+            "+1",
+            "+1",
+            "+1"
+          ]
+        }
+      ]
+    },
+    "CloverFairy": {
+      "name": "Joyeux Trèfle",
+      "description": "Dans la base, le niveau de la capacité de travail Collecte des autres Pals du camp augmente de +1. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Capacité de travail — Collecte",
+          "values": [
+            "+1",
+            "+1",
+            "+1",
+            "+1",
+            "+1"
+          ]
+        }
+      ]
+    },
+    "ClownRabbit": {
+      "name": "Passe-casse",
+      "description": "Lorsqu'il est dans l'équipe, Dupin provoque une explosion autour du joueur lorsque ses PV tombent sous 50 % ( Feu / Puissance: (100~200) ). De plus, l'attaque du joueur augmente de (30~50)% tant que ses PV sont inférieurs à 50 %. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Puissance de l’explosion à faibles PV",
+          "values": [
+            "+100%",
+            "+110%",
+            "+130%",
+            "+160%",
+            "+200%"
+          ]
+        },
+        {
+          "label": "Attaque à faibles PV",
+          "values": [
+            "+30%",
+            "+35%",
+            "+40%",
+            "+45%",
+            "+50%"
+          ]
+        }
+      ]
+    },
+    "ColorfulBird": {
+      "name": "Lance-œufs Explosifs",
+      "description": "Lorsqu'activé, il s'équipe au joueur et se transforme en lanceur d'œufs explosifs.",
+      "effects": []
+    },
+    "CowPal": {
+      "name": "Production de lait",
+      "description": "À affecter à une Ferme pour une chance d'obtenir du Lait.",
+      "effects": []
+    },
+    "CubeTurtle": {
+      "name": "Tortue Maçonne",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans la base, augmente le niveau de la capacité de travail Extraction des autres Pals de la base de 1. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Capacité de travail — Extraction",
+          "values": [
+            "+1",
+            "+1",
+            "+1",
+            "+1",
+            "+1"
+          ]
+        }
+      ]
+    },
+    "CubeTurtle_Neutral": {
+      "name": "Tortue Madone",
+      "description": "Peut être utilisé comme monture pour se déplacer. Réduit de (80~100) % la perte de durabilité des armes et des armures lorsqu'il est dans l'équipe. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Durabilité de l’équipement",
+          "values": [
+            "+80%",
+            "+84%",
+            "+88%",
+            "+92%",
+            "+100%"
+          ]
+        }
+      ]
+    },
+    "CuteButterfly": {
+      "name": "Écailles Mystérieuses",
+      "description": "Lorsqu'activée, attaque l'ennemi ciblé avec Nuage Toxique. Lorsqu'il est dans la base, augmente de +1 le niveau d'aptitude au travail Exploitation des autres Pals de la base. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Capacité de travail — Exploitation",
+          "values": [
+            "+1",
+            "+1",
+            "+1",
+            "+1",
+            "+1"
+          ]
+        }
+      ]
+    },
+    "CuteFox": {
+      "name": "Creuse et creuse",
+      "description": "À affecter à une Ferme pour une chance de déterrer des objets.",
+      "effects": []
+    },
+    "CuteMole": {
+      "name": "Appui Minier",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (30~60)% les dégâts infligés lors de l'extraction de minerais par le joueur, et réduit de (80~100)% le poids de la Pierre. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Efficacité d’extraction",
+          "values": [
+            "+30%",
+            "+34%",
+            "+40%",
+            "+48%",
+            "+60%"
+          ]
+        },
+        {
+          "label": "Réduction du poids des objets",
+          "values": [
+            "+80%",
+            "+84%",
+            "+88%",
+            "+92%",
+            "+100%"
+          ]
+        }
+      ]
+    },
+    "DandelionGirl": {
+      "name": "Fée Duveteuse",
+      "description": "Augmente le taux de capture des Pals souffrant de Entrave lorsqu'il est dans l'équipe. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Bonus de capture sur une cible entravée",
+          "values": [
+            "+1%",
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%"
+          ]
+        }
+      ]
+    },
+    "DarkAlien": {
+      "name": "Envahisseur Non Identifié",
+      "description": "Lorsqu'il est dans l'équipe, les dégâts infligés par la dernière balle du chargeur des armes automatiques augmentent de (100~160)%. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Dégâts de la dernière balle",
+          "values": [
+            "+100%",
+            "+110%",
+            "+120%",
+            "+135%",
+            "+160%"
+          ]
+        }
+      ]
+    },
+    "DarkCrow": {
+      "name": "Oiseau de Nuit",
+      "description": "Lorsqu'activée, active la Vision nocturne pour voir dans l'obscurité. L'effet est annulé lors de la prochaine activation. À affecter à une Ferme pour une chance de déterrer des Os.",
+      "effects": []
+    },
+    "DarkFlameFox": {
+      "name": "Incantation Secrète",
+      "description": "Lorsqu'il est dans l'équipe et qu'une attaque du joueur touche un ennemi affecté par Brûlure, des flammes apparaissent autour de l'ennemi et les ennemis en contact subissent des dégâts continus équivalents à (15~30) % de l'attaque du joueur. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Vortex de feu sur une cible brûlée",
+          "values": [
+            "+15%",
+            "+18%",
+            "+21%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "DarkMechaDragon": {
+      "name": "Ailes Météores",
+      "description": "Peut être utilisé comme monture pour voler. Lorsqu'il est dans l'équipe, augmente de (20~50)% les dégâts des compétences partenaires des Pals équipés d'une arme. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Puissance de la compétence partenaire",
+          "values": [
+            "+20%",
+            "+26%",
+            "+32%",
+            "+38%",
+            "+50%"
+          ]
+        },
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+12%",
+            "+15%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "DarkScorpion": {
+      "name": "Scorpion d'Acier",
+      "description": "Lorsqu'activé, augmente la défense du joueur de (5~10)% et augmente de (40~80)% la probabilité d'obtenir des objets en terrassant des Pals de type Électricité. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Défense",
+          "values": [
+            "+5%",
+            "+6%",
+            "+7%",
+            "+8%",
+            "+10%"
+          ]
+        }
+      ]
+    },
+    "DarkScorpion_Ground": {
+      "name": "Scorpion Doré",
+      "description": "Lorsqu'il est dans l'équipe, augmente la défense du joueur de (5~10)% et augmente de (40~80)% la quantité d'objets obtenus en terrassant des Pals de type Électricité. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Défense",
+          "values": [
+            "+5%",
+            "+6%",
+            "+7%",
+            "+8%",
+            "+10%"
+          ]
+        }
+      ]
+    },
+    "Deer": {
+      "name": "Gardien des Bois",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet l'utilisation du double saut lorsqu'il est monté et augmente l'efficacité de l'abattage des arbres de (220~500)%.",
+      "effects": [
+        {
+          "label": "Efficacité d’abattage",
+          "values": [
+            "+220%",
+            "+260%",
+            "+320%",
+            "+400%",
+            "+500%"
+          ]
+        }
+      ]
+    },
+    "Deer_Ground": {
+      "name": "Gardien des Bois Dorés",
+      "description": "Peut être utilisé comme monture pour se déplacer, ce qui permet l'utilisation du double saut. Dans la base, le niveau de la capacité de travail Abattage des autres Pals du camp augmente de 1. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Capacité de travail — Abattage",
+          "values": [
+            "+1",
+            "+1",
+            "+1",
+            "+1",
+            "+1"
+          ]
+        }
+      ]
+    },
+    "DomeArmorDragon": {
+      "name": "Dragon Inébranlable",
+      "description": "Peut être utilisé comme monture pour se déplacer. Réduit de (60~80) % les dégâts des attaques explosives subis par le joueur et les Pals, et immunise contre Étourdissement lorsqu'il est dans l'équipe. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Résistance à l’effet Stun",
+          "values": [
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%"
+          ]
+        },
+        {
+          "label": "Résistance aux dégâts de Explosion",
+          "values": [
+            "+60%",
+            "+65%",
+            "+70%",
+            "+75%",
+            "+80%"
+          ]
+        }
+      ]
+    },
+    "DreamDemon": {
+      "name": "Charognard Onirique",
+      "description": "Tant qu'il est dans l'équipe, il apparaît aux côtés du joueur. Il lance des projectiles magiques de type Ténèbres pour attaquer les ennemis hostiles. Il ne peut pas achever les adversaires de lui-même.",
+      "effects": []
+    },
+    "DrillGame": {
+      "name": "Perceuse Broyeuse",
+      "description": "Provoque Coquille Rotative lorsqu'il est appelé. Suit le joueur en tournoyant pour faciliter la destruction des minerais de (800~2000) %.",
+      "effects": [
+        {
+          "label": "Efficacité d’extraction",
+          "values": [
+            "+640%",
+            "+640%",
+            "+640%",
+            "+640%",
+            "+640%"
+          ]
+        }
+      ]
+    },
+    "Eagle": {
+      "name": "Monte-Galeclaw",
+      "description": "Lorsqu'il est dans l'équipe, modifie les performances du planeur équipé. Permet de planer à grande vitesse tout en tirant avec l'arme tenue dans la main droite.",
+      "effects": []
+    },
+    "ElecCat": {
+      "name": "Électricité Statique",
+      "description": "Augmente l'attaque des Pals de type Électricité de (15~30) % lorsqu'il est dans l'équipe. (Effet non cumulable) À affecter à une Ferme pour une chance d'obtenir un Organe électrique.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "ElecLizard": {
+      "name": "Mode Relax",
+      "description": "Lorsqu'il est dans l'équipe et qu'une attaque du joueur touche un ennemi affecté par Électrisation, celui-ci libère de l'électricité et inflige des dégâts aux ennemis proches équivalents à (40~60) % de l'attaque du joueur. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Étincelle sur une cible électrisée",
+          "values": [
+            "+40%",
+            "+44%",
+            "+48%",
+            "+52%",
+            "+60%"
+          ]
+        }
+      ]
+    },
+    "ElecPanda": {
+      "name": "Tank Jaune",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet de tirer en rafale avec un minigun lorsqu'il est monté.",
+      "effects": []
+    },
+    "ElecPomeranian": {
+      "name": "Poussée Crépitante",
+      "description": "Dans la base, le niveau de la compétence de travail Génération d'énergie des autres Pals du camp augmente de 1. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Capacité de travail — Génération d’énergie",
+          "values": [
+            "+1",
+            "+1",
+            "+1",
+            "+1",
+            "+1"
+          ]
+        }
+      ]
+    },
+    "ElecSnail": {
+      "name": "Batterie Dissuasive",
+      "description": "Lorsqu'il est dans l'équipe, ajoute une valeur d'accumulation d'état Électrisation de (2~6) aux attaques du joueur. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Chance d’infliger l’effet Electrical",
+          "values": [
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%",
+            "+6%"
+          ]
+        }
+      ]
+    },
+    "ElecSnail_Ground": {
+      "name": "Coquille Invasive",
+      "description": "Lorsqu'il est dans l'équipe, réduit de (15~30) % les dégâts de type Eau subis par le joueur et les Pals, et immunise contre Trempé. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Résistance aux dégâts de Eau",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        },
+        {
+          "label": "Résistance à l’effet Wetness",
+          "values": [
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%"
+          ]
+        }
+      ]
+    },
+    "FairyDragon": {
+      "name": "Dragon Sacré au Grand Cœur",
+      "description": "Peut être utilisé comme monture pour voler. La vitesse de déplacement augmente en vol. Lorsqu'il est dans l'équipe, augmente de (40~80)% la quantité d'objets obtenus en vainquant des Pals de type Ténèbres. (effet non cumulable)",
+      "effects": []
+    },
+    "FairyDragon_Water": {
+      "name": "Dragon Aquatique au Grand Cœur",
+      "description": "Peut être utilisé comme monture pour voler. La vitesse de déplacement augmente en vol. Lorsqu'il est dans l'équipe, réduit de (15~30)% les dégâts de type Feu subis par le joueur et les Pals, et annule l'état Brûlure. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Résistance aux dégâts de Feu",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        },
+        {
+          "label": "Résistance à l’effet Burn",
+          "values": [
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%"
+          ]
+        }
+      ]
+    },
+    "FeatherOstrich": {
+      "name": "Ruée Sablonneuse",
+      "description": "Peut être utilisé comme monture pour se déplacer. Sa vitesse de déplacement augmente de (50~100)% lorsqu'il se trouve sur le sable.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement au sol",
+          "values": [
+            "+50%",
+            "+62%",
+            "+74%",
+            "+86%",
+            "+100%"
+          ]
+        }
+      ]
+    },
+    "FengyunDeeper": {
+      "name": "Vent et Nuages",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est monté, permet d'effectuer un double saut.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+12%",
+            "+15%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "FengyunDeeper_Electric": {
+      "name": "Nuage d'Orage",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet d'utiliser le double saut une fois monté. Lorsqu'il est dans l'équipe, augmente de (40~80)% la quantité d'objets obtenus en terrassant des Pals de type Eau. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+12%",
+            "+15%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "FireKirin": {
+      "name": "Cheval Rouge",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est monté, les attaques du joueur deviennent de type Feu et sa puissance d'attaque augmente de (5~20)%.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+5%",
+            "+7%",
+            "+10%",
+            "+14%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "FireKirin_Dark": {
+      "name": "Cheval Noir",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est monté, les attaques du joueur deviennent de type Ténèbres et sa puissance d'attaque augmente de (5~20)%.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+5%",
+            "+7%",
+            "+10%",
+            "+14%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "FlameBambi": {
+      "name": "Petite Étincelle",
+      "description": "Lorsqu'il est dans l'équipe, augmente la défense des Pals de type Feu de (15~30)%. (effet non cumulable) Peut être assigné à une Ferme avec une chance de produire un Organe de feu.",
+      "effects": [
+        {
+          "label": "Défense",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "FlameBuffalo": {
+      "name": "Chaleur Corporelle",
+      "description": "Peut être utilisé comme monture pour se déplacer. Augmente de +2 la résistance au froid du joueur lorsqu'il est dans l'équipe. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Résistance au froid",
+          "values": [
+            "+2%",
+            "+2%",
+            "+2%",
+            "+2%",
+            "+2%"
+          ]
+        },
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+12%",
+            "+15%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "FlowerDinosaur": {
+      "name": "Dragon Fleurissant",
+      "description": "Peut être utilisé comme monture pour se déplacer. Augmente de (15~30)% la défense des Pals de type Dragon lorsqu'il est dans l'équipe. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Défense",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "FlowerDinosaur_Electric": {
+      "name": "Dragon Orageux",
+      "description": "Peut être utilisé comme monture pour se déplacer. Augmente de (15~30)% la défense des Pals de type Électricité lorsqu'il est dans l'équipe. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Défense",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "FlowerDoll": {
+      "name": "Bénédiction Florale",
+      "description": "Déclenche une restauration des PV du joueur de (75~85)% grâce au pouvoir des fleurs. Dans la base, augmente de +1 le niveau d'aptitude au travail Semence des autres Pals de la base. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Capacité de travail — Semence",
+          "values": [
+            "+1",
+            "+1",
+            "+1",
+            "+1",
+            "+1"
+          ]
+        }
+      ]
+    },
+    "FlowerDoll_Fire": {
+      "name": "Ferveur Florale",
+      "description": "Lorsqu'activée, utilise le pouvoir des fleurs pour restaurer (80~90) % des PV du joueur. Réduit de (15~30) % les dégâts de type Herbe subis par le joueur et les Pals, et immunise contre Entrave lorsqu'il est dans l'équipe. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Résistance aux dégâts de Herbe",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        },
+        {
+          "label": "Résistance à l’effet Ivy Cling",
+          "values": [
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%"
+          ]
+        }
+      ]
+    },
+    "FlowerPrince": {
+      "name": "Gardien du Brouillard",
+      "description": "Lorsqu'activée, confère (2~6) de Empoisonnement aux attaques du joueur. Lorsqu'il est dans l'équipe, le joueur et les Pals deviennent immunisés contre Empoisonnement et les gaz toxiques de la zone de l'Arbre-Monde sont neutralisés. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Résistance à l’effet Poison",
+          "values": [
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%"
+          ]
+        },
+        {
+          "label": "Chance d’infliger l’effet Poison",
+          "values": [
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%",
+            "+6%"
+          ]
+        }
+      ]
+    },
+    "FlowerRabbit": {
+      "name": "Lapin Serviable",
+      "description": "Lorsqu'il est dans l'équipe, apparaît aux côtés du joueur et ramasse automatiquement les objets à proximité.",
+      "effects": []
+    },
+    "FluffyBird": {
+      "name": "Tourontoudou",
+      "description": "Lorsqu'il est dans l'équipe, augmente les chances de capturer les Pals affectés par Gel. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Bonus de capture sur une cible gelée",
+          "values": [
+            "+1%",
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%"
+          ]
+        }
+      ]
+    },
+    "FlyingManta": {
+      "name": "Planeur sur Brise",
+      "description": "Lorsqu'il est dans l'équipe, modifie les performances du planeur équipé et annule les dégâts de chute du joueur. Permet de planer rapidement pendant une longue durée.",
+      "effects": [
+        {
+          "label": "Réduction des dégâts de chute",
+          "values": [
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%"
+          ]
+        }
+      ]
+    },
+    "FlyingManta_Thunder": {
+      "name": "Planair",
+      "description": "Modifie les performances du planeur équipé lorsqu'il est dans l'équipe et annule les dégâts de chute subis par le joueur. Permet de planer rapidement pendant une longue durée.",
+      "effects": [
+        {
+          "label": "Réduction des dégâts de chute",
+          "values": [
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%"
+          ]
+        }
+      ]
+    },
+    "FoxExorcist": {
+      "name": "Avenir Brûlant",
+      "description": "Lorsqu'il est dans l'équipe et qu'une attaque du joueur touche un ennemi affecté par Brûlure, celui-ci explose et inflige des dégâts supplémentaires équivalents à (40~60) % de l'attaque du joueur. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Explosion sur une cible brûlée",
+          "values": [
+            "+40%",
+            "+44%",
+            "+48%",
+            "+52%",
+            "+60%"
+          ]
+        }
+      ]
+    },
+    "FoxMage": {
+      "name": "Maître Renard",
+      "description": "Lorsqu'il est activé, Wixen transfère son pouvoir au joueur, convertissant ses attaques en Feu et augmentant son attaque de (30~50) %.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+30%",
+            "+35%",
+            "+40%",
+            "+45%",
+            "+50%"
+          ]
+        }
+      ]
+    },
+    "FoxMage_Dark": {
+      "name": "Grand Renard Noir",
+      "description": "Lorsqu'activé, Wixen Noct transfère son pouvoir au joueur, convertissant ses attaques en Ténèbres et augmentant son attaque de (30~50) %.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+30%",
+            "+35%",
+            "+40%",
+            "+45%",
+            "+50%"
+          ]
+        }
+      ]
+    },
+    "Ganesha": {
+      "name": "Douche Apaisante",
+      "description": "Lorsqu'il est dans l'équipe, restaure de (20~40)% les PV du joueur si ceux-ci tombent sous 30%. (effet non cumulable) * Après activation, un temps de recharge de 120 secondes est nécessaire avant une nouvelle utilisation.",
+      "effects": [
+        {
+          "label": "PV restaurés",
+          "values": [
+            "+20%",
+            "+24%",
+            "+28%",
+            "+32%",
+            "+40%"
+          ]
+        }
+      ]
+    },
+    "Garm": {
+      "name": "Virée Sauvage",
+      "description": "Peut être utilisé comme monture pour se déplacer. Augmente légèrement la vitesse de déplacement lorsqu'il est monté.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+12%",
+            "+15%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "GhostAnglerfish": {
+      "name": "Guide des Ténèbres",
+      "description": "Peut être utilisé comme monture pour se déplacer sur l'eau. La vitesse de déplacement de ce Pal augmente de (5~25)% pour chaque Pal de type Ténèbres ou Eau présent dans l'équipe, à l'exception de Ghangler.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "+5%",
+            "+9%",
+            "+13%",
+            "+18%",
+            "+25%"
+          ]
+        }
+      ]
+    },
+    "GhostAnglerfish_Fire": {
+      "name": "Cordon-bleu des Profondeurs",
+      "description": "Peut être utilisé comme monture pour nager. La vitesse de déplacement de ce Pal augmente de (5~25)% pour chaque Pal de type Feu ou Eau présent dans l'équipe, à l'exception de Ghangler Ignis.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "+5%",
+            "+9%",
+            "+13%",
+            "+18%",
+            "+25%"
+          ]
+        }
+      ]
+    },
+    "GhostBeast": {
+      "name": "Messager de la Mort",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, réduit le temps de recharge des compétences de tous les Pals de l'équipe de (30~60)% lors de la défaite d'un ennemi. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Réduction du temps de recharge après une élimination",
+          "values": [
+            "+30%",
+            "+34%",
+            "+40%",
+            "+48%",
+            "+60%"
+          ]
+        }
+      ]
+    },
+    "GhostBlackCat": {
+      "name": "Félin Possédé",
+      "description": "Lorsqu'il est dans l'équipe, augmente les chances de capture des Pals lors du bonus d'attaque par derrière. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Bonus de capture furtive",
+          "values": [
+            "+1%",
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%"
+          ]
+        }
+      ]
+    },
+    "GhostDragon": {
+      "name": "Ptérodactyle Libre",
+      "description": "Peut être utilisé comme monture pour voler. L'attaque et la vitesse de déplacement de ce Pal augmentent de (2~6) % pour chaque Pal de type Dragon ou Ténèbres présent dans l'équipe, à l'exception de Eidrolon.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%",
+            "+6%"
+          ]
+        },
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%",
+            "+6%"
+          ]
+        }
+      ]
+    },
+    "GhostDragon_Fire": {
+      "name": "Ptérodactyle Furieux",
+      "description": "Peut être utilisé comme monture pour voler. L'attaque et la vitesse de déplacement de ce Pal augmentent de (2~6) % pour chaque Pal de type Dragon ou Feu présent dans l'équipe, à l'exception de Eidrolon Ignis.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%",
+            "+6%"
+          ]
+        },
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%",
+            "+6%"
+          ]
+        }
+      ]
+    },
+    "GhostRabbit": {
+      "name": "Lapin Volâme",
+      "description": "Lorsqu'il est dans l'équipe, augmente de +(100~200)% la quantité d'âmes obtenues en terrassant des Pals. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Objets supplémentaires obtenus",
+          "values": [
+            "+100%",
+            "+110%",
+            "+130%",
+            "+160%",
+            "+200%"
+          ]
+        }
+      ]
+    },
+    "GhostRabbit_Grass": {
+      "name": "Lapin Blokâme",
+      "description": "Lorsqu'il est dans l'équipe, augmente la défense des Pals de type Herbe de (15~30)%. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Défense",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "GoldenHorse": {
+      "name": "Protection Sablonneuse",
+      "description": "Peut être utilisé comme monture pour se déplacer. Une fois monté, les attaques du joueur deviennent de type Terre et sa puissance d'attaque augmente de (5~20)%.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+5%",
+            "+7%",
+            "+10%",
+            "+14%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "Gorilla": {
+      "name": "Mode Enragé",
+      "description": "Lorsqu'activée, Gorirat libère sa nature sauvage et augmente temporairement son attaque de (75~300)%.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+75%",
+            "+115%",
+            "+165%",
+            "+225%",
+            "+300%"
+          ]
+        }
+      ]
+    },
+    "Gorilla_Ground": {
+      "name": "Bras de Gorille Ultime",
+      "description": "Lorsqu'il est dans l'équipe, augmente la vitesse d'escalade du joueur de (50~100)%. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Vitesse d’escalade",
+          "values": [
+            "+50%",
+            "+60%",
+            "+70%",
+            "+85%",
+            "+100%"
+          ]
+        }
+      ]
+    },
+    "GrassGolem": {
+      "name": "Laser Sylvain",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'activée, Dualith projette un puissant laser de type Herbe depuis sa main droite.",
+      "effects": []
+    },
+    "GrassGolem_Dark": {
+      "name": "Laser Corrompu",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'activée, Dualith Noct projette un puissant laser de type Ténèbres depuis sa main droite.",
+      "effects": []
+    },
+    "GrassMammoth": {
+      "name": "Broyeur Tellurique",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est monté, augmente de (220~500)% l'efficacité pour détruire les arbres et de (500~2000)% l'efficacité pour détruire les minerais.",
+      "effects": [
+        {
+          "label": "Efficacité d’abattage",
+          "values": [
+            "+220%",
+            "+260%",
+            "+320%",
+            "+400%",
+            "+500%"
+          ]
+        },
+        {
+          "label": "Efficacité d’extraction",
+          "values": [
+            "+500%",
+            "+750%",
+            "+1100%",
+            "+1500%",
+            "+2000%"
+          ]
+        }
+      ]
+    },
+    "GrassMammoth_Ice": {
+      "name": "Broyeur à Glace",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est monté, augmente de (220~500)% l'efficacité pour détruire les arbres et de (500~2000)% l'efficacité pour détruire les minerais.",
+      "effects": [
+        {
+          "label": "Efficacité d’abattage",
+          "values": [
+            "+220%",
+            "+260%",
+            "+320%",
+            "+400%",
+            "+500%"
+          ]
+        },
+        {
+          "label": "Efficacité d’extraction",
+          "values": [
+            "+500%",
+            "+750%",
+            "+1100%",
+            "+1500%",
+            "+2000%"
+          ]
+        }
+      ]
+    },
+    "GrassMinotaur": {
+      "name": "Menace Naturelle",
+      "description": "Lorsqu'il est activé, Elgrove transfère son pouvoir au joueur, convertissant ses attaques en Herbe et augmentant son attaque de (30~50) %.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+30%",
+            "+35%",
+            "+40%",
+            "+45%",
+            "+50%"
+          ]
+        }
+      ]
+    },
+    "GrassMinotaur_Ice": {
+      "name": "Pergélisol Menaçant",
+      "description": "Lorsqu'il est dans l'équipe, lorsqu'un ennemi affecté par Trempé est attaqué par le joueur, il est immédiatement affecté par Gel.",
+      "effects": [
+        {
+          "label": "Gel d’une cible trempée",
+          "values": [
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%"
+          ]
+        }
+      ]
+    },
+    "GrassPanda": {
+      "name": "Pandanade",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet de tirer en rafale avec un lance-grenades lorsqu'il est monté.",
+      "effects": []
+    },
+    "GrassPanda_Electric": {
+      "name": "Pandanade",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet de tirer en rafale avec un lance-grenades lorsqu'il est monté.",
+      "effects": []
+    },
+    "GrassRabbitMan": {
+      "name": "Acrobate des Plaines",
+      "description": "Lorsqu'il est dans l'équipe, ajoute + 1 sauts supplémentaires et + 1 sprints aériens supplémentaires. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Sauts supplémentaires",
+          "values": [
+            "+1%",
+            "+1%",
+            "+1%",
+            "+1%",
+            "+1%"
+          ]
+        },
+        {
+          "label": "Puissance de la ruée aérienne",
+          "values": [
+            "+1%",
+            "+1%",
+            "+1%",
+            "+1%",
+            "+1%"
+          ]
+        }
+      ]
+    },
+    "GrimGirl": {
+      "name": "Lame Amoureuse",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (100~200)% les objets obtenus lors du dépeçage avec un Couteau de boucher. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Objets supplémentaires lors de la découpe",
+          "values": [
+            "+100%",
+            "+110%",
+            "+130%",
+            "+160%",
+            "+200%"
+          ]
+        }
+      ]
+    },
+    "GuardianDog": {
+      "name": "Qui se ressemble s'assemble",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il combat à vos côtés, augmente de (15~30)% les chances de rencontrer des Pals possédant la même compétence passive. * À l'exception de certaines compétences passives.",
+      "effects": [
+        {
+          "label": "Chance de transmettre une compétence passive à la capture",
+          "values": [
+            "+15%",
+            "+18%",
+            "+21%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "HadesBird": {
+      "name": "Ailes des Enfers",
+      "description": "Peut être utilisé comme monture pour voler. Lorsqu'il est monté, les attaques du joueur deviennent de type Ténèbres et sa puissance d'attaque augmente de (5~20)%.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+5%",
+            "+7%",
+            "+10%",
+            "+14%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "HadesBird_Electric": {
+      "name": "Ailes Foudroyantes",
+      "description": "Peut être utilisé comme monture pour voler. Une fois monté, les attaques du joueur deviennent de type Électricité et sa puissance d'attaque augmente de (5~20)%.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+5%",
+            "+7%",
+            "+10%",
+            "+14%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "HawkBird": {
+      "name": "Compagnon de Voyage",
+      "description": "Peut être utilisé comme monture pour voler.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+12%",
+            "+15%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "Hedgehog": {
+      "name": "Bombe Zap",
+      "description": "Lorsqu'activée, Jolthog s'équipe dans la main du joueur. Le lancer sur un ennemi provoque une explosion de type Électricité à l'impact.",
+      "effects": []
+    },
+    "Hedgehog_Ice": {
+      "name": "Bombe Glagla",
+      "description": "Lorsqu'il est activé, Jolthog Cryst est équipé dans la main. Lorsqu'il est lancé sur un ennemi, il provoque une explosion de type Glace à l'impact.",
+      "effects": []
+    },
+    "HerculesBeetle": {
+      "name": "Armure Noire",
+      "description": "Lorsqu'il est dans l'équipe, crée une barrière autour du joueur si celui-ci réussit à toucher un ennemi 5 fois avec des attaques au corps-à-corps dans un délai de (5~9) secondes. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Fenêtre pour déclencher la barrière",
+          "values": [
+            "5 s",
+            "6 s",
+            "7 s",
+            "8 s",
+            "9 s"
+          ]
+        }
+      ]
+    },
+    "HerculesBeetle_Ground": {
+      "name": "Armure Or",
+      "description": "Lorsqu'il est dans l'équipe, crée une barrière autour du joueur si ce dernier touche une cible 5 fois avec des attaques de corps à corps en moins de (5~9) secondes. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Fenêtre pour déclencher la barrière",
+          "values": [
+            "5 s",
+            "6 s",
+            "7 s",
+            "8 s",
+            "9 s"
+          ]
+        }
+      ]
+    },
+    "HoodGhost": {
+      "name": "Rôdeur du Néant",
+      "description": "Lorsqu'il est dans l'équipe, les dégâts infligés par le joueur aux ennemis hors combat augmentent de (50~100) %. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Dégâts sur les ennemis hors combat",
+          "values": [
+            "+50%",
+            "+60%",
+            "+70%",
+            "+80%",
+            "+100%"
+          ]
+        }
+      ]
+    },
+    "Horus": {
+      "name": "Prédateur Brûlant",
+      "description": "Peut être utilisé comme monture pour voler. Lorsqu'il est dans l'équipe, augmente de (40~80)% la quantité d'objets obtenus en vainquant des Pals de type Glace. (effet non cumulable)",
+      "effects": []
+    },
+    "Horus_Water": {
+      "name": "Prédateur Aquatique",
+      "description": "Peut être utilisé comme monture pour voler. Lorsqu'il est dans l'équipe, augmente de (40~80)% la quantité d'objets obtenus en terrassant des Pals de type Feu. (Effet non cumulable)",
+      "effects": []
+    },
+    "IceCrocodile": {
+      "name": "Entrailles Glacées",
+      "description": "Lorsqu'il est dans l'équipe, réduit de (30~60)% le poids des ingrédients et des plats. De plus, les aliments se détériorent (-30~-80)% plus lentement, en complément de l'effet de conservation déjà conféré par les Pals de type Glace. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Réduction du poids des objets",
+          "values": [
+            "+30%",
+            "+35%",
+            "+40%",
+            "+50%",
+            "+60%"
+          ]
+        },
+        {
+          "label": "Vitesse de détérioration des objets",
+          "values": [
+            "+-30%",
+            "+-42%",
+            "+-54%",
+            "+-66%",
+            "+-80%"
+          ]
+        }
+      ]
+    },
+    "IceDeer": {
+      "name": "Fraîcheur Corporelle",
+      "description": "Peut être utilisé comme monture pour se déplacer. Augmente de 2 la résistance à la chaleur du joueur lorsqu'il est dans l'équipe. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Résistance à la chaleur",
+          "values": [
+            "+2%",
+            "+2%",
+            "+2%",
+            "+2%",
+            "+2%"
+          ]
+        },
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+12%",
+            "+15%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "IceFox": {
+      "name": "Instinct Boréal",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (15~30)% l'attaque des Pals de type Glace. (effet non cumulable) Peut être assigné à une Ferme avec une chance de produire un Organe de glace.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "IceHorse": {
+      "name": "Pégase des Glaces",
+      "description": "Peut être utilisé comme monture pour voler. Lorsqu'il est monté, les attaques du joueur deviennent de type Glace, sa puissance d'attaque augmente de (10~40)%, et ses attaques appliquent (2~6) d'accumulation d'état Gel.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+10%",
+            "+14%",
+            "+20%",
+            "+28%",
+            "+40%"
+          ]
+        },
+        {
+          "label": "Chance d’infliger l’effet Freeze",
+          "values": [
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%",
+            "+6%"
+          ]
+        }
+      ]
+    },
+    "IceHorse_Dark": {
+      "name": "Pégase Noir",
+      "description": "Peut être utilisé comme monture pour voler. Lorsqu'il est monté, les attaques du joueur deviennent de type Ténèbres, sa puissance d'attaque augmente de (10~40)%, et ses attaques appliquent (2~6) d'accumulation d'état Cécité.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+10%",
+            "+14%",
+            "+20%",
+            "+28%",
+            "+40%"
+          ]
+        },
+        {
+          "label": "Chance d’infliger l’effet Darkness",
+          "values": [
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%",
+            "+6%"
+          ]
+        }
+      ]
+    },
+    "IceNarwhal": {
+      "name": "Céta-Frais",
+      "description": "Peut être utilisé comme monture pour se déplacer sur l'eau. Lorsqu'il est dans l'équipe, les mini-jeux de pêche commencent avec une jauge de capture remplie de (5~14)% supplémentaires, et la progression de la jauge augmente de (5~14)% lorsque les barres sont superposées. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Progression initiale de pêche",
+          "values": [
+            "+5%",
+            "+7%",
+            "+9%",
+            "+11%",
+            "+14%"
+          ]
+        },
+        {
+          "label": "Quantité obtenue en pêche",
+          "values": [
+            "+5%",
+            "+7%",
+            "+9%",
+            "+11%",
+            "+14%"
+          ]
+        },
+        {
+          "label": "Vitesse de nage",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+14%",
+            "+18%",
+            "+25%"
+          ]
+        }
+      ]
+    },
+    "IceNarwhal_Fire": {
+      "name": "Céta-Chaud",
+      "description": "Peut être utilisé comme monture pour nager. Lorsqu'il est dans l'équipe, les mini-jeux de pêche commencent avec une jauge de capture remplie à (7~17)% supplémentaires, et la jauge progresse de (7~17)% supplémentaires lorsque les barres se chevauchent. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Progression initiale de pêche",
+          "values": [
+            "+7%",
+            "+9%",
+            "+11%",
+            "+13%",
+            "+17%"
+          ]
+        },
+        {
+          "label": "Quantité obtenue en pêche",
+          "values": [
+            "+7%",
+            "+9%",
+            "+11%",
+            "+13%",
+            "+17%"
+          ]
+        },
+        {
+          "label": "Vitesse de nage",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+14%",
+            "+18%",
+            "+25%"
+          ]
+        }
+      ]
+    },
+    "IceSeal": {
+      "name": "Dévale Montagne",
+      "description": "Peut être utilisé comme monture pour se déplacer. La vitesse de déplacement augmente de (80~160)% sur la neige. Permet également de dévaler les pentes à toute vitesse.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement sur la neige",
+          "values": [
+            "+80%",
+            "+100%",
+            "+120%",
+            "+140%",
+            "+160%"
+          ]
+        }
+      ]
+    },
+    "IceSeal_Ground": {
+      "name": "Dévale-Montagne",
+      "description": "Peut être utilisé comme monture pour se déplacer. Augmente de (80~160) % la vitesse de déplacement sur la neige. Permet également de dévaler les pentes à grande vitesse. Lors des glissades, la vitesse de départ est faible, mais la vitesse maximale est élevée.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement sur la neige",
+          "values": [
+            "+80%",
+            "+100%",
+            "+120%",
+            "+140%",
+            "+160%"
+          ]
+        }
+      ]
+    },
+    "IceWitch": {
+      "name": "Sorcière Frigorifique",
+      "description": "Lorsqu'activé, Icelyn transfère son pouvoir au joueur, convertissant ses attaques en Glace et augmentant son attaque de (30~50) %.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+30%",
+            "+35%",
+            "+40%",
+            "+45%",
+            "+50%"
+          ]
+        }
+      ]
+    },
+    "JellyfishFairy": {
+      "name": "Largue-Jelliette",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (55~95)% la quantité d'objets obtenus à la pêche. (Effet non cumulable) De plus, lorsque Jelliette et Jellroy se trouvent dans la base, la vitesse de travail d'arrosage de Jelliette augmente de (50~120)%. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Objets supplémentaires obtenus en pêche",
+          "values": [
+            "+55%",
+            "+65%",
+            "+75%",
+            "+85%",
+            "+95%"
+          ]
+        },
+        {
+          "label": "Butin supplémentaire sur les ennemis pêchés",
+          "values": [
+            "+55%",
+            "+65%",
+            "+75%",
+            "+85%",
+            "+95%"
+          ]
+        },
+        {
+          "label": "Vitesse de travail",
+          "values": [
+            "+50%",
+            "+60%",
+            "+70%",
+            "+90%",
+            "+120%"
+          ]
+        }
+      ]
+    },
+    "JellyfishGhost": {
+      "name": "Largue-Jellroy",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (55~95)% la quantité d'objets obtenus par récupération. (Effet non cumulable) De plus, lorsque Jelliette et Jellroy se trouvent dans la base, la vitesse de travail d'arrosage de Jellroy augmente de (50~120)%. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Objets de récupération obtenus en pêche",
+          "values": [
+            "+55%",
+            "+65%",
+            "+75%",
+            "+85%",
+            "+95%"
+          ]
+        },
+        {
+          "label": "Vitesse de travail",
+          "values": [
+            "+50%",
+            "+60%",
+            "+70%",
+            "+90%",
+            "+120%"
+          ]
+        }
+      ]
+    },
+    "JetDragon": {
+      "name": "Missile Aérien",
+      "description": "Peut être utilisé comme monture pour voler. Permet de tirer en rafale avec un lance-missiles lorsqu'il est monté.",
+      "effects": []
+    },
+    "KabukiMan": {
+      "name": "Scène de Combat",
+      "description": "Lorsqu'il est dans l'équipe, ajoute (2~6) d'accumulation d'état Brûlure aux attaques du joueur. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Chance d’infliger l’effet Burn",
+          "values": [
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%",
+            "+6%"
+          ]
+        }
+      ]
+    },
+    "Kelpie": {
+      "name": "Giclée d'eau",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (15~30)% l'attaque des Pals de type Eau. (effet non cumulable) Peut être assigné à une Ferme avec une chance de produire un Fluides de Pal.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "Kelpie_Fire": {
+      "name": "Jet de Lave",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (15~30)% l'attaque des Pals de type Feu. (effet non cumulable) Peut être assigné à une Ferme avec une chance de produire un Organe de feu.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "KendoFrog": {
+      "name": "Position Saut",
+      "description": "Lorsqu'activée, Croajiro, animé par une forte loyauté, gonfle son abdomen afin d'accumuler de l'énergie. Le joueur peut alors sauter sur son dos pour être propulsé haut dans les airs. Augmente l'attaque du joueur de (50~86) % jusqu'à son atterrissage.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+50%",
+            "+56%",
+            "+64%",
+            "+74%",
+            "+86%"
+          ]
+        }
+      ]
+    },
+    "KendoFrog_Dark": {
+      "name": "Posture Annonciatrice",
+      "description": "Lorsqu'activée, Croajiro Noct accumule de l'énergie grâce à sa loyauté et son ventre rebondi. Le joueur saute très haut lorsqu'il monte dessus. Lorsqu'il est dans l'équipe, augmente de (25~40)% les dégâts de type Ténèbres infligés aux points faibles. (effet non cumulable)",
+      "effects": []
+    },
+    "KingAlpaca": {
+      "name": "Montagne de Muscles",
+      "description": "Peut être utilisé comme monture pour se déplacer. La défense et la vitesse de déplacement de ce Pal augmentent en fonction du nombre de Melpaca dans l'équipe, à raison de (5~14)% par Alpaca.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "+5%",
+            "+7%",
+            "+9%",
+            "+11%",
+            "+14%"
+          ]
+        },
+        {
+          "label": "Défense",
+          "values": [
+            "+5%",
+            "+7%",
+            "+9%",
+            "+11%",
+            "+14%"
+          ]
+        }
+      ]
+    },
+    "KingAlpaca_Ice": {
+      "name": "Roi des Glaces",
+      "description": "Peut être utilisé comme monture pour se déplacer. La défense et la vitesse de déplacement de ce Pal augmentent en fonction du nombre de Melpaca dans l'équipe, à raison de (5~14)% par Alpaca.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "+5%",
+            "+7%",
+            "+9%",
+            "+11%",
+            "+14%"
+          ]
+        },
+        {
+          "label": "Défense",
+          "values": [
+            "+5%",
+            "+7%",
+            "+9%",
+            "+11%",
+            "+14%"
+          ]
+        }
+      ]
+    },
+    "KingBahamut": {
+      "name": "Empereur Magmatique",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, augmente de (5~10)% l'attaque et la défense des Pals en combat à chaque ennemi vaincu. Cet effet dure 20 secondes et peut se cumuler jusqu'à 5 fois. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Bonus cumulable après une élimination",
+          "values": [
+            "+5%",
+            "+6%",
+            "+7%",
+            "+8%",
+            "+10%"
+          ]
+        }
+      ]
+    },
+    "KingBahamut_Dragon": {
+      "name": "Roi des Dragons",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, augmente de (25~40)% les dégâts infligés en touchant les faiblesses avec des attaques de type Dragon. (Effet non cumulable)",
+      "effects": []
+    },
+    "KingSunfish": {
+      "name": "Môle Charismatique",
+      "description": "Peut être utilisé comme monture pour nager. Augmente les chances d'attraper des Pals à potentiel lorsqu'il est dans l'équipe.",
+      "effects": [
+        {
+          "label": "Chance d’obtenir un Pal talentueux en pêche",
+          "values": [
+            "+70%",
+            "+72%",
+            "+74%",
+            "+76%",
+            "+80%"
+          ]
+        },
+        {
+          "label": "Vitesse de nage",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+14%",
+            "+18%",
+            "+25%"
+          ]
+        }
+      ]
+    },
+    "KingSunfish_Thunder": {
+      "name": "Môle Plasmique",
+      "description": "Peut être utilisé comme monture pour nager. Lorsqu'il est monté, les attaques du joueur sont converties en Électricité, et son attaque augmente de (5~20) %. De plus, pêcher des Pals à potentiel devient plus facile lorsqu'il est dans l'équipe.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+5%",
+            "+7%",
+            "+10%",
+            "+14%",
+            "+20%"
+          ]
+        },
+        {
+          "label": "Chance d’obtenir un Pal talentueux en pêche",
+          "values": [
+            "+74%",
+            "+76%",
+            "+78%",
+            "+80%",
+            "+82%"
+          ]
+        },
+        {
+          "label": "Vitesse de nage",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+14%",
+            "+18%",
+            "+25%"
+          ]
+        }
+      ]
+    },
+    "KingWhale": {
+      "name": "Gardien des Échos",
+      "description": "Peut être utilisé comme monture pour voler. Un seul spécimen peut être invoqué dans la base. Lorsqu'il est dans la base, il patrouille en permanence dans le ciel au-dessus de celle-ci et attaque les intrus depuis de très haut dans les airs.",
+      "effects": []
+    },
+    "Kirin": {
+      "name": "Éclair Foudroyant",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, augmente de (25~40)% les dégâts infligés aux points faibles par les attaques de type Électricité. (effet non cumulable)",
+      "effects": []
+    },
+    "Kirin_Ice": {
+      "name": "Conflit Polaire",
+      "description": "Peut être utilisé comme monture pour se déplacer. Une fois monté, les attaques du joueur deviennent de type Glace et sa puissance d'attaque augmente de (5~20)%.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+5%",
+            "+7%",
+            "+10%",
+            "+14%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "Kitsunebi": {
+      "name": "Câlin de Flammes",
+      "description": "Lorsqu'activée, il se joint au joueur pour faire office de lance-flammes.",
+      "effects": []
+    },
+    "Kitsunebi_Ice": {
+      "name": "Câlin Glacé",
+      "description": "Lorsqu'activée, se joint au joueur et permet d'attaquer en libérant un souffle glacé.",
+      "effects": []
+    },
+    "LanternButler": {
+      "name": "Lanterne Enchantée",
+      "description": "Lorsqu'il est dans l'équipe, les flèches tirées par le joueur explosent à l'impact et infligent des dégâts supplémentaires équivalents à (15~30) % des dégâts d'attaque du joueur. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Dégâts d’explosion des flèches",
+          "values": [
+            "+15%",
+            "+18%",
+            "+21%",
+            "+25%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "LavaGirl": {
+      "name": "Larmes de Lave",
+      "description": "Lorsqu'il est dans l'équipe, restaure chaque seconde (0.1~0.5)% des PV du joueur et des Pals de l'équipe hors combat. (effet non cumulable) Peut être assigné à une Ferme avec une chance de produire un Organe de feu.",
+      "effects": [
+        {
+          "label": "Régénération des PV",
+          "values": [
+            "+0,1%",
+            "+0,15%",
+            "+0,2%",
+            "+0,3%",
+            "+0,5%"
+          ]
+        }
+      ]
+    },
+    "LazyCatfish": {
+      "name": "Amélioration Terrestre",
+      "description": "Lorsqu'il est dans l'équipe, augmente l'attaque des Pals de type Terre de (15~30)%. (effet non cumulable) Peut être assigné à une Ferme avec une chance de produire de l' Huile de Pal de qualité.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "LazyCatfish_Gold": {
+      "name": "Ruée vers L'Or",
+      "description": "Lorsqu'il est dans l'équipe, augmente de +(100~200)% la quantité de Pièce d'or obtenue sur les ennemis vaincus. (effet non cumulable) Peut être assigné à une Ferme avec une chance de produire de l' Huile de Pal de qualité ou, plus rarement, des Pièce d'or.",
+      "effects": [
+        {
+          "label": "Objets supplémentaires obtenus",
+          "values": [
+            "+100%",
+            "+110%",
+            "+130%",
+            "+160%",
+            "+200%"
+          ]
+        }
+      ]
+    },
+    "LazyDragon": {
+      "name": "Missile Affamé",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet de tirer en rafale avec un lance-missiles lorsqu'il est monté.",
+      "effects": []
+    },
+    "LazyDragon_Electric": {
+      "name": "Fête aux Missiles",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet de tirer en rafale avec un lance-missiles lorsqu'il est monté.",
+      "effects": []
+    },
+    "LeafMomonga": {
+      "name": "Herbapulsion",
+      "description": "Lorsqu'il est dans l'équipe, Herbil ressuscite le joueur avec (30~60)% de ses PV max lorsqu'il est mis K.O., grâce à ses pouvoirs apaisants.",
+      "effects": []
+    },
+    "LeafPrincess": {
+      "name": "Turbo Floral",
+      "description": "Dans la base, Lullu insuffle de l'énergie aux plantations pour augmenter la vitesse de croissance des cultures de (50~70)%.",
+      "effects": [
+        {
+          "label": "Vitesse de croissance des cultures",
+          "values": [
+            "+50%",
+            "+55%",
+            "+60%",
+            "+65%",
+            "+70%"
+          ]
+        }
+      ]
+    },
+    "LegendDeer": {
+      "name": "Barrière Sacrée",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet de générer une barrière bloquant toutes les attaques lorsqu'il est monté. Permet également d'effectuer un triple saut.",
+      "effects": []
+    },
+    "LilyQueen": {
+      "name": "Déesse de la Fertilité",
+      "description": "Lorsqu'activée, restaure (80~90)% des PV du joueur et des Pals de l'équipe grâce aux pouvoirs curatifs de la reine.",
+      "effects": []
+    },
+    "LilyQueen_Dark": {
+      "name": "Déesse de la Pénombre",
+      "description": "Lorsqu'activée, restaure (85~95)% des PV du joueur et des Pals de l'équipe grâce aux pouvoirs curatifs de la reine.",
+      "effects": []
+    },
+    "LittleBriarRose": {
+      "name": "Regard de Princesse",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (15~30)% l'attaque des Pals de type Herbe. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "LizardMan": {
+      "name": "Camouflage",
+      "description": "Lorsqu'activée, rend le joueur et Leezpunk invisibles pendant (10~20) secondes, leur permettant d'échapper à la vigilance des ennemis.",
+      "effects": []
+    },
+    "LizardMan_Fire": {
+      "name": "Camouflage",
+      "description": "Lorsqu'activée, rend le joueur et Leezpunk Ignis invisibles pendant (10~20) secondes, leur permettant d'échapper à la vigilance des ennemis.",
+      "effects": []
+    },
+    "LongCat": {
+      "name": "Extensibilité Féline",
+      "description": "Lorsqu'il est dans l'équipe, la gravité affectant le joueur est réduite, rendant les sauts et les chutes plus légers. (Effet non cumulable)",
+      "effects": []
+    },
+    "LotusDragon": {
+      "name": "Brume Glorieuse",
+      "description": "Lorsqu'il est dans l'équipe, ajoute (2~6) d'accumulation d'état Trempé aux attaques du joueur. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Chance d’infliger l’effet Wetness",
+          "values": [
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%",
+            "+6%"
+          ]
+        }
+      ]
+    },
+    "Manticore": {
+      "name": "Lion Infernal",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, augmente de (40~80)% la quantité d'objets obtenus en terrassant des Pals de type Herbe. (effet non cumulable)",
+      "effects": []
+    },
+    "Manticore_Dark": {
+      "name": "Lion des Flammes Noires",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, augmente de (40~80)% la quantité d'objets obtenus en terrassant des Pals de type Non élém.. (effet non cumulable)",
+      "effects": []
+    },
+    "MimicDog": {
+      "name": "Crochetage",
+      "description": "Lorsqu'il combat à vos côtés, le pouvoir de Mimog permet d'ouvrir les coffres sans utiliser de clé.",
+      "effects": []
+    },
+    "Monkey": {
+      "name": "Fusil Jovial",
+      "description": "Lorsqu'activée, Tanzee mitraille les ennemis à proximité avec un fusil d'assaut pendant un certain temps.",
+      "effects": []
+    },
+    "Monkey_Fire": {
+      "name": "Fou de la Gâchette",
+      "description": "Lorsqu'activée, Tanzee Ignis rejoint le joueur et mitraille sans relâche les ennemis à proximité avec un fusil d'assaut de type Feu.",
+      "effects": []
+    },
+    "MonochromeQueen": {
+      "name": "Princesse Indomptable",
+      "description": "Lorsqu'il est dans l'équipe, l'attaque du joueur augmente de (30~80) % si tous les Pals de l'équipe sont d'espèces différentes. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+30%",
+            "+40%",
+            "+50%",
+            "+60%",
+            "+80%"
+          ]
+        }
+      ]
+    },
+    "MoonChild": {
+      "name": "Énergie Noire Secrète",
+      "description": "Lorsqu'il est dans l'équipe, augmente la défense des Pals de type Ténèbres de (15~30)%. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Défense",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "MoonQueen": {
+      "name": "Ténèbres Célestes",
+      "description": "Peut être utilisé comme monture pour voler. Une fois monté, les attaques de type Non élém. et Ténèbres sont renforcées de (15~30)%.",
+      "effects": [
+        {
+          "label": "Dégâts Non élém.",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        },
+        {
+          "label": "Dégâts de Ténèbres",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "MopBaby": {
+      "name": "Gouzi-Gouzi",
+      "description": "Lorsqu'il est dans l'équipe, augmente la défense et l'attaque de Sweepa.",
+      "effects": []
+    },
+    "MopKing": {
+      "name": "Gouzi-Gouzi Royal",
+      "description": "Peut être utilisé comme monture pour se déplacer. L'attaque et la défense de ce Pal augmentent de (12~24)% pour chaque Swee dans l'équipe.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+12%",
+            "+13%",
+            "+15%",
+            "+19%",
+            "+24%"
+          ]
+        },
+        {
+          "label": "Défense",
+          "values": [
+            "+12%",
+            "+13%",
+            "+15%",
+            "+19%",
+            "+24%"
+          ]
+        }
+      ]
+    },
+    "Mothman": {
+      "name": "Gardien des Spores",
+      "description": "Lorsqu'il est dans l'équipe, fait exploser les ennemis souffrant de Entrave attaqués par le joueur, et inflige des dégâts supplémentaires équivalents à (40~60) % de l'attaque du joueur. (Effet non cumulable) De plus, le joueur et les Pals sont immunisés aux spores explosives de l'Arbre-Monde.",
+      "effects": [
+        {
+          "label": "Puissance des spores explosives",
+          "values": [
+            "+1%",
+            "+1%",
+            "+1%",
+            "+1%",
+            "+1%"
+          ]
+        },
+        {
+          "label": "Explosion sur une cible entravée",
+          "values": [
+            "+40%",
+            "+44%",
+            "+48%",
+            "+52%",
+            "+60%"
+          ]
+        }
+      ]
+    },
+    "MummyPal": {
+      "name": "Résurrection",
+      "description": "Lorsqu'il combat à vos côtés, si Gildra est mis K.O., il est ressuscité au prix d'une satiété réduite à 0.",
+      "effects": []
+    },
+    "MushroomDragon": {
+      "name": "Spores Vivaces",
+      "description": "Peut être utilisé comme monture pour se déplacer. Peut être assigné à une Ferme avec une chance de produire un Champignon ou un Champignon des cavernes.",
+      "effects": []
+    },
+    "MushroomDragon_Dark": {
+      "name": "Spores Fumantes",
+      "description": "Peut être utilisé comme monture pour se déplacer. Dans la base, les mystérieuses spores de Shroomer Noct ralentissent la diminution des points MEN des Pals de (10~15)%.",
+      "effects": [
+        {
+          "label": "Réduction de la perte de MEN",
+          "values": [
+            "+-10%",
+            "+-11,5%",
+            "+-13%",
+            "+-14%",
+            "+-15%"
+          ]
+        }
+      ]
+    },
+    "MushroomLady": {
+      "name": "Spores Charmants",
+      "description": "Dans la base, le niveau d'aptitude au travail Pharmacie des autres Pals du camp augmente de +1. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Capacité de travail — Pharmacie",
+          "values": [
+            "+1",
+            "+1",
+            "+1",
+            "+1",
+            "+1"
+          ]
+        }
+      ]
+    },
+    "Mutant": {
+      "name": "Antigravité",
+      "description": "Lorsqu'il est dans l'équipe, les sphères deviennent téléguidées et suivent automatiquement les Pals, et la limite de poids porté augmente de (300~600). (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Capacité de charge",
+          "values": [
+            "+300",
+            "+339",
+            "+399",
+            "+480",
+            "+600"
+          ]
+        }
+      ]
+    },
+    "MysteryMask": {
+      "name": "Danse du Masque",
+      "description": "Lorsqu'il est dans l'équipe, augmente la quantité d'EXP obtenue par les Pals de l'équipe de (40~80)%. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "EXP obtenue par les Pals",
+          "values": [
+            "+40%",
+            "+44%",
+            "+52%",
+            "+64%",
+            "+80%"
+          ]
+        }
+      ]
+    },
+    "NaughtyCat": {
+      "name": "Œil de Lynx",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, augmente de (50~75)% les chances de ramasser un œuf supplémentaire lorsqu'un œuf de Pal est obtenu. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Chance d’obtenir un œuf supplémentaire",
+          "values": [
+            "+50%",
+            "+55%",
+            "+60%",
+            "+65%",
+            "+75%"
+          ]
+        }
+      ]
+    },
+    "NegativeKoala": {
+      "name": "Shot de Caféine",
+      "description": "Lorsqu'activée, Depresso boit une boisson énergisante, augmentant de (100~900)% sa vitesse de déplacement et de travail. Peut être assigné à une Ferme avec une chance de produire de la Glande à venin.",
+      "effects": [
+        {
+          "label": "Vitesse de travail",
+          "values": [
+            "+100%",
+            "+200%",
+            "+400%",
+            "+600%",
+            "+900%"
+          ]
+        }
+      ]
+    },
+    "NegativeOctopus": {
+      "name": "Calamar Frit",
+      "description": "Lorsqu'il est dans l'équipe, modifie les performances du planeur équipé. Permet de flotter doucement pendant une longue durée en vol plané.",
+      "effects": []
+    },
+    "NegativeOctopus_Neutral": {
+      "name": "Aspirêves",
+      "description": "Lorsqu'il est dans l'équipe, modifie les performances du planeur équipé. Permet de flotter doucement pendant une longue durée en vol plané.",
+      "effects": []
+    },
+    "NightBlueHorse": {
+      "name": "Danseur de Minuit",
+      "description": "Peut être chevauché pour se déplacer. Augmente la hauteur des sauts lorsque vous êtes en selle. La nuit, la vitesse de déplacement de ce Pal augmente de +(50~100) %.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "+50%",
+            "+62%",
+            "+74%",
+            "+86%",
+            "+100%"
+          ]
+        },
+        {
+          "label": "Puissance de saut",
+          "values": [
+            "+25%",
+            "+25%",
+            "+25%",
+            "+25%",
+            "+25%"
+          ]
+        }
+      ]
+    },
+    "NightBlueHorse_Neutral": {
+      "name": "Danseur Radieux",
+      "description": "Peut être utilisé comme monture pour se déplacer et permet de sauter plus haut une fois monté. La vitesse de déplacement de ce Pal augmente de (5~25) % pour chaque Pal de type Non élém. présent dans l'équipe, à l'exception de Starryon Primo.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "+5%",
+            "+9%",
+            "+13%",
+            "+18%",
+            "+25%"
+          ]
+        },
+        {
+          "label": "Puissance de saut",
+          "values": [
+            "+25%",
+            "+25%",
+            "+25%",
+            "+25%",
+            "+25%"
+          ]
+        }
+      ]
+    },
+    "NightFox": {
+      "name": "Cœur de Pierre",
+      "description": "Détecte les statues de Pal à proximité lorsqu'il est appelé.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+20%",
+            "+25%",
+            "+30%",
+            "+35%",
+            "+40%"
+          ]
+        }
+      ]
+    },
+    "NightLady": {
+      "name": "Pupille Cauchemardesque",
+      "description": "Lorsqu'activée, attaque l'ennemi ciblé avec Rayons Cauchemardesques. La puissance de Rayons Cauchemardesques utilisée par ce Pal est multipliée par (1.1~2.5).",
+      "effects": []
+    },
+    "NightLady_Dark": {
+      "name": "Regard Cauchemardesque",
+      "description": "Lorsqu'activée, attaque l'ennemi ciblé avec Floraison Cauchemardesque. La puissance de Floraison Cauchemardesque utilisée par ce Pal est multipliée par (1.1~2.5).",
+      "effects": []
+    },
+    "OctopusGirl": {
+      "name": "Tapette Princière",
+      "description": "Lorsqu'il est dans l'équipe, réduit de (12~35)% la diminution de la jauge de capture lorsque les barres ne sont pas superposées dans le mini-jeu de pêche. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Réduction des échecs de pêche",
+          "values": [
+            "+12%",
+            "+17%",
+            "+22%",
+            "+28%",
+            "+35%"
+          ]
+        }
+      ]
+    },
+    "OctopusGirl_Neutral": {
+      "name": "Princesse Ventouse",
+      "description": "Lorsqu'il est dans l'équipe, augmente la défense des Pals de type Eau de (15~30) %. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Défense",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "OniGhostGirl": {
+      "name": "Fantômette Joviale",
+      "description": "Réduit de (40~80) % l'attaque des ennemis affectés par Empoisonnement lorsqu'il est dans l'équipe. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Réduction d’attaque sur une cible empoisonnée",
+          "values": [
+            "+40%",
+            "+50%",
+            "+60%",
+            "+70%",
+            "+80%"
+          ]
+        }
+      ]
+    },
+    "PandaGirl": {
+      "name": "Abnégation",
+      "description": "L'attaque et la défense de ce Pal augmentent de (2~6)% pour chaque Pal de type Herbe présent dans l'équipe, à l'exception de Leafan.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%",
+            "+6%"
+          ]
+        },
+        {
+          "label": "Défense",
+          "values": [
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%",
+            "+6%"
+          ]
+        }
+      ]
+    },
+    "Penguin": {
+      "name": "Lance-Pengullet",
+      "description": "Lorsqu'il est activé, équipe le joueur d'un Lance-fusées et permet d'utiliser Pengullet comme projectile. À l'impact, il explose et est mis K.O.",
+      "effects": []
+    },
+    "Penguin_Electric": {
+      "name": "Lance-Pengullet Lux",
+      "description": "Lorsqu'activée, le joueur s'équipe d'un Lance-fusées et propulse Pengullet Lux comme projectile. À l'impact, il explose et est mis K.O.",
+      "effects": []
+    },
+    "PinkCat": {
+      "name": "Chat Porteur",
+      "description": "Lorsqu'il est dans l'équipe, augmente la capacité de charge du joueur de (100~200) en portant une partie de son inventaire. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Capacité de charge",
+          "values": [
+            "+100",
+            "+120",
+            "+140",
+            "+160",
+            "+200"
+          ]
+        }
+      ]
+    },
+    "PinkLizard": {
+      "name": "Draine-Cœur",
+      "description": "En combat, confère un effet de vol de vie au joueur et à lui-même, absorbant (5~9)% des dégâts infligés et restaurant leurs PV.",
+      "effects": [
+        {
+          "label": "Vol de vie",
+          "values": [
+            "+5%",
+            "+6%",
+            "+7%",
+            "+8%",
+            "+9%"
+          ]
+        }
+      ]
+    },
+    "PinkRabbit": {
+      "name": "Princesse Lapinou Souriant",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (15~30)% l'attaque des Pals de type Non élém.. (effet non cumulable) Dans la base, augmente de 1 le niveau de compétence de travail Artisanat des autres Pals. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        },
+        {
+          "label": "Capacité de travail — Artisanat",
+          "values": [
+            "+1",
+            "+1",
+            "+1",
+            "+1",
+            "+1"
+          ]
+        }
+      ]
+    },
+    "PinkRabbit_Grass": {
+      "name": "Lapin Dézerbe",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (25~40)% les dégâts infligés en touchant les faiblesses avec des attaques de type Herbe. (Effet non cumulable) Augmente de (200~400)% l'efficacité de travail de Ribbuny Botan lorsqu'il travaille sur un établi ou dans une usine d'armes.",
+      "effects": [
+        {
+          "label": "Vitesse de travail",
+          "values": [
+            "+200%",
+            "+220%",
+            "+260%",
+            "+320%",
+            "+400%"
+          ]
+        }
+      ]
+    },
+    "PlantSlime": {
+      "name": "Aide aux Bûcherons",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (30~50)% les dégâts infligés lors de l'abattage d'arbres, et réduit de (40~60)% le poids de tous les types de bois. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Efficacité d’abattage",
+          "values": [
+            "+30%",
+            "+35%",
+            "+40%",
+            "+45%",
+            "+50%"
+          ]
+        },
+        {
+          "label": "Réduction du poids des objets",
+          "values": [
+            "+40%",
+            "+45%",
+            "+50%",
+            "+55%",
+            "+60%"
+          ]
+        }
+      ]
+    },
+    "Plesiosaur": {
+      "name": "Soleil Accablant",
+      "description": "Peut être utilisé comme monture pour se déplacer. Dans la base, la vitesse de production des œufs des Pals affectés à un Ranch augmente de (20~50)%. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Vitesse de reproduction à la base",
+          "values": [
+            "+20%",
+            "+26%",
+            "+32%",
+            "+38%",
+            "+50%"
+          ]
+        }
+      ]
+    },
+    "PoseidonOrca": {
+      "name": "Conquérant des Océans",
+      "description": "Tant qu'il combat activement aux côtés du joueur, il lance des lances d'eau de type Eau pour attaquer les ennemis hostiles. Peut être chevauché pour se déplacer sur l'eau. Permet d'effectuer de grands sauts à la surface de l'eau lorsque vous êtes en selle.",
+      "effects": [
+        {
+          "label": "Vitesse de nage",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+14%",
+            "+18%",
+            "+25%"
+          ]
+        }
+      ]
+    },
+    "PurpleSpider": {
+      "name": "Toile de Tarantriss",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet d'effectuer un double saut lorsqu'il est monté. Permet également de projeter une toile vers un point ciblé afin de s'y déplacer rapidement à l'aide d'un grappin.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+12%",
+            "+15%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "QueenBee": {
+      "name": "Reine des Abeilles",
+      "description": "Son attaque augmente de (12~24)% pour chaque Beegarde dans l'équipe.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+12%",
+            "+13%",
+            "+15%",
+            "+19%",
+            "+24%"
+          ]
+        },
+        {
+          "label": "Défense",
+          "values": [
+            "+12%",
+            "+13%",
+            "+15%",
+            "+19%",
+            "+24%"
+          ]
+        }
+      ]
+    },
+    "RaijinDaughter": {
+      "name": "Fille de la Foudre",
+      "description": "Tant qu'il est dans l'équipe, il apparaît aux côtés du joueur. Il lance des éclairs de type Électricité pour attaquer les ennemis hostiles. Il ne peut pas achever les adversaires de lui-même.",
+      "effects": []
+    },
+    "RaijinDaughter_Water": {
+      "name": "Fille de l'Orage Obscur",
+      "description": "Tant qu'il est dans l'équipe, il apparaît aux côtés du joueur. Il lance des éclairs de type Ténèbres pour attaquer les ennemis hostiles. Il ne peut pas achever les adversaires de lui-même.",
+      "effects": []
+    },
+    "RedArmorBird": {
+      "name": "Ailes Enflammées",
+      "description": "Peut être utilisé comme monture pour voler. Lorsqu'il est monté, les attaques du joueur deviennent de type Feu et sa puissance d'attaque augmente de (5~20)%.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+5%",
+            "+7%",
+            "+10%",
+            "+14%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "RedFlowerBird": {
+      "name": "Danse Florale",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (15~30) % la durée d'invincibilité lors des roulades et des esquives du joueur. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Durée d’esquive",
+          "values": [
+            "+5%",
+            "+6%",
+            "+7%",
+            "+8%",
+            "+9%"
+          ]
+        }
+      ]
+    },
+    "RobinHood": {
+      "name": "Maître Archer",
+      "description": "Les dégâts des arcs utilisés par le joueur augmentent de (10~35) % lorsqu'il est dans l'équipe. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Dégâts de l’arme équipée",
+          "values": [
+            "+10%",
+            "+15%",
+            "+20%",
+            "+25%",
+            "+35%"
+          ]
+        }
+      ]
+    },
+    "RobinHood_Ground": {
+      "name": "Archer d’Elite",
+      "description": "La vitesse de recharge des arcs utilisés par le joueur augmente de (15~30) % lorsqu'il est dans l'équipe. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Vitesse d’attaque",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "RockBeast": {
+      "name": "Pierre de Force",
+      "description": "Augmente de (50~65) % les dégâts infligés par le joueur et les Pals aux ennemis affectés par l'état Embourbement lorsqu'il est dans l'équipe. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Dégâts sur une cible affectée (muddy)",
+          "values": [
+            "+50%",
+            "+53%",
+            "+56%",
+            "+60%",
+            "+65%"
+          ]
+        }
+      ]
+    },
+    "RockBeast_Ice": {
+      "name": "Cristal de Force",
+      "description": "Lorsqu'il est dans l'équipe, réduit de (15~30)% les dégâts de type Dragon subis par le joueur et les Pals. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Résistance aux dégâts de Dragon",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "Ronin": {
+      "name": "Flash Furtif",
+      "description": "Lorsqu'il est activé, attaque l'ennemi ciblé avec Iaigiri. La puissance de cette compétence est multipliée par (1.1~2.5).",
+      "effects": []
+    },
+    "Ronin_Dark": {
+      "name": "Flash Furtif Inversé",
+      "description": "Lorsqu'activée, attaque l'ennemi visé avec Iaigiri. La puissance de Iaigiri utilisée par ce Pal est multipliée par (1.1~2.5). Lorsqu'il est dans l'équipe, les attaques portées avec une arme de corps à corps avant l'engagement du combat infligent (30~65)% de dégâts supplémentaires. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Dégâts de l’arme équipée",
+          "values": [
+            "+30%",
+            "+35%",
+            "+42%",
+            "+51%",
+            "+65%"
+          ]
+        }
+      ]
+    },
+    "SaintCentaur": {
+      "name": "Chevalier Céleste",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet d'effectuer un triple saut lorsqu'il est monté. Si un Necromus se trouve dans votre équipe, l'utilisation de Lance Sacrée le fera apparaître pour combattre à vos côtés.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+12%",
+            "+15%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "SakuraSaurus": {
+      "name": "Floraison du Premier Amour",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, chaque œuf ramassé a (35~45)% de chances d'être remplacé par un œuf de Pal Alpha. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Chance d’obtenir un Pal Alpha dans un œuf",
+          "values": [
+            "+35%",
+            "+37%",
+            "+39%",
+            "+41%",
+            "+45%"
+          ]
+        }
+      ]
+    },
+    "SakuraSaurus_Water": {
+      "name": "Floraison de Pureté",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, chaque œuf ramassé a (45~55)% de chances d'être remplacé par un œuf de Pal Alpha. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Chance d’obtenir un Pal Alpha dans un œuf",
+          "values": [
+            "+45%",
+            "+47%",
+            "+49%",
+            "+51%",
+            "+55%"
+          ]
+        }
+      ]
+    },
+    "SamuraiDog": {
+      "name": "Soutien Sincère",
+      "description": "Les dégâts des armes de mêlée utilisées par le joueur augmentent de (10~35) % lorsqu'il est dans l'équipe. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Dégâts de l’arme équipée",
+          "values": [
+            "+10%",
+            "+15%",
+            "+20%",
+            "+25%",
+            "+35%"
+          ]
+        }
+      ]
+    },
+    "ScorpionMan": {
+      "name": "Scorpion Patoxique",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (50~65)% les dégâts infligés aux ennemis affectés par Empoisonnement. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Dégâts sur une cible affectée (poison)",
+          "values": [
+            "+50%",
+            "+53%",
+            "+56%",
+            "+60%",
+            "+65%"
+          ]
+        }
+      ]
+    },
+    "ScorpionMan_Electric": {
+      "name": "Scorpion Statique",
+      "description": "Lorsqu'activé, Prixter Lux transfère son pouvoir au joueur, convertissant ses attaques en Électricité et augmentant son attaque de (30~50) %.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+30%",
+            "+35%",
+            "+40%",
+            "+45%",
+            "+50%"
+          ]
+        }
+      ]
+    },
+    "Sekhmet": {
+      "name": "Impératrice des Sables",
+      "description": "Dans la base, la vitesse de travail des Anubis présents augmente de (20~40) %. (Effet non cumulable) L'efficacité de travail de Sekhmet augmente de (30~60) % lorsqu'il travaille sur un établi ou dans une usine.",
+      "effects": [
+        {
+          "label": "Vitesse de travail",
+          "values": [
+            "+20%",
+            "+24%",
+            "+28%",
+            "+32%",
+            "+40%"
+          ]
+        }
+      ]
+    },
+    "Serpent": {
+      "name": "Fouisseur Furtif",
+      "description": "Peut être utilisé comme monture pour se déplacer sur l'eau. Peut être assigné à une Ferme avec une chance de produire du Cuir.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+12%",
+            "+15%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "Serpent_Ground": {
+      "name": "Fouisseur des Sables",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, ajoute (2~6) d'accumulation d'état Embourbement aux attaques du joueur. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Chance d’infliger l’effet Muddy",
+          "values": [
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%",
+            "+6%"
+          ]
+        },
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+12%",
+            "+15%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "SharkKid": {
+      "name": "Squale Ronchon",
+      "description": "Lorsqu'il est activé, attaque l'ennemi ciblé avec Tir Aquatique. La puissance de cette compétence est multipliée par (1.1~2.5). Lorsqu'il est dans l'équipe, augmente de (10~20)% l'attaque du joueur.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+10%",
+            "+11%",
+            "+13%",
+            "+16%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "SharkKid_Fire": {
+      "name": "Squale Ronchon",
+      "description": "Lorsqu'il est activé, attaque l'ennemi ciblé avec Flammes Scindées. La puissance de cette compétence est multipliée par (1.1~2.5). Lorsqu'il est dans l'équipe, augmente de (10~20)% l'attaque du joueur.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+10%",
+            "+11%",
+            "+13%",
+            "+16%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "SheepBall": {
+      "name": "Bouclier Duveteux",
+      "description": "Lorsqu'il est activé, s'équipe au joueur et sert de bouclier. Peut être assigné à une Ferme avec une chance de produire de la Laine.",
+      "effects": []
+    },
+    "SifuDog": {
+      "name": "Prière de Retour",
+      "description": "Lorsqu'il est activé, permet de se téléporter vers la base le plus proche. Inutilisable dans les donjons.",
+      "effects": []
+    },
+    "SkyDragon": {
+      "name": "Compassion du Dragon Céleste",
+      "description": "Peut être utilisé comme monture pour voler. Lorsqu'il est dans l'équipe, augmente l'attaque des Pals de type Dragon de (15~30)%. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "SkyDragon_Grass": {
+      "name": "Affection du Dragon Sylvestre",
+      "description": "Peut être utilisé comme monture pour voler. Une fois monté, les attaques du joueur deviennent de type Herbe et sa puissance d'attaque augmente de (5~20)%.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+5%",
+            "+7%",
+            "+10%",
+            "+14%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "SleeveRabbit": {
+      "name": "Manches Longues Triomphantes",
+      "description": "Lorsqu'il est dans l'équipe, réduit de (10~50)% le temps de recharge des compétences partenaires des autres Pals de l'équipe. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Réduction du temps de recharge des compétences partenaires",
+          "values": [
+            "+-10%",
+            "+-15%",
+            "+-20%",
+            "+-30%",
+            "+-50%"
+          ]
+        }
+      ]
+    },
+    "SmallArmadillo": {
+      "name": "Balle de Plage",
+      "description": "Lorsqu'il est dans l'équipe, augmente la défense des Pals de type Terre de (15~30)%. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Défense",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "SmallYeti": {
+      "name": "Œil Invisible",
+      "description": "Lorsqu'il est dans l'équipe, réduit la probabilité d'être repéré par les ennemis. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Détection par les ennemis",
+          "values": [
+            "+50%",
+            "+55%",
+            "+60%",
+            "+65%",
+            "+75%"
+          ]
+        }
+      ]
+    },
+    "SnakeGirl": {
+      "name": "Sagacité Reptilienne",
+      "description": "Lorsqu'il est dans l'équipe, ajoute (2~6) d'accumulation d'état Cécité aux attaques du joueur. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Chance d’infliger l’effet Darkness",
+          "values": [
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%",
+            "+6%"
+          ]
+        }
+      ]
+    },
+    "SnowPeafowl": {
+      "name": "Paon Pan",
+      "description": "Tant qu'il est dans l'équipe, l'air froid de Frostplume améliore la concentration du joueur et augmente sa vitesse de recharge de +(20~50) %. (Non cumulable)",
+      "effects": [
+        {
+          "label": "Vitesse de rechargement",
+          "values": [
+            "+20%",
+            "+26%",
+            "+32%",
+            "+38%",
+            "+50%"
+          ]
+        }
+      ]
+    },
+    "SnowTigerBeastman": {
+      "name": "Écrasement Blizzard",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet d'attaquer avec un marteau de type Glace lorsqu'il est monté.",
+      "effects": []
+    },
+    "SoldierBee": {
+      "name": "Abeille Ouvrière",
+      "description": "Peut être assigné à une Ferme avec une chance de produire du Miel. Lorsqu'il est dans l'équipe, augmente l'attaque de Elizabee.",
+      "effects": []
+    },
+    "StuffedShark": {
+      "name": "Aqua-Gâchette",
+      "description": "Lorsqu'activé, Finsider transfère son pouvoir au joueur, convertissant ses attaques en Eau et augmentant son attaque de (30~50) %.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+30%",
+            "+35%",
+            "+40%",
+            "+45%",
+            "+50%"
+          ]
+        }
+      ]
+    },
+    "StuffedShark_Fire": {
+      "name": "Chambre de Braises",
+      "description": "Lorsqu'il est dans l'équipe, Finsider Ignis porte les affaires du joueur et réduit de (60~100)% le poids des armes dans l'inventaire. Augmente également de (25~40)% les dégâts de type Feu infligés aux points faibles. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Réduction du poids des objets",
+          "values": [
+            "+60%",
+            "+70%",
+            "+80%",
+            "+90%",
+            "+100%"
+          ]
+        }
+      ]
+    },
+    "SumoDog": {
+      "name": "Carrure de Champion",
+      "description": "Peut être utilisé comme monture pour se déplacer. Réduit de (15~30) % les dégâts de type Électricité subis par le joueur et les Pals, et annule l'état Électrisation lorsqu'il est dans l'équipe. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Résistance aux dégâts de Électricité",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        },
+        {
+          "label": "Résistance à l’effet Electrical",
+          "values": [
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%"
+          ]
+        }
+      ]
+    },
+    "Suzaku": {
+      "name": "Ailes de Feu",
+      "description": "Peut être utilisé comme monture pour voler. La vitesse de déplacement de ce Pal augmente de (5~25)% pour chaque Pal de type Feu dans l'équipe, à l'exception de Suzaku.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "+5%",
+            "+9%",
+            "+13%",
+            "+18%",
+            "+25%"
+          ]
+        }
+      ]
+    },
+    "Suzaku_Water": {
+      "name": "Ailes d'Eau",
+      "description": "Peut être utilisé comme monture pour voler. La vitesse de déplacement de ce Pal augmente de (5~25)% pour chaque Pal de type Eau dans l'équipe, à l'exception de Suzaku Aqua.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "+5%",
+            "+9%",
+            "+13%",
+            "+18%",
+            "+25%"
+          ]
+        }
+      ]
+    },
+    "SweetsSheep": {
+      "name": "Petit Bonbon",
+      "description": "Placé dans une Ferme, de la Barbe à papa tombe parfois de son dos. Dans la base, il ralentit de (-10~-20)% l'évolution de la Repu des Pals. (Non cumulable)",
+      "effects": [
+        {
+          "label": "Réduction de la faim",
+          "values": [
+            "+-10%",
+            "+-12%",
+            "+-14%",
+            "+-16%",
+            "+-20%"
+          ]
+        }
+      ]
+    },
+    "SweetsSheep_Ground": {
+      "name": "Bonbon Amer",
+      "description": "Lorsqu'il est assigné à une Ferme, il peut laisser tomber de la Barbe à papa caramel. Lorsqu'il est dans la base, le taux de diminution de la Repu des Pals de la base est réduit de (-15~-25) %. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Réduction de la faim",
+          "values": [
+            "+-15%",
+            "+-17%",
+            "+-19%",
+            "+-21%",
+            "+-25%"
+          ]
+        }
+      ]
+    },
+    "SwordCutlassfish": {
+      "name": "Désossage",
+      "description": "Lorsqu'activée, Skutlass se transforme en katana à disposition du joueur (Attaque: (2600~3900) ). S'il ne retrouve pas rapidement sa forme d'origine, Skutlass tombe K.O. Utiliser une attaque Laigiri le met également K.O.",
+      "effects": []
+    },
+    "SwordCutlassfish_Fire": {
+      "name": "Barbecue",
+      "description": "Lorsqu'activée, Skutlass Ignis se transforme en katana à disposition du joueur (Attaque: (2900~4200) ). S'il ne retrouve pas rapidement sa forme d'origine, Skutlass Ignis tombe K.O. Utiliser une attaque Laigiri le met également K.O.",
+      "effects": []
+    },
+    "TentacleTurtle": {
+      "name": "Support Pointu",
+      "description": "Lorsqu'il est dans l'équipe, réduit de (80~100)% le poids du Minerai de métal. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Réduction du poids des objets",
+          "values": [
+            "+80%",
+            "+84%",
+            "+88%",
+            "+92%",
+            "+100%"
+          ]
+        }
+      ]
+    },
+    "TentacleTurtle_Ground": {
+      "name": "Support Brillant",
+      "description": "Lorsqu'il est dans l'équipe, réduit de (80~100)% le poids du Soufre et du Charbon, et augmente de (25~40)% les dégâts de type Terre infligés aux points faibles. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Réduction du poids des objets",
+          "values": [
+            "+80%",
+            "+84%",
+            "+88%",
+            "+92%",
+            "+100%"
+          ]
+        }
+      ]
+    },
+    "ThiefBird": {
+      "name": "Ailes des Ténèbres",
+      "description": "Peut être utilisé comme monture pour voler. Augmente de (50~65) % les dégâts infligés par le joueur et les Pals aux ennemis affectés par l'état Cécité lorsqu'il est dans l'équipe. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Dégâts sur une cible affectée (darkness)",
+          "values": [
+            "+50%",
+            "+53%",
+            "+56%",
+            "+60%",
+            "+65%"
+          ]
+        }
+      ]
+    },
+    "ThunderBird": {
+      "name": "Orage",
+      "description": "Peut être utilisé comme monture pour voler. Lorsqu'il est monté, les attaques du joueur deviennent de type Électricité et sa puissance d'attaque augmente de (5~20)%. La vitesse de déplacement de ce Pal augmente de (5~25)% pour chaque Pal de type Électricité dans l'équipe, à l'exception de Beakon.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "+5%",
+            "+9%",
+            "+13%",
+            "+18%",
+            "+25%"
+          ]
+        },
+        {
+          "label": "Attaque",
+          "values": [
+            "+5%",
+            "+7%",
+            "+10%",
+            "+14%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "ThunderBird_Ice": {
+      "name": "Grésil Céleste",
+      "description": "Peut être utilisé comme monture pour voler. Lorsqu'il est monté, les attaques du joueur sont converties en Glace, et son attaque augmente de (5~20)%. La vitesse de déplacement de ce Pal augmente de (5~25)% pour chaque Pal de type Glace présent dans l'équipe, à l'exception de Beakon Cryst.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "+5%",
+            "+9%",
+            "+13%",
+            "+18%",
+            "+25%"
+          ]
+        },
+        {
+          "label": "Attaque",
+          "values": [
+            "+5%",
+            "+7%",
+            "+10%",
+            "+14%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "ThunderDog": {
+      "name": "Chien Électrique",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet d'effectuer un double saut lorsqu'il est monté. La vitesse de déplacement de ce Pal augmente de (5~25)% pour chaque Pal de type Électricité dans l'équipe, à l'exception de Rayhound.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "+5%",
+            "+9%",
+            "+13%",
+            "+18%",
+            "+25%"
+          ]
+        }
+      ]
+    },
+    "ThunderDog_Ice": {
+      "name": "Blizzarus-K9",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet d'effectuer un double saut une fois monté. Augmente la défense des Pals de type Glace de (15~30) % lorsqu'il est dans l'équipe. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Défense",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        },
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+12%",
+            "+15%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "ThunderDragonMan": {
+      "name": "Dragon Tempétueux",
+      "description": "Lorsqu'il est dans l'équipe, chaque tir qui touche un ennemi augmente de (1~5)% l'attaque et la défense des Pals combattants. Cet effet dure 5 secondes et peut se cumuler jusqu'à 30 fois. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Bonus cumulable par balle touchée",
+          "values": [
+            "+1%",
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%"
+          ]
+        }
+      ]
+    },
+    "ThunderFluffyBird": {
+      "name": "Couvaison Électromassante",
+      "description": "Peut être utilisé comme monture pour voler. Lorsqu'il est dans la base, augmente la vitesse d'éclosion des œufs de (20~40) %. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Vitesse d’éclosion des œufs",
+          "values": [
+            "+20%",
+            "+22%",
+            "+26%",
+            "+32%",
+            "+40%"
+          ]
+        }
+      ]
+    },
+    "TropicalOstrich": {
+      "name": "Bain de Soleil",
+      "description": "Peut être utilisé comme monture pour se déplacer. La vitesse de déplacement augmente de (155~240)% dans les hautes herbes.",
+      "effects": [
+        {
+          "label": "Vitesse de déplacement sur l’herbe",
+          "values": [
+            "+155%",
+            "+175%",
+            "+195%",
+            "+215%",
+            "+240%"
+          ]
+        }
+      ]
+    },
+    "Umihebi": {
+      "name": "Dragon Marin Tempétueux",
+      "description": "Peut être utilisé comme monture pour se déplacer sur l'eau. Lorsqu'il est dans l'équipe, augmente de (50~65)% les dégâts infligés aux ennemis affectés par Trempé. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Dégâts sur une cible affectée (wetness)",
+          "values": [
+            "+50%",
+            "+53%",
+            "+56%",
+            "+60%",
+            "+65%"
+          ]
+        },
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+12%",
+            "+15%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "Umihebi_Fire": {
+      "name": "Dragon de Lave Tempétueux",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, annule les dégâts de lave et augmente de (50~65)% les dégâts infligés aux ennemis affectés par Brûlure. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Dégâts sur une cible affectée (burn)",
+          "values": [
+            "+50%",
+            "+53%",
+            "+56%",
+            "+60%",
+            "+65%"
+          ]
+        },
+        {
+          "label": "Protection contre les dégâts de lave",
+          "values": [
+            "+1%",
+            "+1%",
+            "+1%",
+            "+1%",
+            "+1%"
+          ]
+        },
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "Aucun bonus",
+            "+10%",
+            "+12%",
+            "+15%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "VenusFlytrap": {
+      "name": "Langue Fourchue",
+      "description": "Lorsqu'il est dans l'équipe et que le joueur effectue une roulade ou des déplacements rapides, Carnibora génère une tornade qui inflige des dégâts aux ennemis touchés ( Herbe / Puissance: (40~80) ). (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Dégâts de l’attaque végétale du joueur",
+          "values": [
+            "+40%",
+            "+50%",
+            "+60%",
+            "+70%",
+            "+80%"
+          ]
+        }
+      ]
+    },
+    "VioletFairy": {
+      "name": "Purification Tellurique",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (40~80)% la quantité d'objets obtenus en terrassant des Pals de type Terre. (effet non cumulable) Peut être assigné à une Ferme avec une chance de produire diverses graines.",
+      "effects": []
+    },
+    "VolcanicMonster": {
+      "name": "Bête Briseuse de Cristal",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, réduit de (30~60)% le poids de tous les minerais. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Réduction du poids des objets",
+          "values": [
+            "+30%",
+            "+35%",
+            "+40%",
+            "+50%",
+            "+60%"
+          ]
+        }
+      ]
+    },
+    "VolcanicMonster_Ice": {
+      "name": "Bête Biseuse d'Icebergs",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, réduit de (35~65)% le poids de tous les minerais. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Réduction du poids des objets",
+          "values": [
+            "+35%",
+            "+40%",
+            "+45%",
+            "+55%",
+            "+65%"
+          ]
+        }
+      ]
+    },
+    "VolcanoDragon": {
+      "name": "Trop-Plein de Magma",
+      "description": "Peut être utilisé comme monture pour se déplacer. L'attaque de ce Pal augmente de (4~8)% pour chaque Pal de type Feu ou Terre présent dans l'équipe, à l'exception de Moldron.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+4%",
+            "+5%",
+            "+6%",
+            "+7%",
+            "+8%"
+          ]
+        }
+      ]
+    },
+    "VolcanoDragon_Ice": {
+      "name": "Trop-Plein de Glace",
+      "description": "Peut être utilisé comme monture pour se déplacer. Augmente de (25~40) % les dégâts infligés par le joueur et les Pals lorsqu'ils exploitent la faiblesse d'un ennemi avec des attaques de type Glace. (Effet non cumulable)",
+      "effects": []
+    },
+    "WeaselDragon": {
+      "name": "Belette Stupéfiante",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est monté, les attaques du joueur deviennent de type Dragon et sa puissance d'attaque augmente de (5~20)%.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+5%",
+            "+7%",
+            "+10%",
+            "+14%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "WeaselDragon_Fire": {
+      "name": "Belette Crépitante",
+      "description": "Peut être utilisé comme monture pour se déplacer. Une fois monté, les attaques du joueur deviennent de type Feu et sa puissance d'attaque augmente de (5~20)%.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+5%",
+            "+7%",
+            "+10%",
+            "+14%",
+            "+20%"
+          ]
+        }
+      ]
+    },
+    "Werewolf": {
+      "name": "Grilles Scintillantes",
+      "description": "Lorsqu'il est activé, attaque l'ennemi ciblé avec Griffe Sautée. La puissance de cette compétence est multipliée par (1.1~2.5). Lorsqu'il est dans l'équipe, augmente de (15~30)% la vitesse d'attaque des armes de corps-à-corps du joueur. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Vitesse d’attaque",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "Werewolf_Ice": {
+      "name": "Coup de Griffes Glacées",
+      "description": "Lorsqu'activée, attaque l'ennemi visé avec Griffe Neigeuse. La puissance de Griffe Neigeuse utilisée par ce Pal est multipliée par (1.1~2.5). Lorsqu'il est dans l'équipe, augmente de (15~30)% la vitesse d'attaque des armes de corps à corps du joueur. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Vitesse d’attaque",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "WhiteAlienDragon": {
+      "name": "Intrus Non Identifié",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, augmente de (10~35)% les dégâts infligés par les armes énergétiques du joueur. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Dégâts de l’arme équipée",
+          "values": [
+            "+10%",
+            "+15%",
+            "+20%",
+            "+25%",
+            "+35%"
+          ]
+        }
+      ]
+    },
+    "WhiteDeer": {
+      "name": "Bénédiction Purificatrice",
+      "description": "Peut être utilisé comme monture pour se déplacer. L'attaque et la vitesse de déplacement de ce Pal augmentent de (2~6)% pour chaque Pal de type Non élém. présent dans l'équipe, à l'exception de Celesdir. Lorsqu'il est dans l'équipe, restaure chaque seconde les PV du joueur et des Pals de l'équipe de (0.15~0.75)% en dehors des combats. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Régénération des PV",
+          "values": [
+            "+0,15%",
+            "+0,225%",
+            "+0,3%",
+            "+0,45%",
+            "+0,75%"
+          ]
+        },
+        {
+          "label": "Attaque",
+          "values": [
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%",
+            "+6%"
+          ]
+        },
+        {
+          "label": "Vitesse de déplacement",
+          "values": [
+            "+2%",
+            "+3%",
+            "+4%",
+            "+5%",
+            "+6%"
+          ]
+        }
+      ]
+    },
+    "WhiteDeer_Dark": {
+      "name": "Bénédiction du Chaos",
+      "description": "Peut être utilisé comme monture pour se déplacer. Augmente l'attaque des Pals en combat de (40~80) % lorsqu'il est dans l'équipe, mais leurs PV diminuent progressivement. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+40%",
+            "+50%",
+            "+60%",
+            "+70%",
+            "+80%"
+          ]
+        }
+      ]
+    },
+    "WhiteMoth": {
+      "name": "Voile Soyeux",
+      "description": "Lorsqu'il est activé, attaque l'ennemi ciblé avec Morsure du Blizzard. La puissance de cette compétence est multipliée par (1.1~2.5). Peut être assigné à une Ferme avec une chance de produire du Tissu de qualité.",
+      "effects": []
+    },
+    "WhiteMoth_Neutral": {
+      "name": "Voile Doré",
+      "description": "Lorsqu'il est dans l'équipe, augmente la défense des Pals de type Non élém. de (15~30) %. (Effet non cumulable) À affecter à une Ferme pour avoir une chance de fabriquer du Tissu de qualité.",
+      "effects": [
+        {
+          "label": "Défense",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "WhiteShieldDragon": {
+      "name": "Bouclier Aegis",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, réduit de (30~60)% le délai avant le début de la régénération du bouclier du joueur et réduit de (65~80)% la perte de durabilité du bouclier. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Délai de récupération du bouclier",
+          "values": [
+            "+30%",
+            "+34%",
+            "+40%",
+            "+48%",
+            "+60%"
+          ]
+        },
+        {
+          "label": "Réduction des dégâts du bouclier",
+          "values": [
+            "+65%",
+            "+68%",
+            "+71%",
+            "+75%",
+            "+80%"
+          ]
+        }
+      ]
+    },
+    "WhiteTiger": {
+      "name": "Chasseur de Dragons",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (40~80)% la quantité d'objets obtenus en terrassant des Pals de type Dragon. (effet non cumulable)",
+      "effects": []
+    },
+    "WhiteTiger_Ground": {
+      "name": "Poigne Explosive",
+      "description": "Lorsqu'il est dans l'équipe et qu'un point faible est touché, les dégâts du prochain coup porté à un point faible augmentent de (30~60)%. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Dégâts aux points faibles du joueur",
+          "values": [
+            "+30%",
+            "+34%",
+            "+40%",
+            "+48%",
+            "+60%"
+          ]
+        }
+      ]
+    },
+    "WindChimes": {
+      "name": "Trapéziste",
+      "description": "Lorsqu'il est dans l'équipe, modifie les performances du planeur équipé. Permet de s'élever lentement pendant le vol plané.",
+      "effects": []
+    },
+    "WindChimes_Ice": {
+      "name": "Trapéziste du Froid",
+      "description": "Lorsqu'il est dans l'équipe, modifie les performances du planeur équipé. Permet de s'élever lentement pendant le vol plané.",
+      "effects": []
+    },
+    "WingGolem": {
+      "name": "Mode Gardien d'Acier",
+      "description": "Lorsqu'activée, la volonté de fer de Knocklem augmente temporairement son attaque de (50~200)% et sa défense de (50~200)%.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+50%",
+            "+75%",
+            "+110%",
+            "+150%",
+            "+200%"
+          ]
+        },
+        {
+          "label": "Défense",
+          "values": [
+            "+50%",
+            "+75%",
+            "+110%",
+            "+150%",
+            "+200%"
+          ]
+        }
+      ]
+    },
+    "WingGolem_Fire": {
+      "name": "Mode Gardien de Sang",
+      "description": "Lorsqu'il est activé, Knocklem Ignis augmente temporairement son attaque de (60~210) % et sa défense de (60~210) %, grâce à sa volonté de fer.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+60%",
+            "+85%",
+            "+120%",
+            "+160%",
+            "+210%"
+          ]
+        },
+        {
+          "label": "Défense",
+          "values": [
+            "+60%",
+            "+85%",
+            "+120%",
+            "+160%",
+            "+210%"
+          ]
+        }
+      ]
+    },
+    "WizardOwl": {
+      "name": "Sagesse Obscure",
+      "description": "Lorsqu'il est dans l'équipe, augmente l'attaque des Pals de type Ténèbres de (15~30)%. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "WoolFox": {
+      "name": "Laine Soyeuse",
+      "description": "Lorsqu'il est dans l'équipe, augmente l'attaque des Pals de type Non élém. de (15~30)%. (effet non cumulable) Peut être assigné à une Ferme avec une chance de produire de la Laine.",
+      "effects": [
+        {
+          "label": "Attaque",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        }
+      ]
+    },
+    "WorldTreeDragon": {
+      "name": "-",
+      "description": "Des recherches sont en cours pour déterminer les capacités de ce Pal.",
+      "effects": []
+    },
+    "YakushimaBoss001": {
+      "name": "Ruée de l’Œil de Cthulhu",
+      "description": "Lorsqu'activée, Œil de Cthulhu charge l'ennemi ciblé pour l'attaquer.",
+      "effects": [
+        {
+          "label": "Puissance de la compétence partenaire",
+          "values": [
+            "×1,1",
+            "×1,3",
+            "×1,6",
+            "×2",
+            "×2,5"
+          ]
+        }
+      ]
+    },
+    "YakushimaBoss001_Small": {
+      "name": "Vision Démoniaque",
+      "description": "Lorsqu'il est dans l'équipe, augmente l'attaque des Pals de type Ténèbres de (15~30)%. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Attaque des Pals de Ténèbres",
+          "values": [
+            "+15 %",
+            "+17 %",
+            "+20 %",
+            "+24 %",
+            "+30 %"
+          ]
+        }
+      ]
+    },
+    "YakushimaMonster001": {
+      "name": "Corps Gélatineux",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet de sauter plus haut lorsqu'il est monté.",
+      "effects": []
+    },
+    "YakushimaMonster001_Blue": {
+      "name": "Corps Gélatineux",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet de sauter plus haut lorsqu'il est monté.",
+      "effects": []
+    },
+    "YakushimaMonster001_Pink": {
+      "name": "Corps Gélatineux",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet de sauter plus haut lorsqu'il est monté.",
+      "effects": []
+    },
+    "YakushimaMonster001_Purple": {
+      "name": "Corps Gélatineux",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet de sauter plus haut lorsqu'il est monté.",
+      "effects": []
+    },
+    "YakushimaMonster001_Rainbow": {
+      "name": "Corps Gélatineux",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet de sauter plus haut lorsqu'il est monté.",
+      "effects": []
+    },
+    "YakushimaMonster001_Red": {
+      "name": "Corps Gélatineux",
+      "description": "Peut être utilisé comme monture pour se déplacer. Permet de sauter plus haut lorsqu'il est monté.",
+      "effects": []
+    },
+    "YakushimaMonster002": {
+      "name": "Enchantement",
+      "description": "Lorsqu'il est dans l'équipe, augmente de (40~80)% la quantité d'objets obtenus en terrassant des Pals de type Ténèbres. (Effet non cumulable)",
+      "effects": [
+        {
+          "label": "Objets obtenus sur les Pals de Ténèbres",
+          "values": [
+            "+40 %",
+            "+50 %",
+            "+60 %",
+            "+70 %",
+            "+80 %"
+          ]
+        }
+      ]
+    },
+    "YakushimaMonster003": {
+      "name": "Soutien de Chauve-souris",
+      "description": "Lorsqu'il est dans l'équipe, apparaît aux côtés du joueur et ramasse automatiquement les objets à proximité.",
+      "effects": []
+    },
+    "YakushimaMonster003_Purple": {
+      "name": "Soutien de Chauve-souris",
+      "description": "Lorsqu'il est dans l'équipe, apparaît aux côtés du joueur et ramasse automatiquement les objets à proximité.",
+      "effects": []
+    },
+    "Yeti": {
+      "name": "Gardien des Montagnes Enneigées",
+      "description": "Peut être utilisé comme monture pour se déplacer. Dans la base, augmente de +1 le niveau d'aptitude au travail Transport des autres Pals de la base. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Capacité de travail — Transport",
+          "values": [
+            "+1",
+            "+1",
+            "+1",
+            "+1",
+            "+1"
+          ]
+        }
+      ]
+    },
+    "Yeti_Grass": {
+      "name": "Gardien du Sud",
+      "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, réduit de (15~30)% les dégâts de type Terre subis par le joueur et les Pals, et immunise contre l'état Embourbement. (effet non cumulable)",
+      "effects": [
+        {
+          "label": "Résistance aux dégâts de Terre",
+          "values": [
+            "+15%",
+            "+17%",
+            "+20%",
+            "+24%",
+            "+30%"
+          ]
+        },
+        {
+          "label": "Résistance à l’effet Muddy",
+          "values": [
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%",
+            "+100%"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -766,6 +766,33 @@ function condensationCostTemplate(stars) {
     <p><strong>${condensationTotalCosts[stars]} Pals</strong><span>au total depuis 0★</span></p>`;
 }
 
+function condensationPartnerTemplate(pal, stars) {
+  if (!pal) {
+    return '<div class="condensation-partner condensation-partner--ghost" aria-hidden="true"><span></span><span></span><span></span></div>';
+  }
+
+  const partner = pal.partner;
+  const effects = partner.effects
+    .map((effect) => {
+      const value = effect.values[stars];
+      const changed = stars > 0 && value !== effect.values[stars - 1];
+      return `<p><span>${escapeHtml(effect.label)}</span><strong class="${changed ? "condensation-partner__value--changed" : ""}">${escapeHtml(value)}</strong></p>`;
+    })
+    .join("");
+
+  return `
+    <div class="condensation-partner">
+      <div class="condensation-partner__eyebrow"><span>Compétence partenaire</span><small>${stars}★</small></div>
+      <h3>${escapeHtml(partner.name)}</h3>
+      <p class="condensation-partner__description">${escapeHtml(partner.description)}</p>
+      ${
+        effects
+          ? `<div class="condensation-partner__effects">${effects}</div>`
+          : '<p class="condensation-partner__fixed">Aucune valeur évolutive visible.</p>'
+      }
+    </div>`;
+}
+
 function condensationCardTemplate(pal) {
   const isGhost = !pal;
   const displayedStars = isGhost ? 0 : condensationStars;
@@ -791,6 +818,9 @@ function condensationCardTemplate(pal) {
                   .join("")}</div>`
               : ""
           }
+        </div>
+        <div data-condensation-partner>
+          ${condensationPartnerTemplate(pal, displayedStars)}
         </div>
       </header>
 
@@ -877,8 +907,10 @@ function updateCondensationState() {
   const selectedPal = condensationPals.find((pal) => pal.id === selectedCondensationPalId) || null;
   const grid = content.querySelector("[data-condensation-work-grid]");
   const cost = content.querySelector("[data-condensation-cost]");
+  const partner = content.querySelector("[data-condensation-partner]");
   if (grid) grid.innerHTML = condensationWorkGridTemplate(selectedPal, condensationStars);
   if (cost) cost.innerHTML = condensationCostTemplate(condensationStars);
+  if (partner) partner.innerHTML = condensationPartnerTemplate(selectedPal, condensationStars);
   content.querySelectorAll("[data-condensation-star]").forEach((button) => {
     button.classList.toggle("active", Number(button.dataset.condensationStar) === condensationStars);
   });
