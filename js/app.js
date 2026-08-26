@@ -326,6 +326,188 @@ const passiveJobs = jobs.map((job) => ({
   group: job.id === "transport" ? "transport" : job.id === "farming" ? "farming" : "classic",
 }));
 
+const partnerActivities = [
+  ...jobs,
+  {
+    id: "global",
+    name: "Global",
+    shortName: "Global",
+    icon: "assets/pals/shroomer-noct.png",
+    color: "#8fcf9e",
+  },
+  {
+    id: "breeding",
+    name: "Élevage / Œufs",
+    shortName: "Élevage / Œufs",
+    icon: "assets/pals/braloha.png",
+    color: "#f0b987",
+  },
+];
+
+const basePartnerSkills = [
+  {
+    activity: "kindling",
+    pal: "Katress Ignis",
+    portrait: "katress-ignis",
+    skill: "Passion Magie Noire",
+    effects: ["Augmente de +1 l’Allumage de feu des autres Pals présents dans la base."],
+    note: "Effet non cumulable.",
+  },
+  {
+    activity: "watering",
+    pal: "Amione",
+    portrait: "amione",
+    skill: "Jumelage Magique",
+    effects: ["Augmente de +1 l’Arrosage des autres Pals présents dans la base."],
+    note: "Effet non cumulable.",
+  },
+  {
+    activity: "planting",
+    pal: "Petallia",
+    portrait: "petallia",
+    skill: "Bénédiction Florale",
+    effects: ["Augmente de +1 la Semence des autres Pals présents dans la base."],
+    note: "Effet non cumulable.",
+  },
+  {
+    activity: "planting",
+    pal: "Lullu",
+    portrait: "lullu",
+    skill: "Turbo Floral",
+    effects: ["Augmente de 50 % la vitesse de croissance des cultures lorsqu’elle est présente dans la base."],
+  },
+  {
+    activity: "electricity",
+    pal: "Puffolt",
+    portrait: "puffolt",
+    skill: "Poussée Crépitante",
+    effects: ["Augmente de +1 la Génération d’énergie des autres Pals présents dans la base."],
+    note: "Effet non cumulable.",
+  },
+  {
+    activity: "handiwork",
+    pal: "Ribbuny",
+    portrait: "ribbuny",
+    skill: "Princesse Lapinou Souriant",
+    effects: ["Augmente de +1 l’Artisanat des autres Pals présents dans la base."],
+    note: "Effet non cumulable.",
+  },
+  {
+    activity: "handiwork",
+    pal: "Sekhmet",
+    portrait: "sekhmet",
+    skill: "Impératrice des Sables",
+    effects: [
+      "Augmente de 20 % la Vitesse de travail des Anubis présents dans la base.",
+      "Augmente de 30 % l’efficacité de Sekhmet lorsqu’elle travaille sur un établi ou dans une usine.",
+    ],
+    note: "Le bonus destiné aux Anubis est non cumulable.",
+  },
+  {
+    activity: "handiwork",
+    pal: "Ribbuny Botan",
+    portrait: "ribbuny-botan",
+    skill: "Lapin Dézerbe",
+    effects: ["Augmente de 200 % l’efficacité de Ribbuny Botan sur un établi ou dans une usine d’armes."],
+    note: "Bonus spécifique aux installations d’armes, pas à l’Artisanat en général.",
+  },
+  {
+    activity: "gathering",
+    pal: "Clovee",
+    portrait: "clovee",
+    skill: "Joyeux Trèfle",
+    effects: ["Augmente de +1 la Collecte des autres Pals présents dans la base."],
+    note: "Effet non cumulable.",
+  },
+  {
+    activity: "lumbering",
+    pal: "Eikthyrdeer Terra",
+    portrait: "eikthyrdeer-terra",
+    skill: "Gardien des Bois Dorés",
+    effects: ["Augmente de +1 l’Abattage des autres Pals présents dans la base."],
+    note: "Effet non cumulable.",
+  },
+  {
+    activity: "mining",
+    pal: "Tetroise",
+    portrait: "tetroise",
+    skill: "Tortue Maçonne",
+    effects: ["Augmente de +1 l’Extraction des autres Pals présents dans la base."],
+    note: "Effet non cumulable.",
+  },
+  {
+    activity: "medicine",
+    pal: "Mycora",
+    portrait: "mycora",
+    skill: "Spores Charmants",
+    effects: ["Augmente de +1 la Pharmacie des autres Pals présents dans la base."],
+    note: "Effet non cumulable.",
+  },
+  {
+    activity: "cooling",
+    pal: "Smokie Cryst",
+    portrait: "smokie-cryst",
+    skill: "Froide Bête",
+    effects: ["Augmente de +1 la Réfrigération des autres Pals présents dans la base."],
+    note: "Effet non cumulable.",
+  },
+  {
+    activity: "transport",
+    pal: "Wumpo",
+    portrait: "wumpo",
+    skill: "Gardien des Montagnes Enneigées",
+    effects: ["Augmente de +1 le Transport des autres Pals présents dans la base."],
+    note: "Effet non cumulable.",
+  },
+  {
+    activity: "farming",
+    pal: "Cinnamoth",
+    portrait: "cinnamoth",
+    skill: "Écailles Mystérieuses",
+    effects: ["Augmente de +1 l’Exploitation des autres Pals présents dans la base."],
+    note: "Effet non cumulable.",
+  },
+  {
+    activity: "global",
+    pal: "Shroomer Noct",
+    portrait: "shroomer-noct",
+    skill: "Spores Fumantes",
+    effects: ["Les points MEN des Pals présents dans la base diminuent 10 % plus lentement."],
+  },
+  {
+    activity: "global",
+    pal: "Woolipop",
+    portrait: "woolipop",
+    skill: "Petit Bonbon",
+    effects: ["La satiété des Pals présents dans la base diminue 10 % plus lentement."],
+    note: "Effet non cumulable.",
+  },
+  {
+    activity: "global",
+    pal: "Woolipop Terra",
+    portrait: "woolipop-terra",
+    skill: "Bonbon Amer",
+    effects: ["La satiété des Pals présents dans la base diminue 15 % plus lentement."],
+    note: "Effet non cumulable.",
+  },
+  {
+    activity: "breeding",
+    pal: "Braloha",
+    portrait: "braloha",
+    skill: "Soleil Accablant",
+    effects: ["Augmente de 20 % la vitesse de production des œufs des Pals affectés à un Élevage."],
+    note: "Effet non cumulable.",
+  },
+  {
+    activity: "breeding",
+    pal: "Dynamoff",
+    portrait: "dynamoff",
+    skill: "Couvaison Électromassante",
+    effects: ["Augmente de 20 % la vitesse d’éclosion des œufs lorsqu’il est présent dans la base."],
+    note: "Effet non cumulable.",
+  },
+];
+
 const picker = document.querySelector("#job-picker");
 const content = document.querySelector("#content");
 const brand = document.querySelector(".brand");
@@ -340,6 +522,8 @@ const formatter = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2 });
 
 let selectedId = jobs[0].id;
 let selectedPassiveJobId = jobs[0].id;
+let selectedInfoTab = "condensation";
+let selectedPartnerActivityId = partnerActivities[0].id;
 let currentView = "jobs";
 
 function tableTemplate(job) {
@@ -479,6 +663,91 @@ function passivePageTemplate() {
     </section>`;
 }
 
+function condensationTemplate() {
+  return `
+    <article class="info-card" aria-labelledby="condensation-title">
+      <header class="info-card__header">
+        <img src="assets/structures/pal-essence-condenser.jpg" alt="Condensateur d’essence de Pal" />
+        <div>
+          <h3 id="condensation-title">Condensation des Pals</h3>
+          <p>La condensation renforce un Pal en utilisant d’autres Pals de la même espèce. Chaque palier ajoute une étoile et améliore une ou plusieurs de ses aptitudes de travail.</p>
+        </div>
+      </header>
+      <div class="condensation-steps">
+        <div><strong>1★</strong><span>4 Pals</span><p>+1 à son aptitude de travail prioritaire.</p></div>
+        <div><strong>2★</strong><span>8 Pals</span><p>+1 à sa deuxième aptitude de travail prioritaire.</p></div>
+        <div><strong>3★</strong><span>12 Pals</span><p>+1 à sa troisième aptitude de travail prioritaire.</p></div>
+        <div><strong>4★</strong><span>24 Pals</span><p>+1 à toutes ses aptitudes de travail.</p></div>
+      </div>
+      <p class="info-card__note">Il faut donc 48 Pals au total pour atteindre 4★. Les quantités indiquées correspondent au coût de chaque palier.</p>
+    </article>`;
+}
+
+function basePartnerCardTemplate(entry) {
+  return `
+    <article class="partner-card">
+      <img class="partner-card__portrait" src="assets/pals/${entry.portrait}.png" alt="${entry.pal}" />
+      <div class="partner-card__content">
+        <p class="partner-card__pal">${entry.pal}</p>
+        <h3>${entry.skill}</h3>
+        <div class="partner-card__effects">
+          ${entry.effects.map((effect) => `<p>${effect}</p>`).join("")}
+        </div>
+        ${entry.note ? `<p class="partner-card__note">${entry.note}</p>` : ""}
+      </div>
+    </article>`;
+}
+
+function basePartnersTemplate() {
+  const selectedActivity =
+    partnerActivities.find((activity) => activity.id === selectedPartnerActivityId) || partnerActivities[0];
+  const entries = basePartnerSkills.filter((entry) => entry.activity === selectedActivity.id);
+
+  return `
+    <section class="partner-page" aria-labelledby="partner-result-title">
+      <p class="info-section-copy">Choisissez une activité pour identifier rapidement les Pals dont la Compétence partenaire apporte un bonus utile à la base.</p>
+      <nav class="job-picker partner-activity-picker" aria-label="Choisir une activité de base">
+        ${partnerActivities
+          .map(
+            (activity) => `
+              <button
+                type="button"
+                data-partner-activity="${activity.id}"
+                class="${selectedActivity.id === activity.id ? "selected" : ""}"
+                aria-pressed="${selectedActivity.id === activity.id}"
+                style="--job-color:${activity.color}"
+              >
+                <img src="${activity.icon}" alt="" />
+                <span>${activity.name}</span>
+              </button>`,
+          )
+          .join("")}
+      </nav>
+      <div class="partner-results" style="--job-color:${selectedActivity.color}">
+        <header class="partner-results__header">
+          <span class="work-card__icon"><img src="${selectedActivity.icon}" alt="" /></span>
+          <div>
+            <p>Compétences partenaire utiles pour</p>
+            <h2 id="partner-result-title">${selectedActivity.name}</h2>
+          </div>
+        </header>
+        <div class="partner-list">${entries.map(basePartnerCardTemplate).join("")}</div>
+      </div>
+    </section>`;
+}
+
+function infoPageTemplate() {
+  return `
+    <section class="info-page" aria-label="Infos utiles">
+      <p class="eyebrow">Mécaniques de Palworld</p>
+      <nav class="info-tabs" aria-label="Sujets des infos utiles">
+        <button type="button" data-info-tab="condensation" class="${selectedInfoTab === "condensation" ? "active" : ""}" aria-selected="${selectedInfoTab === "condensation"}">Condensation des Pals</button>
+        <button type="button" data-info-tab="base-partners" class="${selectedInfoTab === "base-partners" ? "active" : ""}" aria-selected="${selectedInfoTab === "base-partners"}">Compétences partenaire de base</button>
+      </nav>
+      ${selectedInfoTab === "base-partners" ? basePartnersTemplate() : condensationTemplate()}
+    </section>`;
+}
+
 function updateIntro() {
   intro.classList.toggle("hidden", currentView === "info");
 
@@ -504,29 +773,7 @@ function render() {
   picker.classList.toggle("hidden", currentView !== "jobs");
 
   if (currentView === "info") {
-    content.innerHTML = `
-      <section class="info-page" aria-label="Infos utiles">
-        <p class="eyebrow">Mécaniques de Palworld</p>
-        <nav class="info-tabs" aria-label="Sujets des infos utiles">
-          <button class="active" type="button" aria-current="page">Condensation des Pals</button>
-        </nav>
-        <article class="info-card" aria-labelledby="condensation-title">
-          <header class="info-card__header">
-            <img src="assets/structures/pal-essence-condenser.jpg" alt="Condensateur d’essence de Pal" />
-            <div>
-              <h3 id="condensation-title">Condensation des Pals</h3>
-              <p>La condensation renforce un Pal en utilisant d’autres Pals de la même espèce. Chaque palier ajoute une étoile et améliore une ou plusieurs de ses aptitudes de travail.</p>
-            </div>
-          </header>
-          <div class="condensation-steps">
-            <div><strong>1★</strong><span>4 Pals</span><p>+1 à son aptitude de travail prioritaire.</p></div>
-            <div><strong>2★</strong><span>8 Pals</span><p>+1 à sa deuxième aptitude de travail prioritaire.</p></div>
-            <div><strong>3★</strong><span>12 Pals</span><p>+1 à sa troisième aptitude de travail prioritaire.</p></div>
-            <div><strong>4★</strong><span>24 Pals</span><p>+1 à toutes ses aptitudes de travail.</p></div>
-          </div>
-          <p class="info-card__note">Il faut donc 48 Pals au total pour atteindre 4★. Les quantités indiquées correspondent au coût de chaque palier.</p>
-        </article>
-      </section>`;
+    content.innerHTML = infoPageTemplate();
     return;
   }
 
@@ -548,10 +795,25 @@ picker.addEventListener("click", (event) => {
 });
 
 content.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-passive-job]");
-  if (!button) return;
-  selectedPassiveJobId = button.dataset.passiveJob;
-  render();
+  const passiveJobButton = event.target.closest("[data-passive-job]");
+  if (passiveJobButton) {
+    selectedPassiveJobId = passiveJobButton.dataset.passiveJob;
+    render();
+    return;
+  }
+
+  const infoTabButton = event.target.closest("[data-info-tab]");
+  if (infoTabButton) {
+    selectedInfoTab = infoTabButton.dataset.infoTab;
+    render();
+    return;
+  }
+
+  const partnerActivityButton = event.target.closest("[data-partner-activity]");
+  if (partnerActivityButton) {
+    selectedPartnerActivityId = partnerActivityButton.dataset.partnerActivity;
+    render();
+  }
 });
 
 brand.addEventListener("click", (event) => {
