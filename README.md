@@ -9,8 +9,9 @@ Petite application statique en français regroupant des outils pratiques pour Pa
 - Vue détaillée par aptitude.
 - Passifs utiles par capacité de travail.
 - Informations pratiques sur la condensation des Pals.
-- Compétences partenaire utiles au fonctionnement de la base, classées par activité.
-- Navigation par rubriques et sous-rubriques.
+- Compétences partenaire utilitaires, classées par activité.
+- Accès direct aux rubriques depuis la navigation principale.
+- Aperçu de la future rubrique des Compétences partenaire de combat.
 - Mise en page adaptée au téléphone et au PC.
 
 ## Publication

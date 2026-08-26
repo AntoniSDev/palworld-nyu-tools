@@ -332,14 +332,14 @@ const partnerActivities = [
     id: "global",
     name: "Global",
     shortName: "Global",
-    icon: "assets/pals/shroomer-noct.png",
+    icon: "assets/ui/palbox.png",
     color: "#8fcf9e",
   },
   {
     id: "breeding",
     name: "Élevage / Œufs",
     shortName: "Élevage / Œufs",
-    icon: "assets/pals/braloha.png",
+    icon: "assets/ui/mutant-pal-egg.png",
     color: "#f0b987",
   },
 ];
@@ -513,7 +513,9 @@ const content = document.querySelector("#content");
 const brand = document.querySelector(".brand");
 const singleButton = document.querySelector("#single-view");
 const passiveButton = document.querySelector("#passive-view");
-const infoButton = document.querySelector("#info-view");
+const condensationButton = document.querySelector("#condensation-view");
+const partnerButton = document.querySelector("#partner-view");
+const combatPartnerButton = document.querySelector("#combat-partner-view");
 const intro = document.querySelector(".intro");
 const pageEyebrow = document.querySelector("#page-eyebrow");
 const pageTitle = document.querySelector("#page-title");
@@ -522,7 +524,6 @@ const formatter = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2 });
 
 let selectedId = jobs[0].id;
 let selectedPassiveJobId = jobs[0].id;
-let selectedInfoTab = "condensation";
 let selectedPartnerActivityId = partnerActivities[0].id;
 let currentView = "jobs";
 
@@ -669,7 +670,7 @@ function condensationTemplate() {
       <header class="info-card__header">
         <img src="assets/structures/pal-essence-condenser.jpg" alt="Condensateur d’essence de Pal" />
         <div>
-          <h3 id="condensation-title">Condensation des Pals</h3>
+          <h3 id="condensation-title">Fonctionnement de la condensation</h3>
           <p>La condensation renforce un Pal en utilisant d’autres Pals de la même espèce. Chaque palier ajoute une étoile et améliore une ou plusieurs de ses aptitudes de travail.</p>
         </div>
       </header>
@@ -736,20 +737,26 @@ function basePartnersTemplate() {
     </section>`;
 }
 
-function infoPageTemplate() {
+function combatPartnersTemplate() {
   return `
-    <section class="info-page" aria-label="Infos utiles">
-      <p class="eyebrow">Mécaniques de Palworld</p>
-      <nav class="info-tabs" aria-label="Sujets des infos utiles">
-        <button type="button" data-info-tab="condensation" class="${selectedInfoTab === "condensation" ? "active" : ""}" aria-selected="${selectedInfoTab === "condensation"}">Condensation des Pals</button>
-        <button type="button" data-info-tab="base-partners" class="${selectedInfoTab === "base-partners" ? "active" : ""}" aria-selected="${selectedInfoTab === "base-partners"}">Compétences partenaire de base</button>
-      </nav>
-      ${selectedInfoTab === "base-partners" ? basePartnersTemplate() : condensationTemplate()}
+    <section class="construction-page" aria-labelledby="combat-construction-title">
+      <div class="construction-page__visual" aria-hidden="true">
+        <img src="assets/ui/cattiva-construction.gif" alt="" />
+      </div>
+      <div>
+        <p class="eyebrow">Prochaine fonctionnalité</p>
+        <h2 id="combat-construction-title">Compétences partenaire de combat</h2>
+        <strong>En cours de construction</strong>
+        <p>Cette rubrique arrivera dans une prochaine version.</p>
+      </div>
     </section>`;
 }
 
 function updateIntro() {
-  intro.classList.toggle("hidden", currentView === "info");
+  intro.classList.toggle(
+    "hidden",
+    currentView === "condensation" || currentView === "partners" || currentView === "combat-partners",
+  );
 
   if (currentView === "passives") {
     pageEyebrow.textContent = "Aide à la Palbox";
@@ -769,11 +776,31 @@ function render() {
   updateIntro();
   singleButton.classList.toggle("active", currentView === "jobs");
   passiveButton.classList.toggle("active", currentView === "passives");
-  infoButton.classList.toggle("active", currentView === "info");
+  condensationButton.classList.toggle("active", currentView === "condensation");
+  partnerButton.classList.toggle("active", currentView === "partners");
+  combatPartnerButton.classList.toggle("active", currentView === "combat-partners");
   picker.classList.toggle("hidden", currentView !== "jobs");
 
-  if (currentView === "info") {
-    content.innerHTML = infoPageTemplate();
+  if (currentView === "condensation") {
+    content.innerHTML = `<section class="standalone-page" aria-label="Condensation des Pals">
+      <p class="eyebrow">Amélioration des Pals</p>
+      <h1 class="standalone-page__title">Condensation des Pals</h1>
+      ${condensationTemplate()}
+    </section>`;
+    return;
+  }
+
+  if (currentView === "partners") {
+    content.innerHTML = `<section class="standalone-page" aria-label="Compétences partenaire utilitaires">
+      <p class="eyebrow">Gestion de la base</p>
+      <h1 class="standalone-page__title">Compétences partenaire utilitaires</h1>
+      ${basePartnersTemplate()}
+    </section>`;
+    return;
+  }
+
+  if (currentView === "combat-partners") {
+    content.innerHTML = combatPartnersTemplate();
     return;
   }
 
@@ -802,13 +829,6 @@ content.addEventListener("click", (event) => {
     return;
   }
 
-  const infoTabButton = event.target.closest("[data-info-tab]");
-  if (infoTabButton) {
-    selectedInfoTab = infoTabButton.dataset.infoTab;
-    render();
-    return;
-  }
-
   const partnerActivityButton = event.target.closest("[data-partner-activity]");
   if (partnerActivityButton) {
     selectedPartnerActivityId = partnerActivityButton.dataset.partnerActivity;
@@ -833,8 +853,18 @@ passiveButton.addEventListener("click", () => {
   render();
 });
 
-infoButton.addEventListener("click", () => {
-  currentView = "info";
+condensationButton.addEventListener("click", () => {
+  currentView = "condensation";
+  render();
+});
+
+partnerButton.addEventListener("click", () => {
+  currentView = "partners";
+  render();
+});
+
+combatPartnerButton.addEventListener("click", () => {
+  currentView = "combat-partners";
   render();
 });
 
