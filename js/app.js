@@ -371,10 +371,7 @@ function tableTemplate(job) {
           <span class="work-card__icon" style="--job-color:${job.color}">
             <img src="${job.icon}" alt="" />
           </span>
-          <div>
-            <p>Aptitude de travail</p>
-            <h2>${job.name}</h2>
-          </div>
+          <h2>${job.name}</h2>
         </div>
       </header>
       <div class="table-scroll">
@@ -427,6 +424,20 @@ function passiveSkillTemplate(skillId) {
     </article>`;
 }
 
+function passiveListTemplate(skillIds) {
+  return ["rank-5", "rank-4", "rank-3", "rank-1"]
+    .map((rarity) => {
+      const tierSkills = skillIds.filter((skillId) => passiveSkills[skillId].rarity === rarity);
+      if (!tierSkills.length) return "";
+
+      return `
+        <div class="passive-tier-group passive-tier-group--${rarity}">
+          ${tierSkills.map(passiveSkillTemplate).join("")}
+        </div>`;
+    })
+    .join("");
+}
+
 function passivePageTemplate() {
   const selectedJob = passiveJobs.find((job) => job.id === selectedPassiveJobId) || passiveJobs[0];
   const skillIds = passiveGroups[selectedJob.group];
@@ -468,7 +479,7 @@ function passivePageTemplate() {
           </div>
         </header>
         <div class="passive-list">
-          ${skillIds.map(passiveSkillTemplate).join("")}
+          ${passiveListTemplate(skillIds)}
         </div>
       </div>
     </section>`;
