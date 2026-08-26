@@ -64,14 +64,6 @@ button { color: inherit; }
   box-shadow: 0 0 20px rgba(67, 210, 215, 0.22);
 }
 
-.version {
-  color: var(--muted);
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .page-shell {
   width: min(1180px, calc(100% - 40px));
   margin: 0 auto;
@@ -185,6 +177,12 @@ h1 {
   color: white;
 }
 
+.passive-job-picker button.selected {
+  border-color: var(--cyan-bright);
+  background: rgba(55, 164, 172, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(164, 248, 245, 0.26);
+}
+
 .job-picker img {
   flex: 0 0 auto;
   width: 38px;
@@ -247,29 +245,6 @@ h1 {
   object-fit: contain;
 }
 
-.work-card__note {
-  max-width: 430px;
-  margin: 0;
-  padding: 11px 14px;
-  border-left: 2px solid rgba(164, 248, 245, 0.45);
-  border-radius: 0 9px 9px 0;
-  background: rgba(5, 20, 25, 0.3);
-  color: #bfd0d6;
-  font-size: 0.84rem;
-  line-height: 1.55;
-  text-align: left;
-}
-
-.work-card__note span {
-  display: block;
-  margin-bottom: 2px;
-  color: var(--sand);
-  font-size: 0.64rem;
-  font-weight: 850;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
 .table-scroll { overflow-x: auto; }
 
 table {
@@ -312,8 +287,6 @@ tbody tr:last-child td { border-bottom: 0; }
 
 .value-cell { color: white; font-weight: 760; }
 .ratio-cell { color: var(--sand); font-weight: 720; }
-
-.info-page > h2 { margin: 0 0 18px; font-size: clamp(1.8rem, 4vw, 2.6rem); }
 
 .info-tabs {
   display: flex;
@@ -429,9 +402,9 @@ tbody tr:last-child td { border-bottom: 0; }
 .passive-skill {
   min-width: 0;
   padding: 14px 15px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(215, 225, 228, 0.13);
   border-radius: 12px;
-  background: rgba(5, 20, 25, 0.38);
+  background: rgba(5, 20, 25, 0.32);
 }
 
 .passive-skill__header {
@@ -483,6 +456,10 @@ tbody tr:last-child td { border-bottom: 0; }
 .passive-skill--rank-1 .passive-skill__rank-icon { background: #f2f7f8; }
 .passive-skill--rank-1 h3 { color: #f2f7f8; }
 
+.passive-skill--rank-3 {
+  border-color: rgba(250, 220, 89, 0.25);
+  background: linear-gradient(135deg, rgba(250, 220, 89, 0.07), rgba(5, 20, 25, 0.34) 58%);
+}
 .passive-skill--rank-3 .passive-skill__rarity,
 .passive-skill--rank-3 .passive-skill__rank-icon { background: #fadc59; }
 .passive-skill--rank-3 .passive-skill__rank-icon {
@@ -491,6 +468,10 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 .passive-skill--rank-3 h3 { color: #fadc59; }
 
+.passive-skill--rank-4 {
+  border-color: rgba(38, 224, 235, 0.28);
+  background: linear-gradient(135deg, rgba(38, 224, 235, 0.08), rgba(111, 100, 196, 0.05) 62%);
+}
 .passive-skill--rank-4 .passive-skill__rarity { background: #26e0eb; }
 .passive-skill--rank-4 .passive-skill__rank-icon {
   background: linear-gradient(#62fff1 15%, #69e6ff 58%, #b691ff 59%);
@@ -501,17 +482,17 @@ tbody tr:last-child td { border-bottom: 0; }
 
 .passive-skill--rank-5 .passive-skill__rarity {
   background: #26e0eb;
-  box-shadow: 0 0 8px rgba(38, 224, 235, 0.72);
+}
+.passive-skill--rank-5 {
+  border-color: rgba(81, 237, 231, 0.38);
+  background: linear-gradient(135deg, rgba(38, 224, 235, 0.11), rgba(136, 102, 218, 0.1) 66%);
 }
 .passive-skill--rank-5 .passive-skill__rank-icon {
   background: linear-gradient(#62fff1 15%, #69e6ff 58%, #b691ff 59%);
   -webkit-mask-image: url("../assets/passive-ranks/5.webp");
   mask-image: url("../assets/passive-ranks/5.webp");
 }
-.passive-skill--rank-5 h3 {
-  color: #62f0dd;
-  text-shadow: 0 0 7px rgba(98, 240, 221, 0.62);
-}
+.passive-skill--rank-5 h3 { color: #62f0dd; }
 
 footer {
   padding: 24px 4px 0;
@@ -530,7 +511,6 @@ footer {
   .site-nav { top: 58px; }
   .site-nav__inner { width: 100%; }
   .site-nav button { flex: 1 1 auto; padding-inline: 10px; font-size: 0.76rem; white-space: nowrap; }
-  .version { display: none; }
   .page-shell { width: min(100% - 24px, 1180px); padding-top: 30px; }
   .intro { align-items: stretch; flex-direction: column; gap: 20px; }
   .intro__copy { max-width: 31ch; line-height: 1.5; }
@@ -559,7 +539,6 @@ footer {
   .passive-results__header .work-card__icon { flex: 0 0 auto; }
   .passive-skill__header { grid-template-columns: 4px minmax(0, 1fr) auto; }
   .work-card__header { align-items: flex-start; flex-direction: column; padding: 17px; }
-  .work-card__note { max-width: none; text-align: left; }
   th, td { padding: 10px 14px; }
   th { font-size: 0.61rem; }
 }

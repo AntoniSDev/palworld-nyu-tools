@@ -2,12 +2,14 @@
 
 Petite application statique en français regroupant des outils pratiques pour Palworld.
 
-## Version 0.1
+## Version 0.3
 
 - Les 12 aptitudes de travail.
 - Les niveaux 1 à 10.
 - Vue détaillée par aptitude.
 - Passifs utiles par capacité de travail.
+- Informations pratiques sur la condensation des Pals.
+- Navigation par rubriques et sous-rubriques.
 - Mise en page adaptée au téléphone et au PC.
 
 ## Publication

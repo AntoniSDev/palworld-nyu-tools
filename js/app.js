@@ -376,7 +376,6 @@ function tableTemplate(job) {
             <h2>${job.name}</h2>
           </div>
         </div>
-        <p class="work-card__note"><span>Rôle</span>${job.note}</p>
       </header>
       <div class="table-scroll">
         <table>
@@ -488,7 +487,7 @@ function updateIntro() {
 
   pageEyebrow.textContent = "Guide rapide de la base";
   pageTitle.textContent = "Aptitudes de travail";
-  pageCopy.textContent = "Compare immédiatement ce que produit chaque niveau, de 1 à 10.";
+  pageCopy.textContent = "Compare l’efficacité de chaque niveau d’aptitude, de 1 à 10.";
 }
 
 function render() {
@@ -501,9 +500,8 @@ function render() {
 
   if (currentView === "info") {
     content.innerHTML = `
-      <section class="info-page" aria-labelledby="info-title">
+      <section class="info-page" aria-label="Infos utiles">
         <p class="eyebrow">Mécaniques de Palworld</p>
-        <h2 id="info-title">Infos utiles</h2>
         <nav class="info-tabs" aria-label="Sujets des infos utiles">
           <button class="active" type="button" aria-current="page">Condensation des Pals</button>
         </nav>
