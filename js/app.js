@@ -218,6 +218,49 @@ const passiveSkills = {
     rarity: "rank-4",
     effects: ["Le degré de satiété diminue 20 % plus lentement."],
   },
+  immortalSage: {
+    name: "Sage Immortel",
+    rarity: "rank-5",
+    effects: [
+      "Les points MEN diminuent 50 % plus lentement.",
+      "Vitesse de travail -20 %",
+      "Permet de récolter les arbres et rochers de l’Arbre-Monde sans les faire disparaître.",
+    ],
+  },
+  divineCradle: {
+    name: "Berceau Divin",
+    rarity: "rank-5",
+    effects: [
+      "Le degré de satiété diminue 50 % plus lentement.",
+      "PV -20 %",
+      "Permet de récolter les arbres et rochers de l’Arbre-Monde sans les faire disparaître.",
+    ],
+  },
+  unwavering: {
+    name: "Inébranlable",
+    rarity: "rank-4",
+    effects: ["Les points MEN diminuent 20 % plus lentement."],
+  },
+  workaholic: {
+    name: "Acharné",
+    rarity: "rank-3",
+    effects: ["Les points MEN diminuent 15 % plus lentement."],
+  },
+  positiveThinker: {
+    name: "Optimiste",
+    rarity: "rank-1",
+    effects: ["Les points MEN diminuent 10 % plus lentement."],
+  },
+  nutritionist: {
+    name: "Nutritionniste",
+    rarity: "rank-3",
+    effects: ["Le degré de satiété diminue 15 % plus lentement."],
+  },
+  frugal: {
+    name: "Frugal",
+    rarity: "rank-1",
+    effects: ["Le degré de satiété diminue 10 % plus lentement."],
+  },
   ranchMaster: {
     name: "Maître Éleveur",
     rarity: "rank-4",
@@ -233,22 +276,37 @@ const passiveSkills = {
 const passiveGroups = {
   classic: [
     "demonsHand",
+    "immortalSage",
+    "divineCradle",
     "remarkableCraftsmanship",
     "lucky",
     "vampiric",
+    "unwavering",
+    "masteryOfFasting",
     "artisan",
     "nocturnal",
+    "workaholic",
+    "nutritionist",
     "workSlave",
     "serious",
+    "positiveThinker",
+    "frugal",
   ],
   transport: [
     "worldTraverser",
+    "immortalSage",
+    "divineCradle",
     "swift",
     "legend",
     "vampiric",
+    "unwavering",
     "masteryOfFasting",
+    "workaholic",
+    "nutritionist",
     "runner",
     "nocturnal",
+    "positiveThinker",
+    "frugal",
     "nimble",
   ],
   farming: [
@@ -378,7 +436,7 @@ function passivePageTemplate() {
       ? "La Vitesse de travail n’améliore pas le Transport : privilégiez la vitesse de déplacement et l’autonomie."
       : selectedJob.group === "farming"
         ? "La Ferme bénéficie de ses passifs dédiés et des bonus de Vitesse de travail."
-        : "Ces passifs améliorent la Vitesse de travail ou permettent de poursuivre l’activité la nuit.";
+        : "Ces passifs peuvent soutenir la Vitesse de travail, les MEN, la satiété ou l’activité nocturne.";
 
   return `
     <section class="passive-page" aria-labelledby="passive-result-title">
