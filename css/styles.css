@@ -1562,3 +1562,120 @@ body {
   .condensation-work--improved-now .condensation-work__caret,
   .condensation-work--improved-now .condensation-work__level strong { animation: none; }
 }
+
+/* v0.7 — mémo personnel */
+.memo-page {
+  width: min(820px, 100%);
+  margin: 0 auto;
+}
+.memo-page__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  margin-bottom: 18px;
+  padding: 17px 19px;
+  border: 1px solid rgba(105, 209, 218, 0.18);
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(9, 39, 50, 0.72), rgba(25, 35, 62, 0.44));
+}
+.memo-page__toolbar p {
+  margin: 0;
+  color: #9db8bd;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+.memo-page__add {
+  flex: 0 0 auto;
+  padding: 10px 15px;
+  border: 1px solid rgba(103, 229, 226, 0.5);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(43, 143, 153, 0.42), rgba(66, 78, 142, 0.34));
+  color: #e7fbf9;
+  cursor: pointer;
+  font: 750 0.82rem "Nunito Sans", "Segoe UI", sans-serif;
+  transition: border-color 150ms ease, filter 150ms ease;
+}
+.memo-page__add span { margin-right: 5px; color: #75f5ef; font-size: 1rem; }
+.memo-page__add:hover { border-color: rgba(117, 245, 239, 0.78); filter: brightness(1.08); }
+.memo-list { display: grid; gap: 11px; }
+.memo-card {
+  position: relative;
+  padding: 12px 14px 14px;
+  border: 1px solid rgba(115, 206, 213, 0.18);
+  border-radius: 9px;
+  background: linear-gradient(145deg, rgba(7, 29, 39, 0.86), rgba(20, 30, 50, 0.72));
+  box-shadow: inset 3px 0 rgba(98, 231, 228, 0.3);
+  transition: border-color 150ms ease, filter 150ms ease;
+}
+.memo-card:hover { border-color: rgba(115, 220, 223, 0.3); filter: brightness(1.025); }
+.memo-card--dragging { opacity: 0.42; border-color: rgba(115, 245, 239, 0.62); }
+.memo-card__topline { display: grid; grid-template-columns: 24px minmax(0, 1fr) 30px; gap: 8px; align-items: center; }
+.memo-card__handle {
+  color: #65878e;
+  cursor: grab;
+  font-size: 1.2rem;
+  line-height: 1;
+  text-align: center;
+  user-select: none;
+}
+.memo-card__handle:hover { color: #9ad5d6; }
+.memo-card__handle:active { cursor: grabbing; }
+.memo-card__title,
+.memo-card__note {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #dff2f0;
+  font-family: "Nunito Sans", "Segoe UI", sans-serif;
+}
+.memo-card__title {
+  padding: 4px 2px 6px;
+  border-bottom: 1px solid rgba(119, 194, 200, 0.12);
+  font-size: 0.96rem;
+  font-weight: 750;
+}
+.memo-card__title:focus { border-bottom-color: rgba(101, 230, 226, 0.48); }
+.memo-card__title::placeholder,
+.memo-card__note::placeholder { color: #607d84; }
+.memo-card__delete {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #758f95;
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+.memo-card__delete:hover { background: rgba(225, 105, 123, 0.1); color: #f09aa8; }
+.memo-card__note {
+  display: block;
+  min-height: 56px;
+  max-height: 210px;
+  margin-top: 8px;
+  padding: 5px 3px;
+  resize: none;
+  overflow-y: hidden;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+.memo-card__note--scrolling { overflow-y: auto; }
+.memo-empty {
+  margin: 6px 0 0;
+  padding: 20px;
+  border: 1px dashed rgba(117, 194, 201, 0.18);
+  border-radius: 9px;
+  color: #769197;
+  font-size: 0.84rem;
+  text-align: center;
+}
+
+@media (max-width: 650px) {
+  .memo-page__toolbar { align-items: stretch; flex-direction: column; gap: 12px; }
+  .memo-page__add { width: 100%; }
+}

@@ -516,6 +516,7 @@ const passiveButton = document.querySelector("#passive-view");
 const condensationButton = document.querySelector("#condensation-view");
 const partnerButton = document.querySelector("#partner-view");
 const combatPartnerButton = document.querySelector("#combat-partner-view");
+const memoButton = document.querySelector("#memo-view");
 const intro = document.querySelector(".intro");
 const pageEyebrow = document.querySelector("#page-eyebrow");
 const pageCopy = document.querySelector("#page-copy");
@@ -529,6 +530,27 @@ let condensationStars = 0;
 let condensationQuery = "";
 let currentView = "jobs";
 let viewTransitionTimer;
+let draggedMemoId = null;
+
+const memoStorageKey = "palworld-nyu-tools:memo";
+
+function loadMemoTasks() {
+  try {
+    const storedTasks = JSON.parse(localStorage.getItem(memoStorageKey) || "[]");
+    if (!Array.isArray(storedTasks)) return [];
+    return storedTasks
+      .filter((task) => task && typeof task.id === "string")
+      .map((task) => ({
+        id: task.id,
+        title: typeof task.title === "string" ? task.title : "",
+        note: typeof task.note === "string" ? task.note : "",
+      }));
+  } catch {
+    return [];
+  }
+}
+
+let memoTasks = loadMemoTasks();
 
 const condensationPals = window.CONDENSATION_PALS || [];
 const condensationStepCosts = [0, 4, 8, 12, 24];
@@ -929,10 +951,69 @@ function combatPartnersTemplate() {
     </section>`;
 }
 
+function saveMemoTasks() {
+  try {
+    localStorage.setItem(memoStorageKey, JSON.stringify(memoTasks));
+  } catch {
+    // Le mémo reste utilisable pendant la session si le stockage est indisponible.
+  }
+}
+
+function createMemoId() {
+  return typeof crypto.randomUUID === "function"
+    ? crypto.randomUUID()
+    : `memo-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function memoCardTemplate(task) {
+  return `
+    <article class="memo-card" data-memo-id="${task.id}">
+      <div class="memo-card__topline">
+        <span class="memo-card__handle" draggable="true" title="Déplacer cette tâche" aria-label="Déplacer cette tâche">⠿</span>
+        <input class="memo-card__title" data-memo-title type="text" value="${escapeHtml(task.title)}" placeholder="Titre (facultatif)" aria-label="Titre de la tâche" />
+        <button class="memo-card__delete" data-memo-delete type="button" title="Supprimer cette tâche" aria-label="Supprimer cette tâche">×</button>
+      </div>
+      <textarea class="memo-card__note" data-memo-note placeholder="Écrivez votre note…" aria-label="Note de la tâche">${escapeHtml(task.note)}</textarea>
+    </article>`;
+}
+
+function memoTemplate() {
+  return `
+    <section class="memo-page" aria-label="Mémo personnel">
+      <div class="memo-page__toolbar">
+        <p>Un petit carnet pour garder vos prochains objectifs Palworld sous la main.</p>
+        <button class="memo-page__add" data-memo-add type="button"><span aria-hidden="true">+</span> Nouvelle tâche</button>
+      </div>
+      <div class="memo-list" data-memo-list>
+        ${
+          memoTasks.length
+            ? memoTasks.map(memoCardTemplate).join("")
+            : '<p class="memo-empty" data-memo-empty>Aucune tâche pour le moment.</p>'
+        }
+      </div>
+    </section>`;
+}
+
+function resizeMemoTextarea(textarea) {
+  textarea.style.height = "auto";
+  textarea.style.height = `${Math.min(textarea.scrollHeight, 210)}px`;
+  textarea.classList.toggle("memo-card__note--scrolling", textarea.scrollHeight > 210);
+}
+
+function resizeMemoTextareas() {
+  content.querySelectorAll("[data-memo-note]").forEach(resizeMemoTextarea);
+}
+
+function renderMemoPage(focusNewTask = false) {
+  content.innerHTML = memoTemplate();
+  resizeMemoTextareas();
+  if (focusNewTask) content.querySelector("[data-memo-id]:last-child [data-memo-title]")?.focus();
+}
+
 function updateIntro() {
   intro.classList.toggle(
     "hidden",
-    currentView === "condensation" || currentView === "partners" || currentView === "combat-partners",
+    currentView === "condensation" || currentView === "partners" || currentView === "combat-partners" || currentView === "memo",
   );
 
   if (currentView === "passives") {
@@ -975,6 +1056,7 @@ function render() {
   condensationButton.classList.toggle("active", currentView === "condensation");
   partnerButton.classList.toggle("active", currentView === "partners");
   combatPartnerButton.classList.toggle("active", currentView === "combat-partners");
+  memoButton.classList.toggle("active", currentView === "memo");
   picker.classList.toggle("hidden", currentView !== "jobs");
 
   if (currentView === "condensation") {
@@ -999,6 +1081,11 @@ function render() {
     return;
   }
 
+  if (currentView === "memo") {
+    renderMemoPage();
+    return;
+  }
+
   if (currentView === "passives") {
     content.innerHTML = passivePageTemplate();
     return;
@@ -1017,6 +1104,23 @@ picker.addEventListener("click", (event) => {
 });
 
 content.addEventListener("click", (event) => {
+  const addMemoButton = event.target.closest("[data-memo-add]");
+  if (addMemoButton) {
+    memoTasks.push({ id: createMemoId(), title: "", note: "" });
+    saveMemoTasks();
+    renderMemoPage(true);
+    return;
+  }
+
+  const deleteMemoButton = event.target.closest("[data-memo-delete]");
+  if (deleteMemoButton) {
+    const card = deleteMemoButton.closest("[data-memo-id]");
+    memoTasks = memoTasks.filter((task) => task.id !== card?.dataset.memoId);
+    saveMemoTasks();
+    renderMemoPage();
+    return;
+  }
+
   const condensationPalButton = event.target.closest("[data-condensation-pal]");
   if (condensationPalButton) {
     selectedCondensationPalId = condensationPalButton.dataset.condensationPal;
@@ -1050,6 +1154,20 @@ content.addEventListener("click", (event) => {
 });
 
 content.addEventListener("input", (event) => {
+  const memoCard = event.target.closest("[data-memo-id]");
+  if (memoCard && (event.target.matches("[data-memo-title]") || event.target.matches("[data-memo-note]"))) {
+    const task = memoTasks.find((entry) => entry.id === memoCard.dataset.memoId);
+    if (task) {
+      if (event.target.matches("[data-memo-title]")) task.title = event.target.value;
+      if (event.target.matches("[data-memo-note]")) {
+        task.note = event.target.value;
+        resizeMemoTextarea(event.target);
+      }
+      saveMemoTasks();
+    }
+    return;
+  }
+
   if (event.target.matches("#pal-search-input")) {
     condensationQuery = event.target.value;
     renderCondensationSearchResults();
@@ -1060,6 +1178,42 @@ content.addEventListener("input", (event) => {
     condensationStars = Number(event.target.value);
     updateCondensationState();
   }
+});
+
+content.addEventListener("dragstart", (event) => {
+  const handle = event.target.closest(".memo-card__handle");
+  if (!handle) return;
+  const card = handle.closest("[data-memo-id]");
+  draggedMemoId = card?.dataset.memoId || null;
+  if (!draggedMemoId) return;
+  card.classList.add("memo-card--dragging");
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/plain", draggedMemoId);
+});
+
+content.addEventListener("dragover", (event) => {
+  if (!draggedMemoId) return;
+  const list = event.target.closest("[data-memo-list]");
+  if (!list) return;
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+  const draggingCard = list.querySelector(`[data-memo-id="${draggedMemoId}"]`);
+  const siblings = [...list.querySelectorAll("[data-memo-id]:not(.memo-card--dragging)")];
+  const nextCard = siblings.find((card) => event.clientY < card.getBoundingClientRect().top + card.offsetHeight / 2);
+  if (draggingCard) list.insertBefore(draggingCard, nextCard || null);
+});
+
+content.addEventListener("drop", (event) => {
+  if (!draggedMemoId || !event.target.closest("[data-memo-list]")) return;
+  event.preventDefault();
+  const order = [...content.querySelectorAll("[data-memo-id]")].map((card) => card.dataset.memoId);
+  memoTasks.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+  saveMemoTasks();
+});
+
+content.addEventListener("dragend", () => {
+  content.querySelector(".memo-card--dragging")?.classList.remove("memo-card--dragging");
+  draggedMemoId = null;
 });
 
 brand.addEventListener("click", (event) => {
@@ -1091,6 +1245,10 @@ partnerButton.addEventListener("click", () => {
 
 combatPartnerButton.addEventListener("click", () => {
   switchView("combat-partners");
+});
+
+memoButton.addEventListener("click", () => {
+  switchView("memo");
 });
 
 render();
