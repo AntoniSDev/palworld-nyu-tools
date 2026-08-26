@@ -518,7 +518,6 @@ const partnerButton = document.querySelector("#partner-view");
 const combatPartnerButton = document.querySelector("#combat-partner-view");
 const intro = document.querySelector(".intro");
 const pageEyebrow = document.querySelector("#page-eyebrow");
-const pageTitle = document.querySelector("#page-title");
 const pageCopy = document.querySelector("#page-copy");
 const formatter = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2 });
 
@@ -526,6 +525,7 @@ let selectedId = jobs[0].id;
 let selectedPassiveJobId = jobs[0].id;
 let selectedPartnerActivityId = partnerActivities[0].id;
 let currentView = "jobs";
+let viewTransitionTimer;
 
 function tableTemplate(job) {
   const rows = job.values
@@ -745,8 +745,7 @@ function combatPartnersTemplate() {
       </div>
       <div>
         <p class="eyebrow">Prochaine fonctionnalité</p>
-        <h2 id="combat-construction-title">Compétences partenaire de combat</h2>
-        <strong>En cours de construction</strong>
+        <h2 id="combat-construction-title">En cours de construction</h2>
         <p>Cette rubrique arrivera dans une prochaine version.</p>
       </div>
     </section>`;
@@ -760,15 +759,33 @@ function updateIntro() {
 
   if (currentView === "passives") {
     pageEyebrow.textContent = "Aide à la Palbox";
-    pageTitle.textContent = "Compétences passives";
     pageCopy.textContent =
       "Sélectionnez une capacité de travail pour afficher les compétences passives intéressantes pour les Pals affectés à cette tâche.";
     return;
   }
 
   pageEyebrow.textContent = "Guide rapide de la base";
-  pageTitle.textContent = "Aptitudes de travail";
   pageCopy.textContent = "Compare l’efficacité de chaque niveau d’aptitude, de 1 à 10.";
+}
+
+function switchView(nextView) {
+  if (nextView === currentView && !content.classList.contains("view-leaving")) return;
+  clearTimeout(viewTransitionTimer);
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    currentView = nextView;
+    render();
+    return;
+  }
+
+  content.classList.add("view-leaving");
+  viewTransitionTimer = window.setTimeout(() => {
+    currentView = nextView;
+    render();
+    content.classList.remove("view-leaving");
+    content.classList.add("view-entering");
+    window.setTimeout(() => content.classList.remove("view-entering"), 230);
+  }, 115);
 }
 
 function render() {
@@ -785,7 +802,6 @@ function render() {
   if (currentView === "condensation") {
     content.innerHTML = `<section class="standalone-page" aria-label="Condensation des Pals">
       <p class="eyebrow">Amélioration des Pals</p>
-      <h1 class="standalone-page__title">Condensation des Pals</h1>
       ${condensationTemplate()}
     </section>`;
     return;
@@ -794,7 +810,6 @@ function render() {
   if (currentView === "partners") {
     content.innerHTML = `<section class="standalone-page" aria-label="Compétences partenaire utilitaires">
       <p class="eyebrow">Gestion de la base</p>
-      <h1 class="standalone-page__title">Compétences partenaire utilitaires</h1>
       ${basePartnersTemplate()}
     </section>`;
     return;
@@ -839,34 +854,28 @@ content.addEventListener("click", (event) => {
 
 brand.addEventListener("click", (event) => {
   event.preventDefault();
-  currentView = "jobs";
-  render();
+  switchView("jobs");
   window.scrollTo(0, 0);
 });
 
 singleButton.addEventListener("click", () => {
-  currentView = "jobs";
-  render();
+  switchView("jobs");
 });
 
 passiveButton.addEventListener("click", () => {
-  currentView = "passives";
-  render();
+  switchView("passives");
 });
 
 condensationButton.addEventListener("click", () => {
-  currentView = "condensation";
-  render();
+  switchView("condensation");
 });
 
 partnerButton.addEventListener("click", () => {
-  currentView = "partners";
-  render();
+  switchView("partners");
 });
 
 combatPartnerButton.addEventListener("click", () => {
-  currentView = "combat-partners";
-  render();
+  switchView("combat-partners");
 });
 
 render();
