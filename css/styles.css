@@ -1213,3 +1213,18 @@ body {
   .job-picker button:hover::after,
   .passive-skill--rank-5:hover::after { transform: none; }
 }
+
+/* Lisibilité finale de la navigation v0.5 */
+.site-nav button.active {
+  color: #c6e5e4;
+  text-shadow: 0 0 5px rgba(121, 244, 239, 0.1);
+}
+.site-nav button.active::after {
+  left: 21%;
+  width: 58%;
+}
+
+@keyframes active-tab-breathe {
+  0%, 100% { opacity: 0.28; filter: brightness(0.94) drop-shadow(0 0 2px rgba(242, 138, 194, 0.18)); }
+  50% { opacity: 1; filter: brightness(1.16) drop-shadow(0 0 11px rgba(242, 138, 194, 0.58)); }
+}
