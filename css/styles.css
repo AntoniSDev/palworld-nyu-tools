@@ -119,7 +119,11 @@ h1 {
   display: flex;
   width: min(1180px, calc(100% - 40px));
   margin: 0 auto;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+
+.site-nav__inner::-webkit-scrollbar { display: none; }
 
 .site-nav button {
   min-height: 48px;
@@ -349,6 +353,127 @@ tbody tr:last-child td { border-bottom: 0; }
 .condensation-steps p { margin: 12px 0 0; color: var(--muted); font-size: 0.84rem; line-height: 1.45; }
 .info-card .info-card__note { margin-bottom: 0; font-size: 0.82rem; }
 
+.passive-results {
+  overflow: hidden;
+  border: 1px solid rgba(143, 222, 228, 0.17);
+  border-radius: 20px;
+  background: linear-gradient(145deg, rgba(18, 48, 58, 0.9), rgba(8, 26, 32, 0.94));
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+.passive-results__header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.passive-results__header p {
+  margin: 0 0 3px;
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.passive-results__header h2 { margin: 0; font-size: 1.35rem; }
+.passive-results__header > div > span {
+  display: block;
+  max-width: 720px;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.passive-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 14px;
+}
+
+.passive-skill {
+  min-width: 0;
+  padding: 14px 15px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(5, 20, 25, 0.38);
+}
+
+.passive-skill__header {
+  display: grid;
+  grid-template-columns: 4px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 26px;
+}
+
+.passive-skill__rarity {
+  align-self: stretch;
+  border-radius: 4px;
+  background: #d7e1e4;
+}
+
+.passive-skill h3 {
+  margin: 0;
+  color: #e3ecee;
+  font-size: 0.98rem;
+  line-height: 1.2;
+}
+
+.passive-skill__source {
+  padding: 3px 7px;
+  border: 1px solid rgba(137, 243, 241, 0.32);
+  border-radius: 999px;
+  color: var(--cyan-bright);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.passive-skill__effects { margin: 10px 0 0 14px; }
+.passive-skill__effects p {
+  margin: 3px 0;
+  color: #c8d8dc;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.passive-skill__note {
+  margin: 9px 0 0 14px;
+  color: #7f969e;
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.passive-skill--world-tree {
+  border-color: rgba(110, 226, 228, 0.3);
+  background: linear-gradient(135deg, rgba(62, 189, 195, 0.11), rgba(101, 82, 177, 0.08));
+}
+
+.passive-skill--world-tree .passive-skill__rarity {
+  background: linear-gradient(#8cfff1, #74b9ff, #c99cff);
+  box-shadow: 0 0 10px rgba(116, 211, 255, 0.3);
+}
+
+.passive-skill--world-tree h3 { color: #aefbf4; }
+.passive-skill--rank-4 .passive-skill__rarity {
+  background: linear-gradient(#8ff5ff, #d4a7ff, #ffd177);
+}
+
+.passive-skill--rank-4 h3 {
+  background: linear-gradient(90deg, #adf7ff, #dcb8ff 48%, #f3ce7f);
+  background-clip: text;
+  color: transparent;
+}
+
+.passive-skill--rank-3 .passive-skill__rarity { background: #e9c780; }
+.passive-skill--rank-3 h3 { color: #f1d69d; }
+
 footer {
   padding: 24px 4px 0;
   color: #68828b;
@@ -365,7 +490,7 @@ footer {
   .topbar { min-height: 58px; padding: 0 16px; }
   .site-nav { top: 58px; }
   .site-nav__inner { width: 100%; }
-  .site-nav button { flex: 1; padding-inline: 12px; }
+  .site-nav button { flex: 1 1 auto; padding-inline: 10px; font-size: 0.76rem; white-space: nowrap; }
   .version { display: none; }
   .page-shell { width: min(100% - 24px, 1180px); padding-top: 30px; }
   .intro { align-items: stretch; flex-direction: column; gap: 20px; }
@@ -388,6 +513,10 @@ footer {
     text-align: center;
   }
   .job-picker img { width: 39px; height: 39px; }
+  .passive-list { grid-template-columns: 1fr; padding: 10px; }
+  .passive-results__header { align-items: flex-start; padding: 15px; }
+  .passive-results__header .work-card__icon { flex: 0 0 auto; }
+  .passive-skill__header { grid-template-columns: 4px minmax(0, 1fr) auto; }
   .work-card__header { align-items: flex-start; flex-direction: column; padding: 17px; }
   .work-card__note { max-width: none; text-align: left; }
   th, td { padding: 10px 14px; }

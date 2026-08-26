@@ -1,6 +1,6 @@
 const speedA = [50, 80, 140, 240, 400, 680, 1100, 1900, 3200, 5400];
 const speedB = [50, 70, 100, 140, 190, 260, 370, 510, 720, 1000];
-const iconRoot = "https://cdn.paldb.cc/image/Pal/Texture/UI/InGame/T_icon_palwork_";
+const iconRoot = "assets/work-suitabilities/";
 
 const jobs = [
   {
@@ -134,15 +134,162 @@ const jobs = [
   },
 ];
 
+const passiveSkills = {
+  demonsHand: {
+    name: "Main du Démon",
+    rarity: "world-tree",
+    source: "Arbre-Monde",
+    effects: [
+      "Vitesse de travail +90 %",
+      "Chute des points MEN accélérée +15 %",
+      "Permet de récolter les arbres et rochers de l’Arbre-Monde sans les faire disparaître.",
+    ],
+  },
+  remarkableCraftsmanship: {
+    name: "Maîtrise Exceptionnelle",
+    rarity: "rank-4",
+    effects: ["Vitesse de travail +75 %"],
+  },
+  artisan: {
+    name: "Appliqué",
+    rarity: "rank-3",
+    effects: ["Vitesse de travail +50 %"],
+  },
+  workSlave: {
+    name: "Soumis",
+    rarity: "rank-1",
+    effects: ["Vitesse de travail +30 %", "Attaque -30 %"],
+  },
+  lucky: {
+    name: "Chanceux",
+    rarity: "rank-4",
+    effects: ["Attaque +15 %", "Défense +15 %", "Vitesse de travail +20 %"],
+  },
+  serious: {
+    name: "Sérieux",
+    rarity: "rank-1",
+    effects: ["Vitesse de travail +20 %"],
+  },
+  nocturnal: {
+    name: "Nocturne",
+    rarity: "rank-3",
+    effects: ["Ne dort pas et continue à travailler la nuit."],
+    note: "Inutile pour un Pal qui travaille déjà naturellement la nuit.",
+  },
+  vampiric: {
+    name: "Vampire",
+    rarity: "rank-4",
+    effects: [
+      "Absorbe 5 % des dégâts infligés pour restaurer ses PV.",
+      "Ne dort pas et continue à travailler la nuit.",
+    ],
+    note: "Inutile pour un Pal qui travaille déjà naturellement la nuit.",
+  },
+  worldTraverser: {
+    name: "Traverse-Mondes",
+    rarity: "world-tree",
+    source: "Arbre-Monde",
+    effects: [
+      "Vitesse de déplacement +50 %",
+      "Chute du degré de satiété accélérée +15 %",
+      "Permet de récolter les arbres et rochers de l’Arbre-Monde sans les faire disparaître.",
+    ],
+  },
+  swift: {
+    name: "Sprinteur",
+    rarity: "rank-4",
+    effects: ["Vitesse de déplacement +30 %"],
+  },
+  legend: {
+    name: "Légende",
+    rarity: "rank-4",
+    effects: ["Attaque +20 %", "Défense +20 %", "Vitesse de déplacement +20 %"],
+  },
+  runner: {
+    name: "Coursier",
+    rarity: "rank-3",
+    effects: ["Vitesse de déplacement +20 %"],
+  },
+  nimble: {
+    name: "Vif",
+    rarity: "rank-1",
+    effects: ["Vitesse de déplacement +10 %"],
+  },
+  masteryOfFasting: {
+    name: "Maîtrise de la Faim",
+    rarity: "rank-4",
+    effects: ["Le degré de satiété diminue 20 % plus lentement."],
+  },
+  ranchMaster: {
+    name: "Maître Éleveur",
+    rarity: "rank-4",
+    effects: ["Exploitation : Capacité de travail +2"],
+  },
+  ranchApprentice: {
+    name: "Apprenti Éleveur",
+    rarity: "rank-1",
+    effects: ["Exploitation : Capacité de travail +1"],
+  },
+};
+
+const passiveGroups = {
+  classic: [
+    "demonsHand",
+    "remarkableCraftsmanship",
+    "lucky",
+    "vampiric",
+    "artisan",
+    "nocturnal",
+    "workSlave",
+    "serious",
+  ],
+  transport: [
+    "worldTraverser",
+    "swift",
+    "legend",
+    "vampiric",
+    "masteryOfFasting",
+    "runner",
+    "nocturnal",
+    "nimble",
+  ],
+  farming: [
+    "demonsHand",
+    "ranchMaster",
+    "remarkableCraftsmanship",
+    "lucky",
+    "artisan",
+    "workSlave",
+    "serious",
+    "ranchApprentice",
+  ],
+};
+
+const passiveJobNames = {
+  handiwork: "Travaux manuels",
+  farming: "Ferme",
+};
+
+const passiveJobs = jobs.map((job) => ({
+  ...job,
+  displayName: passiveJobNames[job.id] || job.name,
+  group: job.id === "transport" ? "transport" : job.id === "farming" ? "farming" : "classic",
+}));
+
 const picker = document.querySelector("#job-picker");
 const content = document.querySelector("#content");
 const brand = document.querySelector(".brand");
 const singleButton = document.querySelector("#single-view");
+const passiveButton = document.querySelector("#passive-view");
 const infoButton = document.querySelector("#info-view");
+const pageEyebrow = document.querySelector("#page-eyebrow");
+const pageTitle = document.querySelector("#page-title");
+const pageCopy = document.querySelector("#page-copy");
 const formatter = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2 });
 
 let selectedId = jobs[0].id;
-let showInfo = false;
+let selectedPassiveJobId = jobs[0].id;
+let currentView = "jobs";
 
 function tableTemplate(job) {
   const rows = job.values
@@ -196,8 +343,8 @@ function renderPicker() {
         <button
           type="button"
           data-job="${job.id}"
-          class="${selectedId === job.id && !showInfo ? "selected" : ""}"
-          aria-pressed="${selectedId === job.id && !showInfo}"
+          class="${selectedId === job.id && currentView === "jobs" ? "selected" : ""}"
+          aria-pressed="${selectedId === job.id && currentView === "jobs"}"
           style="--job-color:${job.color}"
         >
           <img src="${job.icon}" alt="" />
@@ -207,13 +354,94 @@ function renderPicker() {
     .join("");
 }
 
+function passiveSkillTemplate(skillId) {
+  const skill = passiveSkills[skillId];
+  const source = skill.source ? `<span class="passive-skill__source">${skill.source}</span>` : "";
+
+  return `
+    <article class="passive-skill passive-skill--${skill.rarity}">
+      <header class="passive-skill__header">
+        <span class="passive-skill__rarity" aria-hidden="true"></span>
+        <h3>${skill.name}</h3>
+        ${source}
+      </header>
+      <div class="passive-skill__effects">
+        ${skill.effects.map((effect) => `<p>${effect}</p>`).join("")}
+      </div>
+      ${skill.note ? `<p class="passive-skill__note">${skill.note}</p>` : ""}
+    </article>`;
+}
+
+function passivePageTemplate() {
+  const selectedJob = passiveJobs.find((job) => job.id === selectedPassiveJobId) || passiveJobs[0];
+  const skillIds = passiveGroups[selectedJob.group];
+  const context =
+    selectedJob.group === "transport"
+      ? "La Vitesse de travail n’améliore pas le Transport : privilégiez la vitesse de déplacement et l’autonomie."
+      : selectedJob.group === "farming"
+        ? "La Ferme bénéficie de ses passifs dédiés et des bonus de Vitesse de travail."
+        : "Ces passifs améliorent la Vitesse de travail ou permettent de poursuivre l’activité la nuit.";
+
+  return `
+    <section class="passive-page" aria-labelledby="passive-result-title">
+      <nav class="job-picker passive-job-picker" aria-label="Choisir une capacité de travail">
+        ${passiveJobs
+          .map(
+            (job) => `
+              <button
+                type="button"
+                data-passive-job="${job.id}"
+                class="${selectedJob.id === job.id ? "selected" : ""}"
+                aria-pressed="${selectedJob.id === job.id}"
+                style="--job-color:${job.color}"
+              >
+                <img src="${job.icon}" alt="" />
+                <span>${job.displayName}</span>
+              </button>`,
+          )
+          .join("")}
+      </nav>
+      <div class="passive-results">
+        <header class="passive-results__header" style="--job-color:${selectedJob.color}">
+          <span class="work-card__icon">
+            <img src="${selectedJob.icon}" alt="" />
+          </span>
+          <div>
+            <p>Passifs utiles pour</p>
+            <h2 id="passive-result-title">${selectedJob.displayName}</h2>
+            <span>${context}</span>
+          </div>
+        </header>
+        <div class="passive-list">
+          ${skillIds.map(passiveSkillTemplate).join("")}
+        </div>
+      </div>
+    </section>`;
+}
+
+function updateIntro() {
+  if (currentView === "passives") {
+    pageEyebrow.textContent = "Aide à la Palbox";
+    pageTitle.textContent = "Compétences passives";
+    pageCopy.textContent =
+      "Sélectionnez une capacité de travail pour afficher les compétences passives intéressantes pour les Pals affectés à cette tâche.";
+    return;
+  }
+
+  pageEyebrow.textContent = "Guide rapide de la base";
+  pageTitle.textContent = "Aptitudes de travail";
+  pageCopy.textContent = "Compare immédiatement ce que produit chaque niveau, de 1 à 10.";
+}
+
 function render() {
   renderPicker();
-  singleButton.classList.toggle("active", !showInfo);
-  infoButton.classList.toggle("active", showInfo);
-  picker.classList.toggle("hidden", showInfo);
+  updateIntro();
+  singleButton.classList.toggle("active", currentView === "jobs");
+  passiveButton.classList.toggle("active", currentView === "passives");
+  infoButton.classList.toggle("active", currentView === "info");
+  picker.classList.toggle("hidden", currentView !== "jobs");
 
-  if (showInfo) {
+  if (currentView === "info") {
     content.innerHTML = `
       <section class="info-card" aria-labelledby="info-title">
         <p class="eyebrow">Mécaniques de Palworld</p>
@@ -231,6 +459,11 @@ function render() {
     return;
   }
 
+  if (currentView === "passives") {
+    content.innerHTML = passivePageTemplate();
+    return;
+  }
+
   const selectedJob = jobs.find((job) => job.id === selectedId) || jobs[0];
   content.innerHTML = `<section class="single-table">${tableTemplate(selectedJob)}</section>`;
 }
@@ -239,22 +472,34 @@ picker.addEventListener("click", (event) => {
   const button = event.target.closest("[data-job]");
   if (!button) return;
   selectedId = button.dataset.job;
-  showInfo = false;
+  currentView = "jobs";
+  render();
+});
+
+content.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-passive-job]");
+  if (!button) return;
+  selectedPassiveJobId = button.dataset.passiveJob;
   render();
 });
 
 brand.addEventListener("click", () => {
-  showInfo = false;
+  currentView = "jobs";
   render();
 });
 
 singleButton.addEventListener("click", () => {
-  showInfo = false;
+  currentView = "jobs";
+  render();
+});
+
+passiveButton.addEventListener("click", () => {
+  currentView = "passives";
   render();
 });
 
 infoButton.addEventListener("click", () => {
-  showInfo = true;
+  currentView = "info";
   render();
 });
 
