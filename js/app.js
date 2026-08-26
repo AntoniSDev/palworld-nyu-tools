@@ -524,8 +524,15 @@ const formatter = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2 });
 let selectedId = jobs[0].id;
 let selectedPassiveJobId = jobs[0].id;
 let selectedPartnerActivityId = partnerActivities[0].id;
+let selectedCondensationPalId = null;
+let condensationStars = 0;
+let condensationQuery = "";
 let currentView = "jobs";
 let viewTransitionTimer;
+
+const condensationPals = window.CONDENSATION_PALS || [];
+const condensationStepCosts = [0, 4, 8, 12, 24];
+const condensationTotalCosts = [0, 4, 12, 24, 48];
 
 function tableTemplate(job) {
   const rows = job.values
@@ -664,24 +671,176 @@ function passivePageTemplate() {
     </section>`;
 }
 
-function condensationTemplate() {
+function normalizeSearch(value) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("fr-FR")
+    .trim();
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatPalNumber(number) {
+  if (!number) return "";
+  const match = String(number).match(/^(\d+)(.*)$/);
+  return match ? `#${match[1].padStart(3, "0")}${match[2]}` : `#${number}`;
+}
+
+function condensationWorkGridTemplate(pal, stars) {
+  const levels = pal?.levels[stars] || jobs.map(() => 0);
+  const baseLevels = pal?.levels[0] || jobs.map(() => 0);
+  const previousLevels = stars > 0 ? pal?.levels[stars - 1] : baseLevels;
+
+  return jobs
+    .map((job, index) => {
+      const ownsWork = baseLevels[index] > 0;
+      const improvedNow = ownsWork && stars > 0 && levels[index] > previousLevels[index];
+      const improvedBefore = ownsWork && !improvedNow && levels[index] > baseLevels[index];
+      const stateClass = improvedNow
+        ? " condensation-work--improved-now"
+        : improvedBefore
+          ? " condensation-work--improved-before"
+          : "";
+
+      return `
+        <div class="condensation-work${ownsWork ? "" : " condensation-work--absent"}${stateClass}" style="--job-color:${job.color}">
+          <img src="${job.icon}" alt="" />
+          <span class="condensation-work__name">${job.name}</span>
+          <span class="condensation-work__level" aria-label="${ownsWork ? `Niveau ${levels[index]}` : "Aptitude absente"}">
+            ${ownsWork && (improvedNow || improvedBefore) ? '<span class="condensation-work__caret" aria-hidden="true">⌃</span>' : ""}
+            ${ownsWork ? `<strong>${levels[index]}</strong>` : ""}
+          </span>
+        </div>`;
+    })
+    .join("");
+}
+
+function condensationCostTemplate(stars) {
+  if (stars === 0) {
+    return `<p class="condensation-cost__empty">Aucun Pal requis à 0★.</p>`;
+  }
+
   return `
-    <article class="info-card" aria-labelledby="condensation-title">
-      <header class="info-card__header">
-        <img src="assets/structures/pal-essence-condenser.jpg" alt="Condensateur d’essence de Pal" />
-        <div>
-          <h3 id="condensation-title">Fonctionnement de la condensation</h3>
-          <p>La condensation renforce un Pal en utilisant d’autres Pals de la même espèce. Chaque palier ajoute une étoile et améliore une ou plusieurs de ses aptitudes de travail.</p>
+    <p><strong>+${condensationStepCosts[stars]} Pals</strong><span>pour ce palier</span></p>
+    <p><strong>${condensationTotalCosts[stars]} Pals</strong><span>au total depuis 0★</span></p>`;
+}
+
+function condensationCardTemplate(pal) {
+  const isGhost = !pal;
+  const number = pal ? formatPalNumber(pal.number) : "";
+  const elements = pal?.elements || [];
+
+  return `
+    <article class="condensation-card${isGhost ? " condensation-card--ghost" : ""}" aria-live="polite">
+      <header class="condensation-card__header">
+        <div class="condensation-card__portrait">
+          ${pal ? `<img src="${pal.portrait}" alt="${escapeHtml(pal.name)}" />` : '<span aria-hidden="true">?</span>'}
+        </div>
+        <div class="condensation-card__identity">
+          ${number ? `<p>${number}</p>` : ""}
+          <h2>${pal ? escapeHtml(pal.name) : "Sélectionnez un Pal"}</h2>
+          <div class="condensation-card__elements">
+            ${elements.length ? elements.map((element) => `<span>${escapeHtml(element)}</span>`).join("") : "<span>Élément</span>"}
+          </div>
         </div>
       </header>
-      <div class="condensation-steps">
-        <div><strong>1★</strong><span>4 Pals</span><p>+1 à son aptitude de travail prioritaire.</p></div>
-        <div><strong>2★</strong><span>8 Pals</span><p>+1 à sa deuxième aptitude de travail prioritaire.</p></div>
-        <div><strong>3★</strong><span>12 Pals</span><p>+1 à sa troisième aptitude de travail prioritaire.</p></div>
-        <div><strong>4★</strong><span>24 Pals</span><p>+1 à toutes ses aptitudes de travail.</p></div>
+
+      <div class="condensation-work-grid" data-condensation-work-grid>
+        ${condensationWorkGridTemplate(pal, condensationStars)}
       </div>
-      <p class="info-card__note">Il faut donc 48 Pals au total pour atteindre 4★. Les quantités indiquées correspondent au coût de chaque palier.</p>
+
+      <div class="condensation-controls">
+        <div class="condensation-slider">
+          <label for="condensation-stars">Niveau de condensation</label>
+          <input id="condensation-stars" type="range" min="0" max="4" step="1" value="${condensationStars}" ${isGhost ? "disabled" : ""} />
+          <div class="condensation-slider__steps" aria-label="Choisir un niveau de condensation">
+            ${[0, 1, 2, 3, 4]
+              .map(
+                (stars) => `<button type="button" data-condensation-star="${stars}" class="${stars === condensationStars ? "active" : ""}" ${isGhost ? "disabled" : ""}>${stars}★</button>`,
+              )
+              .join("")}
+          </div>
+        </div>
+        <div class="condensation-cost" data-condensation-cost>
+          ${condensationCostTemplate(condensationStars)}
+        </div>
+      </div>
     </article>`;
+}
+
+function condensationTemplate() {
+  const selectedPal = condensationPals.find((pal) => pal.id === selectedCondensationPalId) || null;
+
+  return `
+    <section class="condensation-simulator" aria-labelledby="condensation-title">
+      <p id="condensation-title" class="info-section-copy">Recherchez un Pal et choisissez son niveau de condensation pour voir directement l’évolution de ses aptitudes de travail.</p>
+      <div class="pal-search">
+        <label for="pal-search-input">Rechercher un Pal</label>
+        <div class="pal-search__field">
+          <input id="pal-search-input" type="search" placeholder="Rechercher un Pal…" value="${escapeHtml(condensationQuery)}" autocomplete="off" spellcheck="false" />
+          <span aria-hidden="true">⌕</span>
+        </div>
+        <div class="pal-search__results" data-pal-search-results></div>
+      </div>
+      <div data-condensation-card>${condensationCardTemplate(selectedPal)}</div>
+    </section>`;
+}
+
+function renderCondensationSearchResults() {
+  const resultsContainer = content.querySelector("[data-pal-search-results]");
+  if (!resultsContainer) return;
+  const query = normalizeSearch(condensationQuery);
+
+  if (query.length < 3) {
+    resultsContainer.innerHTML = query.length
+      ? '<p class="pal-search__hint">Saisissez au moins 3 caractères.</p>'
+      : "";
+    return;
+  }
+
+  const results = condensationPals.filter((pal) => normalizeSearch(pal.name).includes(query));
+  if (!results.length) {
+    resultsContainer.innerHTML = '<p class="pal-search__empty">Aucun Pal trouvé — contactez Nyu</p>';
+    return;
+  }
+
+  resultsContainer.innerHTML = `<div class="pal-search__grid">
+    ${results
+      .map(
+        (pal) => `
+          <button type="button" data-condensation-pal="${pal.id}" class="${pal.id === selectedCondensationPalId ? "selected" : ""}">
+            <img src="${pal.portrait}" alt="" />
+            <span>${escapeHtml(pal.name)}</span>
+          </button>`,
+      )
+      .join("")}
+  </div>`;
+}
+
+function renderCondensationCard() {
+  const cardContainer = content.querySelector("[data-condensation-card]");
+  if (!cardContainer) return;
+  const selectedPal = condensationPals.find((pal) => pal.id === selectedCondensationPalId) || null;
+  cardContainer.innerHTML = condensationCardTemplate(selectedPal);
+}
+
+function updateCondensationState() {
+  const selectedPal = condensationPals.find((pal) => pal.id === selectedCondensationPalId) || null;
+  const grid = content.querySelector("[data-condensation-work-grid]");
+  const cost = content.querySelector("[data-condensation-cost]");
+  if (grid) grid.innerHTML = condensationWorkGridTemplate(selectedPal, condensationStars);
+  if (cost) cost.innerHTML = condensationCostTemplate(condensationStars);
+  content.querySelectorAll("[data-condensation-star]").forEach((button) => {
+    button.classList.toggle("active", Number(button.dataset.condensationStar) === condensationStars);
+  });
 }
 
 function basePartnerCardTemplate(entry) {
@@ -804,6 +963,7 @@ function render() {
       <p class="eyebrow">Amélioration des Pals</p>
       ${condensationTemplate()}
     </section>`;
+    renderCondensationSearchResults();
     return;
   }
 
@@ -838,6 +998,24 @@ picker.addEventListener("click", (event) => {
 });
 
 content.addEventListener("click", (event) => {
+  const condensationPalButton = event.target.closest("[data-condensation-pal]");
+  if (condensationPalButton) {
+    selectedCondensationPalId = condensationPalButton.dataset.condensationPal;
+    condensationStars = 0;
+    renderCondensationSearchResults();
+    renderCondensationCard();
+    return;
+  }
+
+  const condensationStarButton = event.target.closest("[data-condensation-star]");
+  if (condensationStarButton) {
+    condensationStars = Number(condensationStarButton.dataset.condensationStar);
+    const slider = content.querySelector("#condensation-stars");
+    if (slider) slider.value = condensationStars;
+    updateCondensationState();
+    return;
+  }
+
   const passiveJobButton = event.target.closest("[data-passive-job]");
   if (passiveJobButton) {
     selectedPassiveJobId = passiveJobButton.dataset.passiveJob;
@@ -849,6 +1027,19 @@ content.addEventListener("click", (event) => {
   if (partnerActivityButton) {
     selectedPartnerActivityId = partnerActivityButton.dataset.partnerActivity;
     render();
+  }
+});
+
+content.addEventListener("input", (event) => {
+  if (event.target.matches("#pal-search-input")) {
+    condensationQuery = event.target.value;
+    renderCondensationSearchResults();
+    return;
+  }
+
+  if (event.target.matches("#condensation-stars")) {
+    condensationStars = Number(event.target.value);
+    updateCondensationState();
   }
 });
 
@@ -867,6 +1058,11 @@ passiveButton.addEventListener("click", () => {
 });
 
 condensationButton.addEventListener("click", () => {
+  if (currentView !== "condensation") {
+    selectedCondensationPalId = null;
+    condensationStars = 0;
+    condensationQuery = "";
+  }
   switchView("condensation");
 });
 
