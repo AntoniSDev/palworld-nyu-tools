@@ -6,7 +6,7 @@ const jobs = [
   {
     id: "kindling",
     name: "Allumage de feu",
-    shortName: "Allumage",
+    shortName: "Allumage de feu",
     icon: `${iconRoot}00.webp`,
     color: "#ff8c4b",
     unit: "Capacité de travail",
@@ -36,7 +36,7 @@ const jobs = [
   {
     id: "electricity",
     name: "Génération d’énergie",
-    shortName: "Énergie",
+    shortName: "Génération d’énergie",
     icon: `${iconRoot}03.webp`,
     color: "#ffe15b",
     unit: "Capacité de travail",
@@ -124,8 +124,8 @@ const jobs = [
   },
   {
     id: "farming",
-    name: "Exploitation",
-    shortName: "Exploitation",
+    name: "Ferme",
+    shortName: "Ferme",
     icon: `${iconRoot}12.webp`,
     color: "#f1c177",
     unit: "Valeur d’aptitude",
@@ -321,14 +321,8 @@ const passiveGroups = {
   ],
 };
 
-const passiveJobNames = {
-  handiwork: "Travaux manuels",
-  farming: "Ferme",
-};
-
 const passiveJobs = jobs.map((job) => ({
   ...job,
-  displayName: passiveJobNames[job.id] || job.name,
   group: job.id === "transport" ? "transport" : job.id === "farming" ? "farming" : "classic",
 }));
 
@@ -462,7 +456,7 @@ function passivePageTemplate() {
                 style="--job-color:${job.color}"
               >
                 <img src="${job.icon}" alt="" />
-                <span>${job.displayName}</span>
+                <span>${job.name}</span>
               </button>`,
           )
           .join("")}
@@ -474,7 +468,7 @@ function passivePageTemplate() {
           </span>
           <div>
             <p>Passifs utiles pour</p>
-            <h2 id="passive-result-title">${selectedJob.displayName}</h2>
+            <h2 id="passive-result-title">${selectedJob.name}</h2>
             <span>${context}</span>
           </div>
         </header>
