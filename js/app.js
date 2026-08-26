@@ -694,6 +694,18 @@ function formatPalNumber(number) {
   return match ? `#${match[1].padStart(3, "0")}${match[2]}` : `#${number}`;
 }
 
+const condensationElementIcons = {
+  Neutre: "assets/elements/neutral.webp",
+  Feu: "assets/elements/fire.png",
+  Eau: "assets/elements/water.png",
+  Plante: "assets/elements/grass.png",
+  Électrique: "assets/elements/electric.png",
+  Glace: "assets/elements/ice.png",
+  Terre: "assets/elements/ground.png",
+  Ténèbres: "assets/elements/dark.png",
+  Dragon: "assets/elements/dragon.png",
+};
+
 function condensationWorkGridTemplate(pal, stars) {
   const levels = pal?.levels[stars] || jobs.map(() => 0);
   const baseLevels = pal?.levels[0] || jobs.map(() => 0);
@@ -711,9 +723,8 @@ function condensationWorkGridTemplate(pal, stars) {
           : "";
 
       return `
-        <div class="condensation-work${ownsWork ? "" : " condensation-work--absent"}${stateClass}" style="--job-color:${job.color}">
+        <div class="condensation-work${ownsWork ? "" : " condensation-work--absent"}${stateClass}" style="--job-color:${job.color}" title="${escapeHtml(job.name)}" aria-label="${escapeHtml(job.name)} : ${ownsWork ? `niveau ${levels[index]}` : "aptitude absente"}">
           <img src="${job.icon}" alt="" />
-          <span class="condensation-work__name">${job.name}</span>
           <span class="condensation-work__level" aria-label="${ownsWork ? `Niveau ${levels[index]}` : "Aptitude absente"}">
             ${ownsWork && (improvedNow || improvedBefore) ? '<span class="condensation-work__caret" aria-hidden="true">⌃</span>' : ""}
             ${ownsWork ? `<strong>${levels[index]}</strong>` : ""}
@@ -735,6 +746,7 @@ function condensationCostTemplate(stars) {
 
 function condensationCardTemplate(pal) {
   const isGhost = !pal;
+  const displayedStars = isGhost ? 0 : condensationStars;
   const number = pal ? formatPalNumber(pal.number) : "";
   const elements = pal?.elements || [];
 
@@ -746,31 +758,38 @@ function condensationCardTemplate(pal) {
         </div>
         <div class="condensation-card__identity">
           ${number ? `<p>${number}</p>` : ""}
-          <h2>${pal ? escapeHtml(pal.name) : "Sélectionnez un Pal"}</h2>
-          <div class="condensation-card__elements">
-            ${elements.length ? elements.map((element) => `<span>${escapeHtml(element)}</span>`).join("") : "<span>Élément</span>"}
-          </div>
+          ${pal ? `<h2>${escapeHtml(pal.name)}</h2>` : '<div class="condensation-card__ghost-lines" aria-hidden="true"><span></span><span></span></div>'}
+          ${
+            elements.length
+              ? `<div class="condensation-card__elements" aria-label="${elements.length > 1 ? "Éléments" : "Élément"} : ${elements.map(escapeHtml).join(", ")}">${elements
+                  .map(
+                    (element) =>
+                      `<img src="${condensationElementIcons[element]}" alt="${escapeHtml(element)}" title="${escapeHtml(element)}" />`,
+                  )
+                  .join("")}</div>`
+              : ""
+          }
         </div>
       </header>
 
       <div class="condensation-work-grid" data-condensation-work-grid>
-        ${condensationWorkGridTemplate(pal, condensationStars)}
+        ${condensationWorkGridTemplate(pal, displayedStars)}
       </div>
 
       <div class="condensation-controls">
         <div class="condensation-slider">
           <label for="condensation-stars">Niveau de condensation</label>
-          <input id="condensation-stars" type="range" min="0" max="4" step="1" value="${condensationStars}" ${isGhost ? "disabled" : ""} />
+          <input id="condensation-stars" type="range" min="0" max="4" step="1" value="${displayedStars}" ${isGhost ? "disabled" : ""} />
           <div class="condensation-slider__steps" aria-label="Choisir un niveau de condensation">
             ${[0, 1, 2, 3, 4]
               .map(
-                (stars) => `<button type="button" data-condensation-star="${stars}" class="${stars === condensationStars ? "active" : ""}" ${isGhost ? "disabled" : ""}>${stars}★</button>`,
+                (stars) => `<button type="button" data-condensation-star="${stars}" class="${stars === displayedStars ? "active" : ""}" ${isGhost ? "disabled" : ""}>${stars}★</button>`,
               )
               .join("")}
           </div>
         </div>
         <div class="condensation-cost" data-condensation-cost>
-          ${condensationCostTemplate(condensationStars)}
+          ${condensationCostTemplate(displayedStars)}
         </div>
       </div>
     </article>`;
