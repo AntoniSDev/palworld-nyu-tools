@@ -483,8 +483,8 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 
 .passive-skill--rank-1 .passive-skill__rarity,
-.passive-skill--rank-1 .passive-skill__rank-icon { background: #71d58b; }
-.passive-skill--rank-1 h3 { color: #8be0a0; }
+.passive-skill--rank-1 .passive-skill__rank-icon { background: #f2f7f8; }
+.passive-skill--rank-1 h3 { color: #f2f7f8; }
 
 .passive-skill--rank-3 .passive-skill__rarity,
 .passive-skill--rank-3 .passive-skill__rank-icon { background: #fadc59; }
@@ -502,8 +502,13 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 .passive-skill--rank-4 h3 { color: #62f0dd; }
 
-.passive-skill--rank-5 .passive-skill__rarity { background: #f2f7f8; }
-.passive-skill--rank-5 h3 { color: #f2f7f8; }
+.passive-skill--rank-5 .passive-skill__rarity { background: #26e0eb; }
+.passive-skill--rank-5 .passive-skill__rank-icon {
+  background: linear-gradient(#62fff1 15%, #69e6ff 58%, #b691ff 59%);
+  -webkit-mask-image: url("../assets/passive-ranks/5.webp");
+  mask-image: url("../assets/passive-ranks/5.webp");
+}
+.passive-skill--rank-5 h3 { color: #62f0dd; }
 
 footer {
   padding: 24px 4px 0;

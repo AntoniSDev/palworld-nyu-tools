@@ -355,14 +355,13 @@ function renderPicker() {
 
 function passiveSkillTemplate(skillId) {
   const skill = passiveSkills[skillId];
-  const rankIcon = skill.rarity === "rank-5" ? "" : `<span class="passive-skill__rank-icon" aria-hidden="true"></span>`;
 
   return `
     <article class="passive-skill passive-skill--${skill.rarity}">
       <header class="passive-skill__header">
         <span class="passive-skill__rarity" aria-hidden="true"></span>
         <h3>${skill.name}</h3>
-        ${rankIcon}
+        <span class="passive-skill__rank-icon" aria-hidden="true"></span>
       </header>
       <div class="passive-skill__effects">
         ${skill.effects.map((effect) => `<p>${effect}</p>`).join("")}
