@@ -124,8 +124,8 @@ const jobs = [
   },
   {
     id: "farming",
-    name: "Ferme",
-    shortName: "Ferme",
+    name: "Exploitation",
+    shortName: "Exploitation",
     icon: `${iconRoot}12.webp`,
     color: "#f1c177",
     unit: "Valeur d’aptitude",
@@ -439,7 +439,7 @@ function passivePageTemplate() {
     selectedJob.group === "transport"
       ? "La Vitesse de travail n’améliore pas le Transport : privilégiez la vitesse de déplacement et l’autonomie."
       : selectedJob.group === "farming"
-        ? "La Ferme bénéficie de ses passifs dédiés et des bonus de Vitesse de travail."
+        ? "L’Exploitation bénéficie de ses passifs dédiés et des bonus de Vitesse de travail."
         : "Ces passifs peuvent soutenir la Vitesse de travail, les MEN, la satiété ou l’activité nocturne.";
 
   return `
