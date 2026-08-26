@@ -772,6 +772,7 @@ function updateIntro() {
 }
 
 function render() {
+  document.body.dataset.view = currentView;
   renderPicker();
   updateIntro();
   singleButton.classList.toggle("active", currentView === "jobs");

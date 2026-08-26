@@ -1,3 +1,9 @@
+@font-face { font-family: "Fredoka"; src: url("../assets/fonts/fredoka-600.ttf") format("truetype"); font-display: swap; font-weight: 600; }
+@font-face { font-family: "Fredoka"; src: url("../assets/fonts/fredoka-700.ttf") format("truetype"); font-display: swap; font-weight: 700; }
+@font-face { font-family: "Nunito Sans"; src: url("../assets/fonts/nunito-sans-400.ttf") format("truetype"); font-display: swap; font-weight: 400; }
+@font-face { font-family: "Nunito Sans"; src: url("../assets/fonts/nunito-sans-700.ttf") format("truetype"); font-display: swap; font-weight: 700; }
+@font-face { font-family: "Nunito Sans"; src: url("../assets/fonts/nunito-sans-800.ttf") format("truetype"); font-display: swap; font-weight: 800; }
+
 :root {
   --ink: #eefcff;
   --muted: #9ab0b9;
@@ -718,4 +724,111 @@ footer {
   .work-card__header { align-items: center; padding: 17px; }
   th, td { padding: 10px 14px; }
   th { font-size: 0.61rem; }
+}
+
+/* v0.5 — langage visuel fantasy-tech */
+:root {
+  --cyan: #62e7e4;
+  --violet-bright: #b697ff;
+  --panel-shape: polygon(0 16px, 16px 0, calc(100% - 30px) 0, 100% 30px, 100% 100%, 0 100%);
+  --card-shape: polygon(0 10px, 10px 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 7px 100%, 0 calc(100% - 7px));
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 12% -8%, rgba(55, 213, 211, 0.21), transparent 35rem),
+    radial-gradient(ellipse at 92% 8%, rgba(145, 91, 220, 0.17), transparent 34rem),
+    radial-gradient(ellipse at 72% 85%, rgba(233, 103, 173, 0.1), transparent 31rem),
+    linear-gradient(155deg, #071923 0%, #050e14 48%, #090b19 100%);
+  font-family: "Nunito Sans", "Segoe UI", sans-serif;
+}
+
+body::before {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  opacity: 0.23;
+  background-image: linear-gradient(rgba(117, 232, 232, 0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(117, 232, 232, 0.035) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: linear-gradient(to bottom, black, transparent 72%);
+  pointer-events: none;
+  content: "";
+}
+
+h1, h2, h3, .brand, .site-nav button, .job-picker button { font-family: "Fredoka", "Trebuchet MS", sans-serif; }
+
+.topbar { min-height: 68px; background: linear-gradient(100deg, rgba(5, 20, 27, 0.94), rgba(18, 13, 38, 0.92)); }
+.topbar::after { position: absolute; right: 8%; bottom: -1px; width: min(320px, 30vw); height: 2px; background: linear-gradient(90deg, transparent, var(--violet), var(--magenta-soft), transparent); content: ""; opacity: 0.68; }
+
+.brand__mark { width: 38px; height: 38px; border: 0; border-radius: 0; clip-path: polygon(28% 0, 100% 0, 100% 72%, 72% 100%, 0 100%, 0 28%); background: linear-gradient(145deg, #65eee7 5%, #7160c6 62%, #e87fb8); }
+.brand__version { padding: 2px 6px; border: 1px solid rgba(240, 207, 131, 0.28); clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px); }
+
+.site-nav { top: 68px; background: rgba(5, 15, 21, 0.93); }
+.site-nav button { position: relative; min-height: 52px; border: 0; border-radius: 0; }
+.site-nav button::before { position: absolute; left: 18%; bottom: 0; width: 0; height: 2px; background: linear-gradient(90deg, var(--cyan), var(--violet)); content: ""; transition: width 180ms ease; }
+.site-nav button.active { border: 0; background: linear-gradient(180deg, rgba(85, 220, 216, 0.09), rgba(115, 75, 184, 0.1)); text-shadow: 0 0 14px rgba(121, 244, 239, 0.25); }
+.site-nav button.active::before { width: 68%; }
+
+.eyebrow { display: flex; align-items: center; gap: 9px; font-size: 0.7rem; letter-spacing: 0.18em; }
+.eyebrow::before { width: 22px; height: 3px; clip-path: polygon(0 0, 100% 0, calc(100% - 5px) 100%, 0 100%); background: linear-gradient(90deg, var(--magenta-soft), var(--violet)); content: ""; }
+h1 { font-weight: 700; letter-spacing: -0.045em; }
+.intro h1, .standalone-page__title { background: linear-gradient(100deg, #fff 4%, var(--cyan-bright) 52%, #d9cbff); background-clip: text; color: transparent; filter: drop-shadow(0 5px 22px rgba(93, 225, 221, 0.12)); }
+#content > * { animation: page-enter 210ms ease-out both; }
+
+.job-picker button { min-height: 60px; border-radius: 0; clip-path: var(--card-shape); background: linear-gradient(120deg, color-mix(in srgb, var(--job-color) 7%, transparent), transparent 48%), rgba(8, 29, 37, 0.88); }
+.job-picker button::after { position: absolute; right: 10px; bottom: 0; width: 28px; height: 2px; background: var(--job-color); content: ""; opacity: 0.38; transition: width 160ms ease, opacity 160ms ease; }
+.job-picker button:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--job-color), transparent 48%); }
+.job-picker button.selected { border-color: color-mix(in srgb, var(--job-color), white 35%); background: radial-gradient(circle at 20% 50%, color-mix(in srgb, var(--job-color) 24%, transparent), transparent 60%), linear-gradient(115deg, rgba(20, 55, 62, 0.96), rgba(34, 25, 63, 0.9)); filter: drop-shadow(0 5px 10px color-mix(in srgb, var(--job-color) 18%, transparent)); }
+.job-picker button.selected::after { width: 64%; opacity: 0.95; }
+.job-picker button:hover img, .job-picker button.selected img { transform: scale(1.06); filter: drop-shadow(0 0 7px color-mix(in srgb, var(--job-color) 40%, transparent)); }
+
+.work-card, .info-card, .passive-results, .partner-results, .construction-page { position: relative; border-radius: 0; clip-path: var(--panel-shape); background: radial-gradient(circle at 90% -20%, rgba(166, 111, 234, 0.12), transparent 20rem), linear-gradient(145deg, rgba(14, 45, 54, 0.95), rgba(12, 23, 39, 0.96) 66%, rgba(22, 14, 40, 0.95)); box-shadow: 0 28px 75px rgba(0, 0, 0, 0.3); }
+.work-card::before, .info-card::before, .passive-results::before, .partner-results::before, .construction-page::before { position: absolute; z-index: 2; top: 0; left: 16px; width: 110px; height: 2px; background: linear-gradient(90deg, var(--cyan), var(--violet), transparent); content: ""; }
+.work-card::after, .info-card::after, .passive-results::after, .partner-results::after { position: absolute; z-index: 2; right: 0; bottom: 18px; width: 2px; height: 42px; background: linear-gradient(transparent, var(--magenta-soft)); content: ""; opacity: 0.7; }
+
+.work-card__icon { border-radius: 0; clip-path: polygon(25% 0, 100% 0, 100% 75%, 75% 100%, 0 100%, 0 25%); box-shadow: inset 0 0 16px color-mix(in srgb, var(--job-color) 9%, transparent); }
+.level-badge { border-radius: 0; clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px); background: linear-gradient(135deg, #153e47, #232448); }
+tbody tr:hover { background: linear-gradient(90deg, rgba(91, 218, 223, 0.055), rgba(149, 94, 219, 0.035)); }
+
+.info-card__header img { border-radius: 0; clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px); }
+.condensation-steps div { position: relative; border-radius: 0; clip-path: var(--card-shape); background: linear-gradient(145deg, rgba(4, 20, 27, 0.58), rgba(65, 37, 96, 0.13)); }
+.condensation-steps div::after { position: absolute; right: 9px; top: 0; width: 24px; height: 2px; background: var(--violet); content: ""; opacity: 0.58; }
+.condensation-steps strong { color: var(--magenta-soft); font-family: "Fredoka", sans-serif; }
+
+.partner-card { position: relative; border-radius: 0; clip-path: var(--card-shape); background: linear-gradient(135deg, rgba(5, 23, 30, 0.66), rgba(48, 35, 78, 0.2)); transition: transform 150ms ease, border-color 150ms ease; }
+.partner-card:hover { transform: translateY(-2px); border-color: rgba(126, 229, 214, 0.28); }
+.partner-card::after { position: absolute; right: 8px; bottom: 0; width: 34px; height: 2px; background: #7ee5a6; content: ""; opacity: 0.46; }
+
+.passive-tier-group { border: 0; border-left: 2px solid var(--tier-accent); border-radius: 0; clip-path: polygon(0 8px, 8px 0, 100% 0, 100% 100%, 0 100%); }
+.passive-tier-group--rank-5 { --tier-accent: #66f4ec; }
+.passive-tier-group--rank-4 { --tier-accent: #39e8ed; }
+.passive-tier-group--rank-3 { --tier-accent: #fadc59; }
+.passive-tier-group--rank-1 { --tier-accent: #dce7e9; }
+.passive-skill { position: relative; border-radius: 0; clip-path: var(--card-shape); transition: transform 150ms ease; }
+.passive-skill:hover { transform: translateY(-2px); }
+.passive-skill--rank-5 { background: linear-gradient(105deg, transparent 20%, rgba(181, 143, 255, 0.1) 45%, transparent 70%), linear-gradient(135deg, rgba(38, 224, 235, 0.12), rgba(136, 102, 218, 0.14) 66%); background-size: 220% 100%, 100% 100%; box-shadow: inset 3px 0 rgba(92, 243, 235, 0.22); animation: world-tree-energy 7s ease-in-out infinite; }
+.passive-skill--rank-5::after { position: absolute; right: 9px; bottom: 0; width: 42px; height: 2px; background: linear-gradient(90deg, transparent, #b995ff, #65fff3); content: ""; filter: drop-shadow(0 0 4px #73eee7); }
+.passive-skill--rank-5 .passive-skill__rarity { background: linear-gradient(#6afff3, #a986f1); box-shadow: 0 0 7px rgba(102, 247, 238, 0.52); }
+.passive-skill--rank-5 .passive-skill__rank-icon { filter: drop-shadow(0 0 4px rgba(102, 255, 242, 0.5)); }
+.passive-skill--rank-5 h3 { color: #8ffff3; text-shadow: 0 0 9px rgba(102, 255, 242, 0.22); }
+
+.construction-page { background: radial-gradient(circle at 22% 50%, rgba(236, 108, 178, 0.18), transparent 20rem), radial-gradient(circle at 88% 18%, rgba(99, 235, 228, 0.1), transparent 18rem), linear-gradient(135deg, rgba(12, 48, 57, 0.95), rgba(34, 21, 61, 0.96) 70%, rgba(7, 23, 30, 0.98)); }
+.construction-page__visual { border-radius: 0; clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 22px); }
+
+body[data-view="condensation"] .standalone-page__title { background-image: linear-gradient(100deg, #fff, #8ef7ee 42%, #c39cff); }
+body[data-view="partners"] .standalone-page__title { background-image: linear-gradient(100deg, #fff, #a4f6d4 42%, #a5e7ff); }
+
+@keyframes page-enter { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes world-tree-energy { 0%, 100% { background-position: 110% 0, 0 0; } 50% { background-position: -40% 0, 0 0; } }
+
+@media (max-width: 650px) {
+  .topbar { min-height: 60px; }
+  .site-nav { top: 60px; }
+  .site-nav button { min-height: 48px; }
+  .job-picker button { min-height: 80px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
