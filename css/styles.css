@@ -303,6 +303,37 @@ tbody tr:last-child td { border-bottom: 0; }
   gap: 14px;
 }
 
+.info-card {
+  padding: clamp(24px, 4vw, 40px);
+  border: 1px solid rgba(143, 222, 228, 0.17);
+  border-radius: 20px;
+  background: linear-gradient(145deg, rgba(18, 48, 58, 0.9), rgba(8, 26, 32, 0.94));
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+.info-card h2 { margin: 0 0 28px; font-size: clamp(1.8rem, 4vw, 2.6rem); }
+.info-card h3 { margin: 0 0 8px; color: var(--cyan-bright); font-size: 1.15rem; }
+.info-card > p:not(.eyebrow) { max-width: 760px; color: var(--muted); line-height: 1.6; }
+
+.condensation-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 24px 0;
+}
+
+.condensation-steps div {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(5, 20, 25, 0.38);
+}
+
+.condensation-steps strong { display: block; color: var(--sand); font-size: 1.35rem; }
+.condensation-steps span { color: var(--cyan-bright); font-size: 0.78rem; font-weight: 800; }
+.condensation-steps p { margin: 12px 0 0; color: var(--muted); font-size: 0.84rem; line-height: 1.45; }
+.info-card .info-card__note { margin-bottom: 0; font-size: 0.82rem; }
+
 .work-card--compact .work-card__header { padding: 14px 16px; }
 .work-card--compact .work-card__icon { width: 43px; height: 43px; border-radius: 12px; }
 .work-card--compact .work-card__icon img { width: 36px; height: 36px; }
@@ -322,6 +353,7 @@ footer {
 @media (max-width: 900px) {
   .job-picker { grid-template-columns: repeat(4, 1fr); }
   .all-tables { grid-template-columns: 1fr; }
+  .condensation-steps { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 650px) {
@@ -332,6 +364,7 @@ footer {
   .intro__copy { max-width: 31ch; line-height: 1.5; }
   .view-actions { width: 100%; }
   .view-actions button { flex: 1; padding-inline: 8px; }
+  .condensation-steps { grid-template-columns: 1fr; }
   .job-picker {
     display: flex;
     margin-inline: -12px;

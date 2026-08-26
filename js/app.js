@@ -9,7 +9,7 @@ const jobs = [
     shortName: "Allumage",
     icon: `${iconRoot}00.webp`,
     color: "#ff8c4b",
-    unit: "Puissance",
+    unit: "Capacité de travail",
     note: "Cuisine, fonte et structures nécessitant du feu.",
     values: speedA,
   },
@@ -19,7 +19,7 @@ const jobs = [
     shortName: "Arrosage",
     icon: `${iconRoot}01.webp`,
     color: "#63cfff",
-    unit: "Puissance",
+    unit: "Capacité de travail",
     note: "Arrosage des plantations, moulins, broyeurs et concasseurs.",
     values: speedB,
   },
@@ -29,7 +29,7 @@ const jobs = [
     shortName: "Semence",
     icon: `${iconRoot}02.webp`,
     color: "#83d769",
-    unit: "Puissance",
+    unit: "Capacité de travail",
     note: "Plantation des graines dans les différentes cultures.",
     values: speedB,
   },
@@ -39,7 +39,7 @@ const jobs = [
     shortName: "Énergie",
     icon: `${iconRoot}03.webp`,
     color: "#ffe15b",
-    unit: "Puissance",
+    unit: "Capacité de travail",
     note: "Recharge des générateurs de la base.",
     values: [250, 325, 400, 500, 750, 1000, 1500, 2000, 3000, 4000],
   },
@@ -49,7 +49,7 @@ const jobs = [
     shortName: "Artisanat",
     icon: `${iconRoot}04.webp`,
     color: "#dda982",
-    unit: "Puissance",
+    unit: "Capacité de travail",
     note: "Fabrication, construction et travail sur les chaînes de production.",
     values: speedA,
   },
@@ -59,7 +59,7 @@ const jobs = [
     shortName: "Collecte",
     icon: `${iconRoot}05.webp`,
     color: "#d9e87a",
-    unit: "Puissance",
+    unit: "Capacité de travail",
     extraLabel: "Récolte",
     extraPrefix: "×",
     extra: [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5],
@@ -72,7 +72,7 @@ const jobs = [
     shortName: "Abattage",
     icon: `${iconRoot}06.webp`,
     color: "#c39160",
-    unit: "Puissance",
+    unit: "Capacité de travail",
     extraLabel: "Dégâts ressources",
     extraPrefix: "×",
     extra: [0.05, 0.1, 0.18, 0.26, 0.38, 0.5, 0.6, 0.7, 0.85, 1],
@@ -85,7 +85,7 @@ const jobs = [
     shortName: "Extraction",
     icon: `${iconRoot}07.webp`,
     color: "#aeb8c8",
-    unit: "Puissance",
+    unit: "Capacité de travail",
     extraLabel: "Dégâts ressources",
     extraPrefix: "×",
     extra: [0.07, 0.12, 0.23, 0.31, 0.43, 0.55, 0.65, 0.75, 0.9, 1.1],
@@ -98,7 +98,7 @@ const jobs = [
     shortName: "Pharmacie",
     icon: `${iconRoot}08.webp`,
     color: "#bb83ef",
-    unit: "Puissance",
+    unit: "Capacité de travail",
     note: "Production de médicaments et travail dans les cliniques.",
     values: speedA,
   },
@@ -108,7 +108,7 @@ const jobs = [
     shortName: "Réfrigération",
     icon: `${iconRoot}10.webp`,
     color: "#8ce6ff",
-    unit: "Puissance",
+    unit: "Capacité de travail",
     note: "Conservation de la nourriture et fonctionnement des structures froides.",
     values: speedA,
   },
@@ -138,11 +138,13 @@ const picker = document.querySelector("#job-picker");
 const content = document.querySelector("#content");
 const singleButton = document.querySelector("#single-view");
 const allButton = document.querySelector("#all-view");
+const infoButton = document.querySelector("#info-view");
 const printButton = document.querySelector("#print-view");
 const formatter = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2 });
 
 let selectedId = jobs[0].id;
 let showAll = false;
+let showInfo = false;
 
 function tableTemplate(job, compact = false) {
   const rows = job.values
@@ -209,9 +211,29 @@ function renderPicker() {
 
 function render() {
   renderPicker();
-  singleButton.classList.toggle("active", !showAll);
+  singleButton.classList.toggle("active", !showAll && !showInfo);
   allButton.classList.toggle("active", showAll);
+  infoButton.classList.toggle("active", showInfo);
   printButton.classList.toggle("hidden", !showAll);
+  picker.classList.toggle("hidden", showInfo);
+
+  if (showInfo) {
+    content.innerHTML = `
+      <section class="info-card" aria-labelledby="info-title">
+        <p class="eyebrow">Mécaniques de Palworld</p>
+        <h2 id="info-title">Infos utiles</h2>
+        <h3>Condensation des Pals</h3>
+        <p>La condensation renforce un Pal en utilisant d’autres Pals de la même espèce. Chaque palier ajoute une étoile et améliore une ou plusieurs de ses aptitudes de travail.</p>
+        <div class="condensation-steps">
+          <div><strong>1★</strong><span>4 Pals</span><p>+1 à sa meilleure aptitude de travail.</p></div>
+          <div><strong>2★</strong><span>8 Pals</span><p>+1 à sa deuxième meilleure aptitude.</p></div>
+          <div><strong>3★</strong><span>12 Pals</span><p>+1 à sa troisième meilleure aptitude.</p></div>
+          <div><strong>4★</strong><span>24 Pals</span><p>+1 à toutes ses aptitudes de travail.</p></div>
+        </div>
+        <p class="info-card__note">Il faut donc 48 Pals au total pour atteindre 4★. Les quantités indiquées correspondent au coût de chaque palier.</p>
+      </section>`;
+    return;
+  }
 
   if (showAll) {
     content.innerHTML = `<section class="all-tables" aria-label="Toutes les aptitudes">
@@ -229,16 +251,25 @@ picker.addEventListener("click", (event) => {
   if (!button) return;
   selectedId = button.dataset.job;
   showAll = false;
+  showInfo = false;
   render();
 });
 
 singleButton.addEventListener("click", () => {
   showAll = false;
+  showInfo = false;
   render();
 });
 
 allButton.addEventListener("click", () => {
   showAll = true;
+  showInfo = false;
+  render();
+});
+
+infoButton.addEventListener("click", () => {
+  showAll = false;
+  showInfo = true;
   render();
 });
 
