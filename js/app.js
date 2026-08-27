@@ -1542,7 +1542,9 @@ content.addEventListener("click", (event) => {
   const breedingRoleButton = event.target.closest("[data-breeding-second-role]");
   if (breedingRoleButton) {
     breedingState.secondRole = breedingRoleButton.dataset.breedingSecondRole;
-    breedingSelectionSlot = breedingState.secondRole === "target" ? "target" : "parentB";
+    breedingSelectionSlot = breedingState.parentA
+      ? (breedingState.secondRole === "target" ? "target" : "parentB")
+      : "parentA";
     breedingCanvas.fitted = false;
     saveBreedingState();
     renderBreedingPage();
