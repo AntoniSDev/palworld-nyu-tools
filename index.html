@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Tableaux et outils pratiques en français pour Palworld." />
     <title>Palworld Nyu Tools</title>
-    <link rel="stylesheet" href="css/styles.css?v=0.7-partner" />
+    <link rel="stylesheet" href="css/styles.css?v=0.7-ui" />
     <script src="js/condensation-data.js?v=0.7-partner" defer></script>
-    <script src="js/app.js?v=0.7-partner" defer></script>
+    <script src="js/app.js?v=0.7-ui" defer></script>
   </head>
   <body>
     <header class="topbar">
@@ -20,10 +20,17 @@
     <nav class="site-nav" aria-label="Navigation principale">
       <div class="site-nav__inner">
         <button id="single-view" class="active" type="button">Aptitudes de travail</button>
-        <button id="passive-view" type="button">Compétences passives</button>
+        <div class="site-nav__group">
+          <button id="skills-menu-button" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="skills-menu">
+            Compétences <span class="site-nav__chevron" aria-hidden="true"></span>
+          </button>
+          <div id="skills-menu" class="site-nav__submenu" role="menu" hidden>
+            <button id="passive-view" type="button" role="menuitem">Passives</button>
+            <button id="partner-view" type="button" role="menuitem">Utilitaires</button>
+            <button id="combat-partner-view" type="button" role="menuitem">Combat</button>
+          </div>
+        </div>
         <button id="condensation-view" type="button">Condensation des Pals</button>
-        <button id="partner-view" type="button">Compétences partenaire utilitaires</button>
-        <button id="combat-partner-view" type="button">Compétences partenaire de combat</button>
         <button id="memo-view" type="button">Mémo</button>
       </div>
     </nav>

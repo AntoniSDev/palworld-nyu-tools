@@ -512,6 +512,8 @@ const picker = document.querySelector("#job-picker");
 const content = document.querySelector("#content");
 const brand = document.querySelector(".brand");
 const singleButton = document.querySelector("#single-view");
+const skillsMenuButton = document.querySelector("#skills-menu-button");
+const skillsMenu = document.querySelector("#skills-menu");
 const passiveButton = document.querySelector("#passive-view");
 const condensationButton = document.querySelector("#condensation-view");
 const partnerButton = document.querySelector("#partner-view");
@@ -531,6 +533,10 @@ let condensationQuery = "";
 let currentView = "jobs";
 let viewTransitionTimer;
 let draggedMemoId = null;
+let memoDragPlaceholder = null;
+let memoDragGhost = null;
+let memoDragOffset = { x: 0, y: 0 };
+let memoDragPointerId = null;
 
 const memoStorageKey = "palworld-nyu-tools:memo";
 
@@ -1001,7 +1007,7 @@ function memoCardTemplate(task) {
   return `
     <article class="memo-card" data-memo-id="${task.id}">
       <div class="memo-card__topline">
-        <span class="memo-card__handle" draggable="true" title="Déplacer cette tâche" aria-label="Déplacer cette tâche">⠿</span>
+        <span class="memo-card__handle" title="Déplacer cette tâche" aria-label="Déplacer cette tâche">↕</span>
         <input class="memo-card__title" data-memo-title type="text" value="${escapeHtml(task.title)}" placeholder="Titre (facultatif)" aria-label="Titre de la tâche" />
         <button class="memo-card__delete" data-memo-delete type="button" title="Supprimer cette tâche" aria-label="Supprimer cette tâche">×</button>
       </div>
@@ -1079,11 +1085,20 @@ function switchView(nextView) {
   }, 115);
 }
 
+function setSkillsMenu(open, focusFirst = false) {
+  skillsMenu.hidden = !open;
+  skillsMenuButton.setAttribute("aria-expanded", String(open));
+  skillsMenuButton.parentElement.classList.toggle("site-nav__group--open", open);
+  if (open && focusFirst) skillsMenu.querySelector('[role="menuitem"]')?.focus();
+}
+
 function render() {
   document.body.dataset.view = currentView;
   renderPicker();
   updateIntro();
   singleButton.classList.toggle("active", currentView === "jobs");
+  const skillsViewActive = ["passives", "partners", "combat-partners"].includes(currentView);
+  skillsMenuButton.classList.toggle("active", skillsViewActive);
   passiveButton.classList.toggle("active", currentView === "passives");
   condensationButton.classList.toggle("active", currentView === "condensation");
   partnerButton.classList.toggle("active", currentView === "partners");
@@ -1212,41 +1227,64 @@ content.addEventListener("input", (event) => {
   }
 });
 
-content.addEventListener("dragstart", (event) => {
+content.addEventListener("pointerdown", (event) => {
   const handle = event.target.closest(".memo-card__handle");
-  if (!handle) return;
+  if (!handle || event.button !== 0) return;
   const card = handle.closest("[data-memo-id]");
   draggedMemoId = card?.dataset.memoId || null;
   if (!draggedMemoId) return;
+  event.preventDefault();
+  memoDragPointerId = event.pointerId;
+  const bounds = card.getBoundingClientRect();
+  memoDragOffset = { x: event.clientX - bounds.left, y: event.clientY - bounds.top };
+  memoDragPlaceholder = document.createElement("div");
+  memoDragPlaceholder.className = "memo-card-placeholder";
+  memoDragPlaceholder.setAttribute("aria-hidden", "true");
+  memoDragPlaceholder.style.height = `${bounds.height}px`;
+  card.after(memoDragPlaceholder);
+  memoDragGhost = card.cloneNode(true);
+  memoDragGhost.classList.add("memo-card--drag-ghost");
+  memoDragGhost.setAttribute("aria-hidden", "true");
+  memoDragGhost.querySelectorAll("input, textarea, button").forEach((field) => field.setAttribute("tabindex", "-1"));
+  memoDragGhost.style.width = `${bounds.width}px`;
+  memoDragGhost.style.height = `${bounds.height}px`;
+  memoDragGhost.style.left = `${bounds.left}px`;
+  memoDragGhost.style.top = `${bounds.top}px`;
+  document.body.append(memoDragGhost);
   card.classList.add("memo-card--dragging");
-  event.dataTransfer.effectAllowed = "move";
-  event.dataTransfer.setData("text/plain", draggedMemoId);
 });
 
-content.addEventListener("dragover", (event) => {
-  if (!draggedMemoId) return;
-  const list = event.target.closest("[data-memo-list]");
-  if (!list) return;
+document.addEventListener("pointermove", (event) => {
+  if (!draggedMemoId || event.pointerId !== memoDragPointerId || !memoDragGhost) return;
   event.preventDefault();
-  event.dataTransfer.dropEffect = "move";
-  const draggingCard = list.querySelector(`[data-memo-id="${draggedMemoId}"]`);
-  const siblings = [...list.querySelectorAll("[data-memo-id]:not(.memo-card--dragging)")];
-  const nextCard = siblings.find((card) => event.clientY < card.getBoundingClientRect().top + card.offsetHeight / 2);
-  if (draggingCard) list.insertBefore(draggingCard, nextCard || null);
-});
+  memoDragGhost.style.left = `${event.clientX - memoDragOffset.x}px`;
+  memoDragGhost.style.top = `${event.clientY - memoDragOffset.y}px`;
+  const hoveredCard = document.elementFromPoint(event.clientX, event.clientY)?.closest("[data-memo-id]");
+  if (!hoveredCard || hoveredCard.dataset.memoId === draggedMemoId || !memoDragPlaceholder) return;
+  const bounds = hoveredCard.getBoundingClientRect();
+  const after = event.clientY > bounds.top + bounds.height / 2 ||
+    (Math.abs(event.clientY - (bounds.top + bounds.height / 2)) < bounds.height / 3 && event.clientX > bounds.left + bounds.width / 2);
+  hoveredCard[after ? "after" : "before"](memoDragPlaceholder);
+}, { passive: false });
 
-content.addEventListener("drop", (event) => {
-  if (!draggedMemoId || !event.target.closest("[data-memo-list]")) return;
-  event.preventDefault();
+function finishMemoDrag(event) {
+  if (!draggedMemoId || (event.pointerId !== undefined && event.pointerId !== memoDragPointerId)) return;
+  const draggingCard = content.querySelector(`[data-memo-id="${draggedMemoId}"]`);
+  if (draggingCard && memoDragPlaceholder) memoDragPlaceholder.before(draggingCard);
+  draggingCard?.classList.remove("memo-card--dragging");
+  memoDragPlaceholder?.remove();
+  memoDragGhost?.remove();
+  memoDragPlaceholder = null;
+  memoDragGhost = null;
+  memoDragPointerId = null;
   const order = [...content.querySelectorAll("[data-memo-id]")].map((card) => card.dataset.memoId);
   memoTasks.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
   saveMemoTasks();
-});
-
-content.addEventListener("dragend", () => {
-  content.querySelector(".memo-card--dragging")?.classList.remove("memo-card--dragging");
   draggedMemoId = null;
-});
+}
+
+document.addEventListener("pointerup", finishMemoDrag);
+document.addEventListener("pointercancel", finishMemoDrag);
 
 brand.addEventListener("click", (event) => {
   event.preventDefault();
@@ -1255,10 +1293,39 @@ brand.addEventListener("click", (event) => {
 });
 
 singleButton.addEventListener("click", () => {
+  setSkillsMenu(false);
   switchView("jobs");
 });
 
+skillsMenuButton.addEventListener("click", () => {
+  setSkillsMenu(skillsMenu.hidden);
+});
+
+skillsMenuButton.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    setSkillsMenu(true, true);
+  }
+});
+
+skillsMenu.addEventListener("keydown", (event) => {
+  const items = [...skillsMenu.querySelectorAll('[role="menuitem"]')];
+  const index = items.indexOf(document.activeElement);
+  if (event.key === "Escape") {
+    setSkillsMenu(false);
+    skillsMenuButton.focus();
+  } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+    event.preventDefault();
+    items[(index + (event.key === "ArrowDown" ? 1 : -1) + items.length) % items.length].focus();
+  }
+});
+
+document.addEventListener("click", (event) => {
+  if (!event.target.closest(".site-nav__group")) setSkillsMenu(false);
+});
+
 passiveButton.addEventListener("click", () => {
+  setSkillsMenu(false);
   switchView("passives");
 });
 
@@ -1272,10 +1339,12 @@ condensationButton.addEventListener("click", () => {
 });
 
 partnerButton.addEventListener("click", () => {
+  setSkillsMenu(false);
   switchView("partners");
 });
 
 combatPartnerButton.addEventListener("click", () => {
+  setSkillsMenu(false);
   switchView("combat-partners");
 });
 
