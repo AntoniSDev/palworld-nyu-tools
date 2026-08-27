@@ -84,6 +84,10 @@
     return passiveById.get(id) || { id, name: id, effect: "Effet non localisé", rank: 0 };
   }
 
+  function passiveEffectText(effect) {
+    return String(effect || "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  }
+
   function passiveClass(rank) {
     if (rank >= 5) return "save-passive--world-tree";
     if (rank >= 4) return "save-passive--legendary";
@@ -92,11 +96,23 @@
     return "save-passive--common";
   }
 
+  function passiveRank(rank) {
+    if (rank >= 5) return "5";
+    if (rank >= 4) return "4";
+    if (rank >= 3) return "3";
+    if (rank === 2) return "2";
+    if (rank < 0) return `negative-${Math.min(3, Math.abs(rank))}`;
+    return "1";
+  }
+
+  function passiveRankIcon(passive) {
+    return `<i class="save-passive-rank save-passive-rank--${passiveRank(passive.rank)}" aria-hidden="true"></i>`;
+  }
+
   function passiveChip(id, removable = false) {
     const passive = passiveInfo(id);
-    const title = `${passive.name}\n${passive.effect}`;
-    return `<span class="save-passive ${passiveClass(passive.rank)}" title="${escapeHtml(title)}" data-passive-id="${escapeHtml(id)}">
-      <span>${escapeHtml(passive.name)}</span>${removable ? `<button type="button" data-remove-passive="${escapeHtml(id)}" aria-label="Retirer ${escapeHtml(passive.name)}">×</button>` : ""}
+    return `<span class="save-passive ${passiveClass(passive.rank)}" data-passive-id="${escapeHtml(id)}" data-passive-tooltip="${escapeHtml(id)}" tabindex="0">
+      <span>${escapeHtml(passive.name)}</span>${passiveRankIcon(passive)}${removable ? `<button type="button" data-remove-passive="${escapeHtml(id)}" aria-label="Retirer ${escapeHtml(passive.name)}">×</button>` : ""}
     </span>`;
   }
 
@@ -270,13 +286,25 @@
   function passiveModal() {
     const search = normalize(passiveQuery);
     const rows = passives.filter((passive) => !search || normalize(passive.name).includes(search));
+    const groups = [
+      { label: "Arbre-Monde", match: (rank) => rank >= 5 },
+      { label: "Légendaires", match: (rank) => rank === 4 },
+      { label: "Rares", match: (rank) => rank === 3 },
+      { label: "Supérieurs", match: (rank) => rank === 2 },
+      { label: "Communs", match: (rank) => rank >= 0 && rank < 2 },
+      { label: "Négatifs", match: (rank) => rank < 0 },
+    ];
     return `<div class="save-modal-backdrop" data-close-passive-modal><section class="save-modal save-passive-modal" role="dialog" aria-modal="true" aria-labelledby="passive-modal-title">
       <header><div><span class="eyebrow">Objectif d’élevage</span><h2 id="passive-modal-title">Compétences passives</h2></div><button type="button" data-close-passive-modal aria-label="Fermer">×</button></header>
       <div class="save-passive-modal__tools"><input type="search" data-passive-search placeholder="Rechercher un passif…" value="${escapeHtml(passiveQuery)}" autofocus /><span>${state.selectedPassives.length}/4</span><button type="button" data-clear-passives>Tout effacer</button></div>
-      <div class="save-passive-list">${rows.map((passive) => {
-        const available = allAvailable.has(passive.id);
-        const selected = state.selectedPassives.includes(passive.id);
-        return `<button type="button" data-toggle-passive="${escapeHtml(passive.id)}" class="${passiveClass(passive.rank)}${selected ? " is-selected" : ""}" ${available ? "" : "disabled"} title="${escapeHtml(`${passive.name}\n${passive.effect}`)}"><span><strong>${escapeHtml(passive.name)}</strong><small>${escapeHtml(passive.effect)}</small></span><i>${selected ? "✓" : available ? "+" : "—"}</i></button>`;
+      <div class="save-passive-list">${groups.map((group) => {
+        const groupRows = rows.filter((passive) => group.match(passive.rank));
+        if (!groupRows.length) return "";
+        return `<section class="save-passive-tier"><header><strong>${group.label}</strong><span>${groupRows.length}</span></header><div>${groupRows.map((passive) => {
+          const available = allAvailable.has(passive.id);
+          const selected = state.selectedPassives.includes(passive.id);
+          return `<button type="button" data-toggle-passive="${escapeHtml(passive.id)}" data-passive-tooltip="${escapeHtml(passive.id)}" class="${passiveClass(passive.rank)}${selected ? " is-selected" : ""}" ${available ? "" : "disabled"}><strong>${escapeHtml(passive.name)}</strong>${passiveRankIcon(passive)}<span aria-hidden="true">${selected ? "✓" : available ? "+" : "—"}</span></button>`;
+        }).join("")}</div></section>`;
       }).join("")}</div>
       <footer><span>${rows.length} compétence${rows.length > 1 ? "s" : ""}</span><button type="button" class="save-primary" data-close-passive-modal>Terminer</button></footer>
     </section></div>`;
@@ -321,12 +349,16 @@
 
   function treeToGraph(root) {
     const nodes = [];
-    const edges = [];
+    const families = [];
     let leafCursor = 0;
+    const nodeWidth = 210;
+    const nodeHeight = 150;
+    const horizontalStep = 238;
+    const verticalStep = 226;
     function visit(node, depth = 0) {
       const key = `node-${nodes.length}`;
       if (!node.parents) {
-        nodes.push({ key, node, x: leafCursor++ * 205, depth });
+        nodes.push({ key, node, x: leafCursor++ * horizontalStep, depth });
         return key;
       }
       const a = visit(node.parents[0], depth + 1);
@@ -334,23 +366,29 @@
       const left = nodes.find((entry) => entry.key === a);
       const right = nodes.find((entry) => entry.key === b);
       nodes.push({ key, node, x: (left.x + right.x) / 2, depth });
-      edges.push([a, key], [b, key]);
+      families.push({ parents: [a, b], child: key });
       return key;
     }
     visit(root);
     const maxDepth = Math.max(...nodes.map((node) => node.depth), 0);
-    nodes.forEach((node) => { node.y = node.depth * 178 + 30; node.x += 55; });
-    return { nodes, edges, width: Math.max(500, leafCursor * 205 + 110), height: (maxDepth + 1) * 178 + 130 };
+    nodes.forEach((node) => { node.y = node.depth * verticalStep + 42; node.x += 64; });
+    return { nodes, families, nodeWidth, nodeHeight, width: Math.max(560, leafCursor * horizontalStep + 128), height: (maxDepth + 1) * verticalStep + 150 };
   }
 
   function graphTemplate() {
     if (!graph?.root) return `<div class="breeding-canvas__empty"><span aria-hidden="true">⌁</span><p>${escapeHtml(graph?.error || (state.calculation === "target" ? "Choisissez un Pal cible pour calculer une route." : "Choisissez deux individus de votre sauvegarde."))}</p></div>`;
     const layout = treeToGraph(graph.root);
     const nodeByKey = new Map(layout.nodes.map((entry) => [entry.key, entry]));
-    const paths = layout.edges.map(([fromKey, toKey]) => {
-      const from = nodeByKey.get(fromKey); const to = nodeByKey.get(toKey);
-      const sx = from.x + 76; const sy = from.y; const ex = to.x + 76; const ey = to.y + 112; const mid = (sy + ey) / 2;
-      return `<path d="M ${sx} ${sy} C ${sx} ${mid}, ${ex} ${mid}, ${ex} ${ey}" />`;
+    const paths = layout.families.map(({ parents, child }) => {
+      const [left, right] = parents.map((key) => nodeByKey.get(key));
+      const target = nodeByKey.get(child);
+      const leftX = left.x + layout.nodeWidth / 2;
+      const rightX = right.x + layout.nodeWidth / 2;
+      const childX = target.x + layout.nodeWidth / 2;
+      const parentY = left.y;
+      const childY = target.y + layout.nodeHeight;
+      const joinY = childY + (parentY - childY) * .48;
+      return `<path class="save-family-link" d="M ${leftX} ${parentY} V ${joinY} H ${rightX} V ${parentY} M ${childX} ${joinY} V ${childY}" /><circle class="save-family-junction" cx="${childX}" cy="${joinY}" r="4" />`;
     }).join("");
     const nodes = layout.nodes.map(({ node, x, y }) => {
       const pal = palInfo(node.speciesId); if (!pal) return "";
@@ -360,7 +398,7 @@
       const eggAsset = `assets/eggs/t_itemicon_material_palegg${eggSuffix ? `_${eggSuffix}` : ""}.webp`;
       return `<article class="breeding-node save-tree-node${final ? " save-tree-node--final" : ""}" style="left:${x}px;top:${y}px">
         ${node.owned ? "" : `<span class="save-egg" title="À obtenir par reproduction · ${escapeHtml(eggName)}"><img src="${eggAsset}" alt="${escapeHtml(eggName)}" /></span>`}
-        <span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><strong>${escapeHtml(pal.name)}</strong>${node.sex ? `<b class="breeding-node__sex">${sexSymbol(node.sex)}</b>` : ""}
+        <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span><strong>${escapeHtml(pal.name)}</strong>${node.sex ? `<b class="breeding-node__sex">${sexSymbol(node.sex)}</b>` : ""}</span></span>
         ${useful.length ? `<span class="save-tree-node__passives">${useful.map((id) => passiveChip(id)).join("")}</span>` : ""}
       </article>`;
     }).join("");
@@ -673,6 +711,30 @@
     if (event.target.matches("[data-passive-search]")) { passiveQuery = event.target.value; render(false); }
   }
 
+  function showPassiveTooltip(target) {
+    const passive = passiveInfo(target.dataset.passiveTooltip);
+    let tooltip = document.querySelector(".save-passive-tooltip");
+    if (!tooltip) {
+      tooltip = document.createElement("div");
+      tooltip.className = "save-passive-tooltip";
+      tooltip.setAttribute("role", "tooltip");
+      document.body.append(tooltip);
+    }
+    tooltip.innerHTML = `<strong>${escapeHtml(passive.name)}</strong><span>${escapeHtml(passiveEffectText(passive.effect))}</span>`;
+    tooltip.hidden = false;
+    const rect = target.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const left = Math.min(window.innerWidth - tooltipRect.width - 10, Math.max(10, rect.left + rect.width / 2 - tooltipRect.width / 2));
+    const above = rect.top - tooltipRect.height - 9;
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${above >= 8 ? above : rect.bottom + 9}px`;
+  }
+
+  function hidePassiveTooltip() {
+    const tooltip = document.querySelector(".save-passive-tooltip");
+    if (tooltip) tooltip.hidden = true;
+  }
+
   async function handleChange(event) {
     if (!event.target.matches("[data-save-directory]")) return;
     pendingWorlds = detectWorlds(event.target.files);
@@ -692,6 +754,10 @@
   document.addEventListener("click", handleClick);
   document.addEventListener("input", handleInput);
   document.addEventListener("change", handleChange);
+  document.addEventListener("pointerover", (event) => { const target = event.target.closest("[data-passive-tooltip]"); if (target) showPassiveTooltip(target); });
+  document.addEventListener("pointerout", (event) => { const target = event.target.closest("[data-passive-tooltip]"); if (target && !target.contains(event.relatedTarget)) hidePassiveTooltip(); });
+  document.addEventListener("focusin", (event) => { const target = event.target.closest("[data-passive-tooltip]"); if (target) showPassiveTooltip(target); });
+  document.addEventListener("focusout", (event) => { if (event.target.closest("[data-passive-tooltip]")) hidePassiveTooltip(); });
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape" || mode !== "save") return;
     if (passiveModalOpen) { passiveModalOpen = false; render(false); }

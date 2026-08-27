@@ -27,3 +27,11 @@ from that project’s extracted Palworld asset set.
 
 Palworld names, data and imagery belong to Pocketpair, Inc. This community
 project is not affiliated with or endorsed by Pocketpair.
+
+## Palworld Wiki interface icons
+
+The embedded rank-2 and negative passive-skill indicators are the 24 × 24
+Palworld interface icons distributed by
+[`palworld.wiki.gg`](https://palworld.wiki.gg/wiki/Category:Passive_Skill_template_images)
+under CC BY-SA 4.0. They complement the same local icon family already used by
+the passive-skills page.
