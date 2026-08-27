@@ -1206,8 +1206,7 @@ function buildBreedingGraph() {
 }
 
 function breedingGraphTemplate(graph) {
-  if (!graph) return '<div class="breeding-canvas__empty"><span>⌁</span><p>Sélectionnez deux paramètres pour afficher l’arbre généalogique.</p></div>';
-  if (graph.error) return `<div class="breeding-canvas__empty"><span>?</span><p>${escapeHtml(graph.error)}</p></div>`;
+  if (!graph || graph.error) return "";
   const nodeByKey = new Map(graph.nodes.map((node) => [node.key, node]));
   const paths = graph.edges.map(([fromKey, toKey]) => {
     const from = nodeByKey.get(fromKey);
@@ -1222,8 +1221,9 @@ function breedingGraphTemplate(graph) {
   const sexSymbol = (gender) => gender === "Male" ? "♂" : gender === "Female" ? "♀" : "";
   const nodes = graph.nodes.map((node) => {
     const pal = breedingPalById.get(node.palId);
+    const usefulRole = node.role === "Cible" || node.role === "Enfant" ? `<span class="breeding-node__role">${escapeHtml(node.role)}</span>` : "";
     return `<article class="breeding-node${node.role === "Cible" || node.role === "Enfant" ? " breeding-node--result" : ""}" style="left:${node.x}px;top:${node.y}px">
-      <span class="breeding-node__role">${escapeHtml(node.role)}</span>
+      ${usefulRole}
       <span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span>
       <strong>${escapeHtml(pal.name)}</strong>${node.gender ? `<b class="breeding-node__sex">${sexSymbol(node.gender)}</b>` : ""}
     </article>`;
@@ -1237,9 +1237,9 @@ function breedingGraphTemplate(graph) {
 function breedingPanelTemplate() {
   const secondSlot = breedingState.secondRole === "target" ? "target" : "parentB";
   return `<aside class="breeding-panel">
-    <div class="breeding-panel__heading"><p class="eyebrow">Paramètres</p><button type="button" class="breeding-reset" data-breeding-reset>Réinitialiser</button></div>
+    <div class="breeding-panel__heading"><p class="eyebrow">Sélection</p><button type="button" class="breeding-reset" data-breeding-reset>Réinitialiser</button></div>
     <div class="breeding-role" role="group" aria-label="Type de calcul">
-      <button type="button" data-breeding-second-role="parentB" aria-pressed="${breedingState.secondRole === "parentB"}">Second parent</button>
+      <button type="button" data-breeding-second-role="parentB" aria-pressed="${breedingState.secondRole === "parentB"}">Deux parents</button>
       <button type="button" data-breeding-second-role="target" aria-pressed="${breedingState.secondRole === "target"}">Pal cible</button>
     </div>
     <div class="breeding-selections">
@@ -1247,7 +1247,7 @@ function breedingPanelTemplate() {
       ${breedingSelectedCard(secondSlot, breedingState.secondRole === "target" ? "Pal cible" : "Parent B", breedingState.secondRole === "target" ? null : "sexB")}
     </div>
     <label class="breeding-search" for="breeding-search-input"><span>Rechercher pour ${breedingSelectionSlot === "parentA" ? "le premier emplacement" : "le second"}</span>
-      <span class="pal-search__field"><input id="breeding-search-input" type="search" placeholder="Nom du Pal…" value="${escapeHtml(breedingQuery)}" autocomplete="off" spellcheck="false" /><i aria-hidden="true">⌕</i></span>
+      <span class="pal-search__field"><input id="breeding-search-input" type="search" placeholder="Nom du Pal…" value="${escapeHtml(breedingQuery)}" autocomplete="off" spellcheck="false" /><i class="breeding-search__icon" aria-hidden="true"></i></span>
     </label>
     <div class="breeding-picker__results" data-breeding-results></div>
   </aside>`;
@@ -1255,14 +1255,17 @@ function breedingPanelTemplate() {
 
 function breedingTemplate() {
   const graph = buildBreedingGraph();
+  const emptyMessage = graph?.error || "Sélectionnez deux paramètres pour afficher l’arbre.";
   return `<section class="breeding-page" aria-labelledby="breeding-title">
-    <header class="breeding-page__header"><p class="eyebrow" id="breeding-title">Planificateur d’élevage</p><p>Choisissez deux parents pour calculer leur enfant, ou un Pal de départ et une cible pour générer la route la plus courte.</p></header>
+    <header class="breeding-page__header"><p class="eyebrow" id="breeding-title">Planificateur d’élevage</p><p>Deux parents pour un enfant, ou un départ et une cible pour la route la plus courte.</p></header>
     <div class="breeding-layout">
       ${breedingPanelTemplate()}
       <section class="breeding-canvas" data-breeding-viewport aria-label="Arbre généalogique interactif">
         <div class="breeding-canvas__tip">Molette : zoom · Cliquer-glisser : déplacer</div>
         <div class="breeding-canvas__summary">${graph?.summary ? escapeHtml(graph.summary) : "Arbre généalogique"}</div>
-        <div class="breeding-canvas__world" data-breeding-world>${breedingGraphTemplate(graph)}</div>
+        ${graph && !graph.error
+          ? `<div class="breeding-canvas__world" data-breeding-world>${breedingGraphTemplate(graph)}</div>`
+          : `<div class="breeding-canvas__empty"><span aria-hidden="true">⌁</span><p>${escapeHtml(emptyMessage)}</p></div>`}
       </section>
     </div>
   </section>`;
@@ -1276,7 +1279,7 @@ function renderBreedingPickerResults() {
     results.innerHTML = '<p class="pal-search__hint">Saisissez au moins 2 caractères.</p>';
     return;
   }
-  const matches = breedingPals.filter((pal) => !query || normalizeSearch(pal.name).includes(query)).slice(0, 30);
+  const matches = breedingPals.filter((pal) => !query || normalizeSearch(pal.name).includes(query));
   results.innerHTML = matches.length
     ? `<div class="breeding-pal-grid">${matches.map((pal) => `<button type="button" data-breeding-select="${pal.id}"><img src="${pal.portrait}" alt="" /><span>${escapeHtml(pal.name)}</span></button>`).join("")}</div>`
     : '<p class="pal-search__empty">Aucun Pal trouvé — contactez Nyu</p>';
@@ -1284,15 +1287,18 @@ function renderBreedingPickerResults() {
 
 function applyBreedingCanvasTransform() {
   const world = content.querySelector("[data-breeding-world]");
-  if (world) world.style.transform = `translate(${breedingCanvas.x}px, ${breedingCanvas.y}px) scale(${breedingCanvas.scale})`;
+  if (!world) return;
+  world.style.left = `${breedingCanvas.x}px`;
+  world.style.top = `${breedingCanvas.y}px`;
+  world.style.zoom = breedingCanvas.scale;
 }
 
 function fitBreedingCanvas() {
   const viewport = content.querySelector("[data-breeding-viewport]");
   const tree = content.querySelector("[data-breeding-tree]");
   if (!viewport || !tree) return;
-  const padding = 72;
-  const scale = Math.min(1, Math.max(0.32, Math.min((viewport.clientWidth - padding) / tree.offsetWidth, (viewport.clientHeight - padding) / tree.offsetHeight)));
+  const padding = 38;
+  const scale = Math.min(1.12, Math.max(0.32, Math.min((viewport.clientWidth - padding) / tree.offsetWidth, (viewport.clientHeight - padding) / tree.offsetHeight)));
   breedingCanvas = {
     scale,
     x: (viewport.clientWidth - tree.offsetWidth * scale) / 2,
