@@ -351,12 +351,13 @@
     const nodes = [];
     const families = [];
     let leafCursor = 0;
+    let keyCursor = 0;
     const nodeWidth = 210;
     const nodeHeight = 150;
     const horizontalStep = 226;
     const verticalStep = 192;
     function visit(node, depth = 0) {
-      const key = `node-${nodes.length}`;
+      const key = `node-${keyCursor++}`;
       if (!node.parents) {
         nodes.push({ key, node, x: leafCursor++ * horizontalStep, depth });
         return key;
