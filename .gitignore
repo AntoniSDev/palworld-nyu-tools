@@ -1,0 +1,12 @@
+# Palworld saves are private user data and must never be published.
+*.sav
+*.sav.bak
+*SaveGames*.zip
+*Palworld*.zip
+7656119*.zip
+
+# Local test artifacts.
+.tmp/
+tmp/
+test-fixtures/private/
+

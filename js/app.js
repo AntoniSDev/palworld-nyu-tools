@@ -1237,6 +1237,7 @@ function breedingGraphTemplate(graph) {
 function breedingPanelTemplate() {
   const secondSlot = breedingState.secondRole === "target" ? "target" : "parentB";
   return `<aside class="breeding-panel">
+    ${window.SaveCumoir?.sourceSwitch?.() || `<div class="breeding-source" role="group" aria-label="Source des Pals"><span>Source des Pals</span><div><button type="button" data-cumoir-source="manual" aria-pressed="true">Manuel</button><button type="button" data-cumoir-source="save" aria-pressed="false">Sauvegarde</button></div></div>`}
     <div class="breeding-panel__heading"><p class="eyebrow">Sélection</p><button type="button" class="breeding-reset" data-breeding-reset>Réinitialiser</button></div>
     <div class="breeding-role" role="group" aria-label="Type de calcul">
       <button type="button" data-breeding-second-role="parentB" aria-pressed="${breedingState.secondRole === "parentB"}">Deux parents</button>
@@ -1254,6 +1255,7 @@ function breedingPanelTemplate() {
 }
 
 function breedingTemplate() {
+  if (window.SaveCumoir?.isSaveMode?.()) return window.SaveCumoir.template();
   const graph = buildBreedingGraph();
   const emptyMessage = graph?.error || "Sélectionnez deux paramètres pour afficher l’arbre.";
   return `<section class="breeding-page" aria-labelledby="breeding-title">
@@ -1345,6 +1347,10 @@ function bindBreedingCanvas() {
 }
 
 function renderBreedingPage(focusSearch = false, preserveCanvas = false) {
+  if (window.SaveCumoir?.isSaveMode?.()) {
+    window.SaveCumoir.render(!preserveCanvas);
+    return;
+  }
   content.innerHTML = breedingTemplate();
   renderBreedingPickerResults();
   bindBreedingCanvas();
@@ -1352,6 +1358,8 @@ function renderBreedingPage(focusSearch = false, preserveCanvas = false) {
   else requestAnimationFrame(fitBreedingCanvas);
   if (focusSearch) content.querySelector("#breeding-search-input")?.focus();
 }
+
+window.renderBreedingPage = renderBreedingPage;
 
 function saveMemoTasks() {
   try {
