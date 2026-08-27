@@ -3,12 +3,14 @@
  * Parsing stays in the browser; no save bytes leave this worker.
  * GPL-3.0 — see LICENSE and THIRD_PARTY_NOTICES.md.
  */
-import { inspectWorld } from "../vendor/palworld-save-toolkit/js/migrate.js";
-import { decompress as ooz } from "../vendor/ooz-wasm/index.js";
-
 self.addEventListener("message", async ({ data }) => {
   if (data?.type !== "parse-world" || !(data.level instanceof ArrayBuffer)) return;
   try {
+    self.postMessage({ type: "progress", requestId: data.requestId, stage: "Chargement du lecteur de sauvegarde…" });
+    const [{ inspectWorld }, { decompress: ooz }] = await Promise.all([
+      import("../vendor/palworld-save-toolkit/js/migrate.js"),
+      import("../vendor/ooz-wasm/index.js"),
+    ]);
     self.postMessage({ type: "progress", requestId: data.requestId, stage: "Décompression de la sauvegarde…" });
     const started = performance.now();
     const parsed = await inspectWorld(new Uint8Array(data.level), ooz);
@@ -43,4 +45,3 @@ self.addEventListener("message", async ({ data }) => {
     });
   }
 });
-
