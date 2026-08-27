@@ -146,7 +146,7 @@
 
   function sourceSwitch() {
     return `<div class="breeding-source" role="group" aria-label="Source des Pals">
-      <span>Source des Pals</span>
+      <p class="eyebrow">Source des Pals</p>
       <div><button type="button" data-cumoir-source="manual" aria-pressed="${mode === "manual"}">Manuel</button><button type="button" data-cumoir-source="save" aria-pressed="${mode === "save"}">Sauvegarde</button></div>
     </div>`;
   }
@@ -197,7 +197,8 @@
       <strong>Importez votre sauvegarde Steam</strong>
       <p>Tout est lu localement dans votre navigateur. Aucun fichier n’est envoyé.</p>
       <button type="button" class="save-primary" data-import-save>Importer une sauvegarde</button>
-      <small>1. Ouvrez le sélecteur · 2. Choisissez le dossier <code>SaveGames</code> · 3. Sélectionnez votre monde</small>
+      <div class="save-import-path"><code>%localappdata%\\Pal\\Saved\\SaveGames</code><button type="button" data-copy-save-path>Copier le chemin</button></div>
+      <ol><li>Ouvrez le sélecteur.</li><li>Collez ce chemin dans la barre d’adresse.</li><li>Sélectionnez le dossier <code>SaveGames</code>, puis votre monde.</li></ol>
       <input class="save-file-input" data-save-directory type="file" webkitdirectory directory multiple />
     </div>`;
   }
@@ -247,7 +248,7 @@
   function worldModal() {
     return `<div class="save-modal-backdrop" data-close-world-modal><section class="save-modal save-world-modal" role="dialog" aria-modal="true" aria-labelledby="world-modal-title">
       <header><div><span class="eyebrow">Sauvegardes détectées</span><h2 id="world-modal-title">Choisir le monde</h2></div><button type="button" data-close-world-modal aria-label="Fermer">×</button></header>
-      <div class="save-world-list">${pendingWorlds.map((world, index) => `<button type="button" data-world-index="${index}"><span class="save-world-list__icon">◈</span><span><strong>${escapeHtml(world.label)}</strong><small>${new Date(world.modified).toLocaleString("fr-FR")} · ${(world.level.size / 1024 / 1024).toFixed(1)} Mo</small><em>${world.players.length} fichier${world.players.length > 1 ? "s" : ""} joueur</em></span><b>Importer ce monde</b></button>`).join("")}</div>
+      <div class="save-world-list">${pendingWorlds.map((world, index) => `<button type="button" data-world-index="${index}"><span class="save-world-list__icon">◈</span><span><strong>${escapeHtml(world.label)}</strong><small>${new Date(world.modified).toLocaleString("fr-FR")} · ${(world.level.size / 1024 / 1024).toFixed(1)} Mo</small><em>${world.players.length} fichier${world.players.length > 1 ? "s" : ""} joueur</em></span><b class="save-world-list__cta">Importer ce monde</b></button>`).join("")}</div>
     </section></div>`;
   }
 
@@ -530,14 +531,16 @@
       calculation: state.calculation,
     } : null;
     parsing = true; error = ""; progress = "Préparation de la sauvegarde…"; worldModalOpen = false; render();
-    const buffer = await world.level.arrayBuffer();
-    const worker = new Worker("js/save-parser.worker.js?v=0.9", { type: "module" });
-    const requestId = crypto.randomUUID ? crypto.randomUUID() : String(Date.now());
-    worker.onmessage = async ({ data }) => {
+    try {
+      const buffer = world.levelBuffer ? world.levelBuffer.slice(0) : await world.level.arrayBuffer();
+      const worker = new Worker("js/save-parser.worker.js?v=0.9.1", { type: "module" });
+      const requestId = crypto.randomUUID ? crypto.randomUUID() : String(Date.now());
+      worker.onmessage = async ({ data }) => {
       if (data.requestId !== requestId) return;
       if (data.type === "progress") { progress = data.stage; render(false); return; }
       if (data.type === "parse-error") {
-        parsing = false; error = "Problème lors de l’import de la sauvegarde. Contactez-nous."; worker.terminate(); render(); return;
+        console.error("Échec du parsing Palworld :", data.message);
+        parsing = false; error = "La sauvegarde n’a pas pu être lue. Vérifiez qu’elle provient bien de Palworld 1.0."; worker.terminate(); render(); return;
       }
       if (data.type === "parsed-world") {
         worker.terminate();
@@ -551,12 +554,16 @@
         state.calculation = previousGoal?.calculation || "parents";
         graph = null; selectionSlot = "parentA"; query = "";
         parsing = false; progress = ""; saveState();
-        await dbPut({ activeWorld, roster });
+        await dbPut({ activeWorld, roster }).catch((dbError) => console.error("Échec de la sauvegarde locale du roster :", dbError));
         scheduleSolve(true);
       }
-    };
-    worker.onerror = () => { parsing = false; error = "Problème lors de l’import de la sauvegarde. Contactez-nous."; worker.terminate(); render(); };
-    worker.postMessage({ type: "parse-world", requestId, level: buffer }, [buffer]);
+      };
+      worker.onerror = (workerError) => { console.error("Échec du worker de sauvegarde :", workerError.message || workerError); parsing = false; error = "Le module de lecture de sauvegarde n’a pas pu démarrer."; worker.terminate(); render(); };
+      worker.postMessage({ type: "parse-world", requestId, level: buffer }, [buffer]);
+    } catch (parseError) {
+      console.error("Échec de la préparation de la sauvegarde :", parseError);
+      parsing = false; progress = ""; error = "Le fichier Level.sav n’a pas pu être ouvert."; render();
+    }
   }
 
   async function removeSave() {
@@ -573,6 +580,21 @@
     }
     if (mode !== "save" || !event.target.closest(".breeding-page--save")) return;
     if (event.target.closest("[data-import-save]")) { content.querySelector("[data-save-directory]")?.click(); return; }
+    if (event.target.closest("[data-copy-save-path]")) {
+      const path = "%localappdata%\\Pal\\Saved\\SaveGames";
+      const copy = navigator.clipboard?.writeText
+        ? navigator.clipboard.writeText(path)
+        : Promise.reject(new Error("Clipboard API indisponible"));
+      copy.catch(() => {
+        const field = document.createElement("textarea");
+        field.value = path; field.style.position = "fixed"; field.style.opacity = "0"; document.body.append(field); field.select();
+        document.execCommand("copy"); field.remove();
+      }).then(() => {
+        const button = content.querySelector("[data-copy-save-path]");
+        if (button) { button.textContent = "Chemin copié"; setTimeout(() => { if (button.isConnected) button.textContent = "Copier le chemin"; }, 1600); }
+      });
+      return;
+    }
     if (event.target.closest("[data-delete-save]")) { void removeSave(); return; }
     const calculation = event.target.closest("[data-save-calculation]");
     if (calculation) { state.calculation = calculation.dataset.saveCalculation; state.parentA = null; state.parentB = null; state.forced = []; selectionSlot = "parentA"; saveState(); scheduleSolve(true); return; }
@@ -616,12 +638,17 @@
     if (event.target.matches("[data-passive-search]")) { passiveQuery = event.target.value; render(false); }
   }
 
-  function handleChange(event) {
+  async function handleChange(event) {
     if (!event.target.matches("[data-save-directory]")) return;
     pendingWorlds = detectWorlds(event.target.files);
-    event.target.value = "";
     if (!pendingWorlds.length) { error = "Aucun monde Palworld valide n’a été trouvé dans ce dossier."; render(); return; }
-    worldModalOpen = true; render(false);
+    try {
+      await Promise.all(pendingWorlds.map(async (world) => { world.levelBuffer = await world.level.arrayBuffer(); }));
+      worldModalOpen = true; render(false);
+    } catch (readError) {
+      console.error("Échec de la lecture du dossier de sauvegarde :", readError);
+      error = "Impossible d’ouvrir le fichier Level.sav de ce dossier."; render();
+    }
   }
 
   document.addEventListener("click", handleClick);

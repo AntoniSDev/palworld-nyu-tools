@@ -1943,7 +1943,7 @@ body[data-view="breeding"] footer { margin-top: 18px; }
 
 /* Cumoir — source Sauvegarde */
 .breeding-source { display: grid; gap: 6px; margin-bottom: 12px; padding: 10px; border: 1px solid rgba(96, 206, 213, .2); border-radius: 9px; background: rgba(4, 25, 34, .58); }
-.breeding-source > span { color: #7c9da2; font-size: .58rem; font-weight: 850; letter-spacing: .09em; text-transform: uppercase; }
+.breeding-source > .eyebrow { margin: 0; color: #f3d79b; font-size: .7rem; }
 .breeding-source > div { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
 .breeding-source button { height: 30px; border: 1px solid rgba(104, 184, 191, .15); border-radius: 6px; background: rgba(8, 23, 31, .75); color: #78989d; cursor: pointer; font: inherit; font-size: .68rem; font-weight: 800; }
 .breeding-source button[aria-pressed="true"] { border-color: rgba(99, 229, 226, .55); background: linear-gradient(115deg, rgba(34, 139, 150, .34), rgba(83, 73, 137, .3)); box-shadow: inset 0 -2px #66e3df; color: #e7ffff; }
@@ -1954,8 +1954,11 @@ body[data-view="breeding"] footer { margin-top: 18px; }
 .save-import-empty__icon { display: grid; width: 52px; height: 52px; margin-bottom: 10px; place-items: center; border: 1px solid rgba(104, 226, 222, .35); border-radius: 50%; color: #70e7e2; font-size: 1.7rem; }
 .save-import-empty strong { color: #eafbf9; font-size: 1rem; }
 .save-import-empty p { margin: 5px 0 16px; color: #8faeb2; font-size: .78rem; }
-.save-import-empty small { margin-top: 12px; color: #698a90; font-size: .66rem; }
-.save-import-empty code { color: #9fd8d8; }
+.save-import-path { display: flex; align-items: center; gap: 7px; margin-top: 14px; padding: 6px 7px 6px 11px; border: 1px solid rgba(102, 205, 209, .22); border-radius: 7px; background: rgba(2, 20, 28, .64); }
+.save-import-path code { color: #b9e4e3; font-size: .7rem; }
+.save-import-path button { min-height: 27px; padding: 0 9px; border: 1px solid rgba(104, 211, 213, .3); border-radius: 5px; background: rgba(23, 76, 86, .58); color: #b8dddd; cursor: pointer; font: inherit; font-size: .58rem; font-weight: 800; }
+.save-import-empty ol { margin: 10px 0 0; padding-left: 20px; color: #91afb3; font-size: .7rem; line-height: 1.55; text-align: left; }
+.save-import-empty ol code { color: #b5dddd; }
 .save-primary { min-height: 34px; padding: 0 17px; border: 1px solid rgba(108, 235, 230, .6); border-radius: 7px; background: linear-gradient(120deg, rgba(29, 150, 163, .67), rgba(85, 77, 150, .66)); box-shadow: 0 7px 18px rgba(0, 12, 19, .25); color: #f2ffff; cursor: pointer; font: inherit; font-size: .72rem; font-weight: 850; }
 .save-world-status { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 12px 15px; border: 1px solid rgba(103, 214, 216, .24); border-radius: 10px; background: linear-gradient(110deg, rgba(8, 56, 65, .67), rgba(25, 35, 60, .65)); }
 .save-world-status > div:first-child { display: grid; }
@@ -2027,7 +2030,7 @@ body[data-view="breeding"] footer { margin-top: 18px; }
 .save-world-list__icon { display: grid; width: 45px; height: 45px; place-items: center; border-radius: 50%; background: rgba(75, 190, 193, .12); color: #66dfdb; font-size: 1.2rem; }
 .save-world-list span:nth-child(2) { display: grid; }
 .save-world-list strong { color: #eefdfc; }.save-world-list small { color: #77989d; font-size: .63rem; }.save-world-list em { color: #b69bd8; font-size: .58rem; font-style: normal; }
-.save-world-list b { color: #77dfdc; font-size: .64rem; }
+.save-world-list__cta { display: inline-flex; min-height: 32px; align-items: center; padding: 0 12px; border: 1px solid rgba(108, 235, 230, .52); border-radius: 6px; background: linear-gradient(120deg, rgba(29, 150, 163, .58), rgba(85, 77, 150, .58)); color: #efffff; box-shadow: 0 5px 13px rgba(0, 12, 19, .2); font-size: .64rem; }
 .save-passive-modal { grid-template-rows: auto auto minmax(0, 1fr) auto; }
 .save-passive-modal__tools { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; padding: 12px 15px; }
 .save-passive-modal__tools input { min-width: 0; height: 36px; padding: 0 12px; border: 1px solid rgba(103, 203, 208, .22); border-radius: 7px; outline: none; background: rgba(1, 18, 25, .68); color: #e7f7f6; font: inherit; font-size: .72rem; }
