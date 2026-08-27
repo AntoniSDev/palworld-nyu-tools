@@ -2,7 +2,7 @@
 
 Petite application statique en français regroupant des outils pratiques pour Palworld.
 
-## Version 0.5
+## Version 0.8
 
 - Les 12 aptitudes de travail.
 - Les niveaux 1 à 10.
@@ -10,6 +10,8 @@ Petite application statique en français regroupant des outils pratiques pour Pa
 - Passifs utiles par capacité de travail.
 - Informations pratiques sur la condensation des Pals.
 - Compétences partenaire utilitaires, classées par activité.
+- Mémo personnel sauvegardé dans le navigateur.
+- Cumoir : croisements directs et routes d’élevage minimales.
 - Accès direct aux rubriques depuis la navigation principale.
 - Aperçu de la future rubrique des Compétences partenaire de combat.
 - Identité visuelle fantasy-tech inspirée de l’univers de Palworld.

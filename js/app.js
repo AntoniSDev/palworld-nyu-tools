@@ -516,6 +516,7 @@ const skillsMenuButton = document.querySelector("#skills-menu-button");
 const skillsMenu = document.querySelector("#skills-menu");
 const passiveButton = document.querySelector("#passive-view");
 const condensationButton = document.querySelector("#condensation-view");
+const breedingButton = document.querySelector("#breeding-view");
 const partnerButton = document.querySelector("#partner-view");
 const combatPartnerButton = document.querySelector("#combat-partner-view");
 const memoButton = document.querySelector("#memo-view");
@@ -540,6 +541,7 @@ let memoDragOffset = { x: 0, y: 0 };
 let memoDragPointerId = null;
 
 const memoStorageKey = "palworld-nyu-tools:memo";
+const breedingStorageKey = "palworld-nyu-tools:breeding-v0.8";
 
 function loadMemoTasks() {
   try {
@@ -560,8 +562,59 @@ function loadMemoTasks() {
 let memoTasks = loadMemoTasks();
 
 const condensationPals = window.CONDENSATION_PALS || [];
+const breedingSource = window.BREEDING_DATA || { pals: [], children: [], genderCombos: [] };
+const breedingPals = breedingSource.pals.map(([id, name, portrait, order]) => ({
+  id,
+  name,
+  portrait,
+  order,
+}));
+const breedingPalById = new Map(breedingPals.map((pal) => [pal.id, pal]));
+const breedingChildren = breedingSource.children || [];
+const breedingGenderCombos = breedingSource.genderCombos || [];
+const breedingRouteEdges = new Map();
 const condensationStepCosts = [0, 4, 8, 12, 24];
 const condensationTotalCosts = [0, 4, 12, 24, 48];
+
+function loadBreedingState() {
+  const emptyState = {
+    mode: "direct",
+    parentA: null,
+    parentB: null,
+    target: null,
+    sexA: "Male",
+    sexB: "Female",
+    routeRequested: false,
+  };
+  try {
+    const stored = JSON.parse(localStorage.getItem(breedingStorageKey) || "null");
+    if (!stored || typeof stored !== "object") return emptyState;
+    return {
+      ...emptyState,
+      mode: stored.mode === "route" ? "route" : "direct",
+      parentA: breedingPalById.has(stored.parentA) ? stored.parentA : null,
+      parentB: breedingPalById.has(stored.parentB) ? stored.parentB : null,
+      target: breedingPalById.has(stored.target) ? stored.target : null,
+      sexA: stored.sexA === "Female" ? "Female" : "Male",
+      sexB: stored.sexB === "Male" ? "Male" : "Female",
+      routeRequested: Boolean(stored.routeRequested),
+    };
+  } catch {
+    return emptyState;
+  }
+}
+
+let breedingState = loadBreedingState();
+let breedingPickerSlot = null;
+let breedingQuery = "";
+
+function saveBreedingState() {
+  try {
+    localStorage.setItem(breedingStorageKey, JSON.stringify(breedingState));
+  } catch {
+    // Le planificateur reste utilisable pendant la session si le stockage est indisponible.
+  }
+}
 
 function tableTemplate(job) {
   const rows = job.values
@@ -990,6 +1043,255 @@ function combatPartnersTemplate() {
     </section>`;
 }
 
+function breedingPairIndex(parentAIndex, parentBIndex) {
+  const low = Math.min(parentAIndex, parentBIndex);
+  const high = Math.max(parentAIndex, parentBIndex);
+  return low * breedingPals.length - (low * (low - 1)) / 2 + high - low;
+}
+
+function breedingGenderComboMatch(combo, parentAIndex, parentBIndex) {
+  if (combo[0] === parentAIndex && combo[2] === parentBIndex) {
+    return { genderA: combo[1] === "M" ? "Male" : "Female", genderB: combo[3] === "M" ? "Male" : "Female" };
+  }
+  if (combo[0] === parentBIndex && combo[2] === parentAIndex) {
+    return { genderA: combo[3] === "M" ? "Male" : "Female", genderB: combo[1] === "M" ? "Male" : "Female" };
+  }
+  return null;
+}
+
+function breedingOutcomes(parentAId, parentBId, genderA = null, genderB = null) {
+  const parentA = breedingPalById.get(parentAId);
+  const parentB = breedingPalById.get(parentBId);
+  if (!parentA || !parentB || (genderA && genderA === genderB)) return [];
+  let pairHasGenderRule = false;
+  const genderOutcomes = [];
+  breedingGenderCombos.forEach((combo) => {
+    const match = breedingGenderComboMatch(combo, parentA.order, parentB.order);
+    if (!match) return;
+    pairHasGenderRule = true;
+    if (genderA && (match.genderA !== genderA || match.genderB !== genderB)) return;
+    genderOutcomes.push({
+      child: breedingPals[combo[4]],
+      genders: match.genderA ? match : null,
+      special: true,
+    });
+  });
+  if (genderOutcomes.length || pairHasGenderRule) return genderOutcomes;
+
+  const childIndex = breedingChildren[breedingPairIndex(parentA.order, parentB.order)];
+  const child = childIndex >= 0 ? breedingPals[childIndex] : null;
+  return child ? [{ child, genders: null, special: false }] : [];
+}
+
+function breedingEdgesFor(parentId) {
+  if (breedingRouteEdges.has(parentId)) return breedingRouteEdges.get(parentId);
+  const edges = [];
+  breedingPals.forEach((partner) => {
+    breedingOutcomes(parentId, partner.id).forEach((outcome) => {
+      edges.push({
+        parent: parentId,
+        partner: partner.id,
+        child: outcome.child.id,
+        genders: outcome.genders,
+      });
+    });
+  });
+  breedingRouteEdges.set(parentId, edges);
+  return edges;
+}
+
+function findBreedingRoute(startId, targetId) {
+  if (!breedingPalById.has(startId) || !breedingPalById.has(targetId)) return null;
+  if (startId === targetId) return [];
+  const previous = new Map([[startId, null]]);
+  const queue = [startId];
+  let cursor = 0;
+
+  while (cursor < queue.length && !previous.has(targetId)) {
+    const current = queue[cursor++];
+    for (const edge of breedingEdgesFor(current)) {
+      if (previous.has(edge.child)) continue;
+      previous.set(edge.child, edge);
+      queue.push(edge.child);
+      if (edge.child === targetId) break;
+    }
+  }
+  if (!previous.has(targetId)) return null;
+
+  const route = [];
+  let current = targetId;
+  while (current !== startId) {
+    const edge = previous.get(current);
+    route.push(edge);
+    current = edge.parent;
+  }
+  return route.reverse();
+}
+
+function breedingPalCard(palId, options = {}) {
+  const pal = breedingPalById.get(palId);
+  const { slot, label, genderKey, calculated = false } = options;
+  const selectable = !calculated;
+  if (!pal) {
+    if (calculated) {
+      return `
+        <div class="breeding-pal breeding-pal--empty breeding-pal--result">
+          <span class="breeding-pal__label">${escapeHtml(label)}</span>
+          <span class="breeding-pal__portrait" aria-hidden="true">?</span>
+          <strong>Résultat calculé</strong>
+        </div>`;
+    }
+    return `
+      <button class="breeding-pal breeding-pal--empty" data-breeding-pick="${slot}" type="button">
+        <span class="breeding-pal__label">${escapeHtml(label)}</span>
+        <span class="breeding-pal__portrait" aria-hidden="true">+</span>
+        <strong>Choisir un Pal</strong>
+      </button>`;
+  }
+
+  const gender = genderKey ? breedingState[genderKey] : null;
+  return `
+    <div class="breeding-pal${calculated ? " breeding-pal--result" : ""}">
+      <span class="breeding-pal__label">${escapeHtml(label)}</span>
+      ${
+        selectable
+          ? `<button class="breeding-pal__choice" data-breeding-pick="${slot}" type="button"><span class="breeding-pal__portrait"><img src="${pal.portrait}" alt="" /></span><strong>${escapeHtml(pal.name)}</strong><span class="breeding-pal__change">Changer</span></button>`
+          : `<span class="breeding-pal__portrait"><img src="${pal.portrait}" alt="" /></span><strong>${escapeHtml(pal.name)}</strong>`
+      }
+      ${
+        genderKey
+          ? `<span class="breeding-gender" aria-label="Sexe de ${escapeHtml(pal.name)}">
+              <button type="button" data-breeding-sex="${genderKey}" data-sex="Male" aria-pressed="${gender === "Male"}">♂</button>
+              <button type="button" data-breeding-sex="${genderKey}" data-sex="Female" aria-pressed="${gender === "Female"}">♀</button>
+            </span>`
+          : ""
+      }
+    </div>`;
+}
+
+function breedingGenderConstraint(step) {
+  if (!step.genders) return "";
+  const parent = breedingPalById.get(step.parent);
+  const partner = breedingPalById.get(step.partner);
+  const symbol = (gender) => (gender === "Male" ? "♂" : "♀");
+  return `<p class="breeding-step__constraint">${escapeHtml(parent.name)} ${symbol(step.genders.genderA)} requis · ${escapeHtml(partner.name)} ${symbol(step.genders.genderB)} requis</p>`;
+}
+
+function breedingRouteTemplate(route) {
+  if (route === null) {
+    return '<div class="breeding-route breeding-route--empty"><p>Aucune route d’élevage valide trouvée avec les données actuelles.</p></div>';
+  }
+  if (!route.length) {
+    return '<div class="breeding-route breeding-route--empty"><p>Le Pal de départ est déjà le Pal cible.</p></div>';
+  }
+  return `
+    <div class="breeding-route" aria-label="Route d’élevage en ${route.length} génération${route.length > 1 ? "s" : ""}">
+      <p class="breeding-route__summary">${route.length} génération${route.length > 1 ? "s" : ""}</p>
+      ${route
+        .map(
+          (step, index) => `
+            <article class="breeding-step">
+              <p class="breeding-step__number">Génération ${index + 1}</p>
+              <div class="breeding-step__equation">
+                ${breedingPalCard(step.parent, { label: "Lignée", calculated: true })}
+                <span class="breeding-operator" aria-hidden="true">+</span>
+                ${breedingPalCard(step.partner, { label: "Partenaire", calculated: true })}
+                <span class="breeding-operator breeding-operator--arrow" aria-hidden="true">→</span>
+                ${breedingPalCard(step.child, { label: "Enfant", calculated: true })}
+              </div>
+              ${breedingGenderConstraint(step)}
+            </article>
+            ${index < route.length - 1 ? '<div class="breeding-route__branch" aria-hidden="true"><span></span></div>' : ""}`,
+        )
+        .join("")}
+    </div>`;
+}
+
+function breedingPickerTemplate() {
+  if (!breedingPickerSlot) return "";
+  const labels = { parentA: "Parent A", parentB: "Parent B", target: "Pal cible" };
+  return `
+    <div class="breeding-picker">
+      <div class="breeding-picker__header">
+        <label for="breeding-search-input">Choisir : ${labels[breedingPickerSlot]}</label>
+        <button type="button" data-breeding-close-picker aria-label="Fermer la recherche">×</button>
+      </div>
+      <div class="pal-search__field">
+        <input id="breeding-search-input" type="search" placeholder="Rechercher un Pal…" value="${escapeHtml(breedingQuery)}" autocomplete="off" spellcheck="false" />
+        <span aria-hidden="true">⌕</span>
+      </div>
+      <div class="breeding-picker__results" data-breeding-results></div>
+    </div>`;
+}
+
+function breedingDirectTemplate() {
+  const outcome = breedingState.parentA && breedingState.parentB
+    ? breedingOutcomes(breedingState.parentA, breedingState.parentB, breedingState.sexA, breedingState.sexB)[0]
+    : null;
+  return `
+    <div class="breeding-equation" aria-label="Croisement direct">
+      ${breedingPalCard(breedingState.parentA, { slot: "parentA", label: "Parent A", genderKey: "sexA" })}
+      <span class="breeding-operator" aria-hidden="true">+</span>
+      ${breedingPalCard(breedingState.parentB, { slot: "parentB", label: "Parent B", genderKey: "sexB" })}
+      <span class="breeding-operator breeding-operator--arrow" aria-hidden="true">→</span>
+      ${breedingPalCard(outcome?.child.id, { label: "Enfant calculé", calculated: true })}
+    </div>
+    ${breedingState.parentA && breedingState.parentB && !outcome ? '<p class="breeding-feedback">Un couple doit comporter un Pal mâle et un Pal femelle.</p>' : ""}`;
+}
+
+function breedingPlannerTemplate() {
+  const canCalculate = Boolean(breedingState.parentA && breedingState.target);
+  const route = breedingState.routeRequested && canCalculate
+    ? findBreedingRoute(breedingState.parentA, breedingState.target)
+    : undefined;
+  return `
+    <div class="breeding-route-inputs">
+      ${breedingPalCard(breedingState.parentA, { slot: "parentA", label: "Parent de départ" })}
+      <span class="breeding-operator breeding-operator--branch" aria-hidden="true">⌁</span>
+      ${breedingPalCard(breedingState.target, { slot: "target", label: "Pal cible" })}
+    </div>
+    <button class="breeding-calculate" data-breeding-calculate type="button" ${canCalculate ? "" : "disabled"}>Calculer la route</button>
+    ${route === undefined ? '<p class="breeding-route-hint">Sélectionnez un Pal de départ et un Pal cible.</p>' : breedingRouteTemplate(route)}`;
+}
+
+function breedingTemplate() {
+  return `
+    <section class="breeding-page" aria-labelledby="breeding-title">
+      <header class="breeding-page__header">
+        <div><p class="eyebrow">Planificateur d’élevage</p><h1 id="breeding-title">Cumoir</h1></div>
+        <button type="button" class="breeding-reset" data-breeding-reset>Réinitialiser</button>
+      </header>
+      <div class="breeding-modes" role="tablist" aria-label="Mode du Cumoir">
+        <button type="button" role="tab" data-breeding-mode="direct" aria-selected="${breedingState.mode === "direct"}">Croisement direct</button>
+        <button type="button" role="tab" data-breeding-mode="route" aria-selected="${breedingState.mode === "route"}">Route d’élevage</button>
+      </div>
+      <div class="breeding-workspace">
+        ${breedingState.mode === "direct" ? breedingDirectTemplate() : breedingPlannerTemplate()}
+      </div>
+      ${breedingPickerTemplate()}
+    </section>`;
+}
+
+function renderBreedingPickerResults() {
+  const results = content.querySelector("[data-breeding-results]");
+  if (!results) return;
+  const query = normalizeSearch(breedingQuery);
+  if (query.length < 2) {
+    results.innerHTML = query ? '<p class="pal-search__hint">Saisissez au moins 2 caractères.</p>' : "";
+    return;
+  }
+  const matches = breedingPals.filter((pal) => normalizeSearch(pal.name).includes(query)).slice(0, 30);
+  results.innerHTML = matches.length
+    ? `<div class="pal-search__grid">${matches.map((pal) => `<button type="button" data-breeding-select="${pal.id}"><img src="${pal.portrait}" alt="" /><span>${escapeHtml(pal.name)}</span></button>`).join("")}</div>`
+    : '<p class="pal-search__empty">Aucun Pal trouvé — contactez Nyu</p>';
+}
+
+function renderBreedingPage(focusSearch = false) {
+  content.innerHTML = breedingTemplate();
+  renderBreedingPickerResults();
+  if (focusSearch) content.querySelector("#breeding-search-input")?.focus();
+}
+
 function saveMemoTasks() {
   try {
     localStorage.setItem(memoStorageKey, JSON.stringify(memoTasks));
@@ -1052,7 +1354,7 @@ function renderMemoPage(focusNewTask = false) {
 function updateIntro() {
   intro.classList.toggle(
     "hidden",
-    currentView === "condensation" || currentView === "partners" || currentView === "combat-partners" || currentView === "memo",
+    currentView === "condensation" || currentView === "breeding" || currentView === "partners" || currentView === "combat-partners" || currentView === "memo",
   );
 
   if (currentView === "passives") {
@@ -1126,6 +1428,7 @@ function render() {
   skillsMenuButton.classList.toggle("active", skillsViewActive);
   passiveButton.classList.toggle("active", currentView === "passives");
   condensationButton.classList.toggle("active", currentView === "condensation");
+  breedingButton.classList.toggle("active", currentView === "breeding");
   partnerButton.classList.toggle("active", currentView === "partners");
   combatPartnerButton.classList.toggle("active", currentView === "combat-partners");
   memoButton.classList.toggle("active", currentView === "memo");
@@ -1137,6 +1440,11 @@ function render() {
       ${condensationTemplate()}
     </section>`;
     renderCondensationSearchResults();
+    return;
+  }
+
+  if (currentView === "breeding") {
+    renderBreedingPage();
     return;
   }
 
@@ -1176,6 +1484,78 @@ picker.addEventListener("click", (event) => {
 });
 
 content.addEventListener("click", (event) => {
+  const breedingModeButton = event.target.closest("[data-breeding-mode]");
+  if (breedingModeButton) {
+    breedingState.mode = breedingModeButton.dataset.breedingMode;
+    breedingState.routeRequested = false;
+    breedingPickerSlot = null;
+    breedingQuery = "";
+    saveBreedingState();
+    renderBreedingPage();
+    return;
+  }
+
+  const breedingPickButton = event.target.closest("[data-breeding-pick]");
+  if (breedingPickButton) {
+    breedingPickerSlot = breedingPickButton.dataset.breedingPick;
+    breedingQuery = "";
+    renderBreedingPage(true);
+    return;
+  }
+
+  const breedingSelectButton = event.target.closest("[data-breeding-select]");
+  if (breedingSelectButton && breedingPickerSlot) {
+    breedingState[breedingPickerSlot] = breedingSelectButton.dataset.breedingSelect;
+    breedingState.routeRequested = false;
+    breedingPickerSlot = null;
+    breedingQuery = "";
+    saveBreedingState();
+    renderBreedingPage();
+    return;
+  }
+
+  const breedingSexButton = event.target.closest("[data-breeding-sex]");
+  if (breedingSexButton) {
+    const key = breedingSexButton.dataset.breedingSex;
+    const otherKey = key === "sexA" ? "sexB" : "sexA";
+    breedingState[key] = breedingSexButton.dataset.sex;
+    breedingState[otherKey] = breedingState[key] === "Male" ? "Female" : "Male";
+    saveBreedingState();
+    renderBreedingPage();
+    return;
+  }
+
+  if (event.target.closest("[data-breeding-close-picker]")) {
+    breedingPickerSlot = null;
+    breedingQuery = "";
+    renderBreedingPage();
+    return;
+  }
+
+  if (event.target.closest("[data-breeding-calculate]")) {
+    breedingState.routeRequested = true;
+    saveBreedingState();
+    renderBreedingPage();
+    return;
+  }
+
+  if (event.target.closest("[data-breeding-reset]")) {
+    breedingState = {
+      mode: breedingState.mode,
+      parentA: null,
+      parentB: null,
+      target: null,
+      sexA: "Male",
+      sexB: "Female",
+      routeRequested: false,
+    };
+    breedingPickerSlot = null;
+    breedingQuery = "";
+    saveBreedingState();
+    renderBreedingPage();
+    return;
+  }
+
   const addMemoButton = event.target.closest("[data-memo-add]");
   if (addMemoButton) {
     memoTasks.push({ id: createMemoId(), title: "", note: "" });
@@ -1226,6 +1606,12 @@ content.addEventListener("click", (event) => {
 });
 
 content.addEventListener("input", (event) => {
+  if (event.target.matches("#breeding-search-input")) {
+    breedingQuery = event.target.value;
+    renderBreedingPickerResults();
+    return;
+  }
+
   const memoCard = event.target.closest("[data-memo-id]");
   if (memoCard && (event.target.matches("[data-memo-title]") || event.target.matches("[data-memo-note]"))) {
     const task = memoTasks.find((entry) => entry.id === memoCard.dataset.memoId);
@@ -1374,6 +1760,12 @@ condensationButton.addEventListener("click", () => {
     condensationQuery = "";
   }
   switchView("condensation");
+});
+
+breedingButton.addEventListener("click", () => {
+  breedingPickerSlot = null;
+  breedingQuery = "";
+  switchView("breeding");
 });
 
 partnerButton.addEventListener("click", () => {
