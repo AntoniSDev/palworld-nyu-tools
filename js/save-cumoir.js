@@ -353,8 +353,8 @@
     let leafCursor = 0;
     const nodeWidth = 210;
     const nodeHeight = 150;
-    const horizontalStep = 238;
-    const verticalStep = 226;
+    const horizontalStep = 226;
+    const verticalStep = 192;
     function visit(node, depth = 0) {
       const key = `node-${nodes.length}`;
       if (!node.parents) {
@@ -372,7 +372,7 @@
     visit(root);
     const maxDepth = Math.max(...nodes.map((node) => node.depth), 0);
     nodes.forEach((node) => { node.y = node.depth * verticalStep + 42; node.x += 64; });
-    return { nodes, families, nodeWidth, nodeHeight, width: Math.max(560, leafCursor * horizontalStep + 128), height: (maxDepth + 1) * verticalStep + 150 };
+    return { nodes, families, nodeWidth, nodeHeight, width: Math.max(560, leafCursor * horizontalStep + 128), height: maxDepth * verticalStep + nodeHeight + 84 };
   }
 
   function graphTemplate() {

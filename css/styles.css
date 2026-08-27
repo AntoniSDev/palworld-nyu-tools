@@ -2076,10 +2076,10 @@ body[data-view="breeding"] footer { margin-top: 18px; }
 .save-tree-node__identity > span:last-child { display: grid; min-width: 0; gap: 4px; }
 .save-tree-node .breeding-node__portrait { position: static; width: 62px; height: 62px; overflow: hidden; border-width: 2px; }
 .save-tree-node .breeding-node__portrait img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: center; }
-.save-tree-node strong { width: auto; margin: 0; color: #efffff; font-size: .78rem; line-height: 1.2; overflow-wrap: anywhere; }
+.save-tree-node strong { width: auto; margin: 0; color: #efffff; font-size: .84rem; line-height: 1.2; overflow-wrap: anywhere; }
 .save-tree-node .breeding-node__sex { position: static; font-size: .78rem; }
 .save-tree-node__passives { display: grid; width: auto; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 4px; margin: 0; }
-.save-tree-node__passives .save-passive { min-height: 28px; padding: 4px 4px 4px 6px; font-size: .5rem; }
+.save-tree-node__passives .save-passive { min-height: 28px; padding: 4px 4px 4px 6px; font-size: .56rem; }
 .save-tree-node__passives .save-passive > span { overflow: visible; white-space: normal; }
 .save-tree-node__passives .save-passive-rank { width: 15px; height: 15px; flex-basis: 15px; }
 .save-family-link { stroke-linecap: round; stroke-linejoin: round; }
