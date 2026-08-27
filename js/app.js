@@ -532,6 +532,7 @@ let condensationStars = 0;
 let condensationQuery = "";
 let currentView = "jobs";
 let viewTransitionTimer;
+let skillsMenuCloseTimer;
 let draggedMemoId = null;
 let memoDragPlaceholder = null;
 let memoDragGhost = null;
@@ -1086,10 +1087,34 @@ function switchView(nextView) {
 }
 
 function setSkillsMenu(open, focusFirst = false) {
-  skillsMenu.hidden = !open;
+  clearTimeout(skillsMenuCloseTimer);
+  skillsMenu.setAttribute("aria-hidden", String(!open));
   skillsMenuButton.setAttribute("aria-expanded", String(open));
   skillsMenuButton.parentElement.classList.toggle("site-nav__group--open", open);
   if (open && focusFirst) skillsMenu.querySelector('[role="menuitem"]')?.focus();
+}
+
+function animateMemoReflow(mutateLayout) {
+  const cards = [...content.querySelectorAll("[data-memo-id]:not(.memo-card--dragging)")];
+  const previousPositions = new Map(cards.map((card) => [card, card.getBoundingClientRect()]));
+  mutateLayout();
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  cards.forEach((card) => {
+    const previous = previousPositions.get(card);
+    const current = card.getBoundingClientRect();
+    const deltaX = previous.left - current.left;
+    const deltaY = previous.top - current.top;
+    if (Math.abs(deltaX) < 1 && Math.abs(deltaY) < 1) return;
+    card.getAnimations().forEach((animation) => {
+      if (animation.id === "memo-reflow") animation.cancel();
+    });
+    const animation = card.animate(
+      [{ transform: `translate(${deltaX}px, ${deltaY}px)` }, { transform: "translate(0, 0)" }],
+      { duration: 180, easing: "cubic-bezier(0.2, 0.75, 0.25, 1)" },
+    );
+    animation.id = "memo-reflow";
+  });
 }
 
 function render() {
@@ -1264,7 +1289,10 @@ document.addEventListener("pointermove", (event) => {
   const bounds = hoveredCard.getBoundingClientRect();
   const after = event.clientY > bounds.top + bounds.height / 2 ||
     (Math.abs(event.clientY - (bounds.top + bounds.height / 2)) < bounds.height / 3 && event.clientX > bounds.left + bounds.width / 2);
-  hoveredCard[after ? "after" : "before"](memoDragPlaceholder);
+  const alreadyPlaced = after
+    ? hoveredCard.nextElementSibling === memoDragPlaceholder
+    : hoveredCard.previousElementSibling === memoDragPlaceholder;
+  if (!alreadyPlaced) animateMemoReflow(() => hoveredCard[after ? "after" : "before"](memoDragPlaceholder));
 }, { passive: false });
 
 function finishMemoDrag(event) {
@@ -1298,7 +1326,17 @@ singleButton.addEventListener("click", () => {
 });
 
 skillsMenuButton.addEventListener("click", () => {
-  setSkillsMenu(skillsMenu.hidden);
+  const mouseIsInside = window.matchMedia("(hover: hover)").matches && skillsMenuButton.parentElement.matches(":hover");
+  setSkillsMenu(mouseIsInside || skillsMenuButton.getAttribute("aria-expanded") !== "true");
+});
+
+skillsMenuButton.parentElement.addEventListener("pointerenter", (event) => {
+  if (event.pointerType !== "touch") setSkillsMenu(true);
+});
+
+skillsMenuButton.parentElement.addEventListener("pointerleave", (event) => {
+  if (event.pointerType === "touch") return;
+  skillsMenuCloseTimer = window.setTimeout(() => setSkillsMenu(false), 90);
 });
 
 skillsMenuButton.addEventListener("keydown", (event) => {
