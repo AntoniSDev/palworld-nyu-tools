@@ -1850,7 +1850,7 @@ body:has(.memo-card--dragging), body:has(.memo-card--dragging) * { cursor: grabb
   .site-nav__chevron, .site-nav__submenu, .memo-card, .memo-card-placeholder { transition: none; animation: none; }
 }
 
-/* v0.8 — Cumoir */
+/* v0.9 — Cumoir */
 body[data-view="breeding"] .page-shell { width: min(1680px, calc(100% - 28px)); padding-top: 24px; }
 body[data-view="breeding"] footer { margin-top: 18px; }
 .breeding-page { width: 100%; }

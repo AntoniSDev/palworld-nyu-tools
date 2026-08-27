@@ -531,7 +531,7 @@
     } : null;
     parsing = true; error = ""; progress = "Préparation de la sauvegarde…"; worldModalOpen = false; render();
     const buffer = await world.level.arrayBuffer();
-    const worker = new Worker("js/save-parser.worker.js?v=1", { type: "module" });
+    const worker = new Worker("js/save-parser.worker.js?v=0.9", { type: "module" });
     const requestId = crypto.randomUUID ? crypto.randomUUID() : String(Date.now());
     worker.onmessage = async ({ data }) => {
       if (data.requestId !== requestId) return;

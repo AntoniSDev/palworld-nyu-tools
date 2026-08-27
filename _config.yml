@@ -1,0 +1,6 @@
+exclude:
+  - README.md
+  - scripts
+  - data/BREEDING_SOURCES.md
+  - data/partner-skills-fr.json
+

@@ -18,7 +18,7 @@ tiers, notamment `ooz-wasm` (GPL-3.0-or-later).
 
 Petite application statique en français regroupant des outils pratiques pour Palworld.
 
-## Version 0.8
+## Version 0.9
 
 - Les 12 aptitudes de travail.
 - Les niveaux 1 à 10.
