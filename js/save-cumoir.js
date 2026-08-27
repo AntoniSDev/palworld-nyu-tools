@@ -27,6 +27,7 @@
   let passiveQuery = "";
   let passiveModalOpen = false;
   let worldModalOpen = false;
+  let selectedWorldIndex = 0;
   let selectionSlot = "parentA";
   let solveTimer = 0;
   let graph = null;
@@ -246,9 +247,23 @@
   }
 
   function worldModal() {
+    const selectedWorld = pendingWorlds[selectedWorldIndex];
     return `<div class="save-modal-backdrop" data-close-world-modal><section class="save-modal save-world-modal" role="dialog" aria-modal="true" aria-labelledby="world-modal-title">
-      <header><div><span class="eyebrow">Sauvegardes détectées</span><h2 id="world-modal-title">Choisir le monde</h2></div><button type="button" data-close-world-modal aria-label="Fermer">×</button></header>
-      <div class="save-world-list">${pendingWorlds.map((world, index) => `<button type="button" data-world-index="${index}"><span class="save-world-list__icon">◈</span><span><strong>${escapeHtml(world.label)}</strong><small>${new Date(world.modified).toLocaleString("fr-FR")} · ${(world.level.size / 1024 / 1024).toFixed(1)} Mo</small><em>${world.players.length} fichier${world.players.length > 1 ? "s" : ""} joueur</em></span><b class="save-world-list__cta">Importer ce monde</b></button>`).join("")}</div>
+      <header><div><span class="eyebrow">Sauvegardes détectées</span><h2 id="world-modal-title">Choisir un monde</h2><p>Sélectionnez un monde, puis confirmez son import.</p></div><button type="button" data-close-world-modal aria-label="Fermer">×</button></header>
+      <div class="save-world-list" role="radiogroup" aria-label="Mondes Palworld détectés">${pendingWorlds.map((world, index) => {
+        const metadata = world.metadata || {};
+        const selected = index === selectedWorldIndex;
+        const savedAt = metadata.savedAt || world.modified;
+        return `<button type="button" role="radio" aria-checked="${selected}" data-world-index="${index}" class="${selected ? "is-selected" : ""}">
+          <span class="save-world-list__selector" aria-hidden="true"></span>
+          <span class="save-world-list__identity"><strong>${escapeHtml(metadata.name || "Monde Palworld")}</strong><small>${new Date(savedAt).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" })}</small></span>
+          ${metadata.day != null ? `<span class="save-world-list__meta"><small>Jour</small><b>${escapeHtml(metadata.day)}</b></span>` : ""}
+          ${metadata.playerName ? `<span class="save-world-list__meta"><small>Joueur</small><b>${escapeHtml(metadata.playerName)}</b></span>` : ""}
+          ${metadata.playerLevel != null ? `<span class="save-world-list__meta"><small>Niveau</small><b>${escapeHtml(metadata.playerLevel)}</b></span>` : ""}
+          ${typeof metadata.multiplayer === "boolean" ? `<span class="save-world-list__meta"><small>Multijoueur</small><b>${metadata.multiplayer ? "Oui" : "Non"}</b></span>` : ""}
+        </button>`;
+      }).join("")}</div>
+      <footer><small>Seul le monde confirmé est importé dans le Cumoir.</small><button type="button" class="save-primary" data-import-world ${selectedWorld ? "" : "disabled"}>Importer ce monde</button></footer>
     </section></div>`;
   }
 
@@ -517,9 +532,28 @@
       const directory = path.slice(0, path.lastIndexOf("/"));
       const prefix = `${directory}/Players/`.toLowerCase();
       const players = entries.filter((entry) => entry.path.toLowerCase().startsWith(prefix) && entry.file.name.toLowerCase().endsWith(".sav")).map((entry) => entry.file);
+      const inDirectory = (name) => entries.find((entry) => entry.path.toLowerCase() === `${directory}/${name}`.toLowerCase())?.file || null;
       const label = directory.split("/").filter(Boolean).pop() || "Monde Palworld";
-      return { label, path, level, players, modified: level.lastModified };
+      return { label, path, level, levelMeta: inDirectory("LevelMeta.sav"), worldOption: inDirectory("WorldOption.sav"), players, modified: level.lastModified };
     }).sort((a, b) => b.modified - a.modified);
+  }
+
+  async function readWorldMetadata(world) {
+    const [levelMeta, worldOption] = await Promise.all([world.levelMeta?.arrayBuffer() || null, world.worldOption?.arrayBuffer() || null]);
+    if (!levelMeta && !worldOption) return null;
+    return new Promise((resolve) => {
+      const worker = new Worker("js/save-parser.worker.js?v=0.9.3", { type: "module" });
+      const requestId = crypto.randomUUID ? crypto.randomUUID() : String(Date.now());
+      const finish = (result) => { worker.terminate(); resolve(result); };
+      worker.onmessage = ({ data }) => {
+        if (data.requestId !== requestId) return;
+        if (data.type === "parsed-metadata") finish(data.result);
+        else if (data.type === "parse-error") finish(null);
+      };
+      worker.onerror = () => finish(null);
+      const transfers = [levelMeta, worldOption].filter((buffer) => buffer instanceof ArrayBuffer);
+      worker.postMessage({ type: "parse-metadata", requestId, levelMeta, worldOption }, transfers);
+    });
   }
 
   async function parseWorld(world) {
@@ -533,7 +567,7 @@
     parsing = true; error = ""; progress = "Préparation de la sauvegarde…"; worldModalOpen = false; render();
     try {
       const buffer = world.levelBuffer ? world.levelBuffer.slice(0) : await world.level.arrayBuffer();
-      const worker = new Worker("js/save-parser.worker.js?v=0.9.2", { type: "module" });
+      const worker = new Worker("js/save-parser.worker.js?v=0.9.3", { type: "module" });
       const requestId = crypto.randomUUID ? crypto.randomUUID() : String(Date.now());
       worker.onmessage = async ({ data }) => {
       if (data.requestId !== requestId) return;
@@ -545,7 +579,7 @@
       if (data.type === "parsed-world") {
         worker.terminate();
         roster = data.result.roster.filter((individual) => palInfo(individual.speciesId));
-        activeWorld = { label: world.label, path: world.path, modified: world.modified, players: data.result.players, parseMs: data.result.parseMs, warnings: data.result.warnings };
+        activeWorld = { label: world.metadata?.name || world.label, path: world.path, modified: world.modified, players: data.result.players, parseMs: data.result.parseMs, warnings: data.result.warnings };
         allAvailable.clear(); roster.forEach((pal) => pal.passives.forEach((id) => allAvailable.add(id)));
         state.parentA = null; state.parentB = null;
         state.target = previousGoal?.target || null;
@@ -626,7 +660,8 @@
     }
     if (event.target.closest("[data-clear-passives]")) { state.selectedPassives = []; saveState(); scheduleSolve(); return; }
     if (event.target.matches(".save-modal-backdrop[data-close-passive-modal]") || event.target.closest("button[data-close-passive-modal]")) { passiveModalOpen = false; render(false); return; }
-    const worldChoice = event.target.closest("[data-world-index]"); if (worldChoice) { void parseWorld(pendingWorlds[Number(worldChoice.dataset.worldIndex)]); return; }
+    const worldChoice = event.target.closest("[data-world-index]"); if (worldChoice) { selectedWorldIndex = Number(worldChoice.dataset.worldIndex); render(false); return; }
+    if (event.target.closest("[data-import-world]")) { const world = pendingWorlds[selectedWorldIndex]; if (world) void parseWorld(world); return; }
     if (event.target.matches(".save-modal-backdrop[data-close-world-modal]") || event.target.closest("button[data-close-world-modal]")) { worldModalOpen = false; render(false); return; }
     if (event.target.closest("[data-save-reset]")) { Object.assign(state, { parentA: null, parentB: null, target: null, selectedPassives: [], forced: [] }); graph = null; saveState(); render(); return; }
     if (event.target.closest("[data-open-target]")) { selectionSlot = "target"; query = ""; render(false); content.querySelector("[data-save-search]")?.focus(); }
@@ -643,7 +678,10 @@
     pendingWorlds = detectWorlds(event.target.files);
     if (!pendingWorlds.length) { error = "Aucun monde Palworld valide n’a été trouvé dans ce dossier."; render(); return; }
     try {
-      await Promise.all(pendingWorlds.map(async (world) => { world.levelBuffer = await world.level.arrayBuffer(); }));
+      await Promise.all(pendingWorlds.map(async (world) => {
+        [world.levelBuffer, world.metadata] = await Promise.all([world.level.arrayBuffer(), readWorldMetadata(world)]);
+      }));
+      selectedWorldIndex = 0;
       worldModalOpen = true; render(false);
     } catch (readError) {
       console.error("Échec de la lecture du dossier de sauvegarde :", readError);
