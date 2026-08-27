@@ -1559,6 +1559,9 @@ content.addEventListener("click", (event) => {
   const breedingSelectButton = event.target.closest("[data-breeding-select]");
   if (breedingSelectButton && breedingSelectionSlot) {
     breedingState[breedingSelectionSlot] = breedingSelectButton.dataset.breedingSelect;
+    if (breedingSelectionSlot === "parentA") {
+      breedingSelectionSlot = breedingState.secondRole === "target" ? "target" : "parentB";
+    }
     breedingCanvas.fitted = false;
     breedingQuery = "";
     saveBreedingState();
