@@ -2082,6 +2082,8 @@ body[data-view="breeding"] footer { margin-top: 18px; }
 .save-tree-node__passives .save-passive-rank { width: 15px; height: 15px; flex-basis: 15px; }
 .save-family-link { stroke-linecap: round; stroke-linejoin: round; }
 .save-family-junction { fill: #83ddd8; stroke: rgba(4, 27, 35, .9); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.save-cake-marker { position: absolute; z-index: 3; display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid rgba(131, 221, 216, .68); border-radius: 50%; background: rgba(4, 20, 27, .94); box-shadow: 0 4px 12px rgba(0, 0, 0, .46), 0 0 10px rgba(81, 210, 203, .18); cursor: help; transform: translate(-50%, -50%); }
+.save-cake-marker img { width: 29px; height: 29px; object-fit: contain; }
 .save-passive-tooltip { position: fixed; z-index: 1300; display: grid; width: min(280px, calc(100vw - 20px)); gap: 4px; padding: 9px 11px; border: 1px solid rgba(104, 220, 216, .38); border-radius: 7px; background: rgba(3, 20, 28, .97); box-shadow: 0 12px 30px rgba(0, 5, 10, .42); color: #d9eeee; pointer-events: none; }
 .save-passive-tooltip[hidden] { display: none; }
 .save-passive-tooltip strong { color: #f1ffff; font-size: .7rem; }

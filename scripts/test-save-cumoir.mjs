@@ -5,6 +5,7 @@
  */
 import fs from "node:fs";
 import vm from "node:vm";
+import { performance } from "node:perf_hooks";
 import { inspectWorld } from "../vendor/palworld-save-toolkit/js/migrate.js";
 import { decompress } from "../vendor/ooz-wasm/index.js";
 
@@ -17,6 +18,7 @@ const context = vm.createContext({
   console,
   setTimeout,
   clearTimeout,
+  performance,
   crypto: { randomUUID: () => "test" },
   indexedDB: { open: () => { throw new Error("disabled in test"); } },
   localStorage: { getItem: (key) => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, value) },
@@ -24,7 +26,7 @@ const context = vm.createContext({
   window: {},
 });
 context.window = context;
-for (const file of ["js/condensation-data.js", "js/egg-size-data.js", "js/breeding-data.js", "js/passive-data.js", "js/save-cumoir.js"]) {
+for (const file of ["js/condensation-data.js", "js/egg-size-data.js", "js/breeding-data.js", "js/passive-data.js", "js/passive-probability.js", "js/probabilistic-breeding-solver.js", "js/save-cumoir.js"]) {
   vm.runInContext(fs.readFileSync(new URL(`../${file}`, import.meta.url), "utf8"), context, { filename: file });
 }
 
@@ -51,6 +53,17 @@ for (let count = 0; count <= 4; count += 1) {
   const result = api.solveTarget();
   if (!result.root && !result.error) throw new Error(`Solver returned neither a plan nor an explicit error (${count} passives).`);
   solveChecks.push({ count, solved: Boolean(result.root), result: result.summary || result.error });
+}
+if (objectives.length) {
+  api.setTarget(target, objectives.slice(0, Math.min(3, objectives.length)));
+  const probabilistic = api.solveProbabilistic();
+  if (!probabilistic.root && !probabilistic.error) throw new Error("Probabilistic solver returned neither a plan nor an explicit error.");
+  if (probabilistic.root) {
+    const graph = api.renderGraph(probabilistic);
+    if (!graph.includes("data-cake-tooltip=\"") || !graph.includes("assets/items/")) throw new Error("Cake recommendation is missing from the shared tree renderer.");
+    if (graph.includes("expectedBatches") || graph.includes("probability")) throw new Error("Internal probability data leaked into the UI.");
+  }
+  solveChecks.push({ count: "new", solved: Boolean(probabilistic.root), result: probabilistic.summary || probabilistic.error, durationMs: probabilistic.durationMs, expanded: probabilistic.expanded });
 }
 const male = normalized.find((pal) => pal.sex === "Male");
 const female = normalized.find((pal) => pal.sex === "Female");

@@ -28,6 +28,8 @@
   let worldModalOpen = false;
   let selectedWorldIndex = 0;
   let solveTimer = 0;
+  let probabilisticWorker = null;
+  let solveRequestId = 0;
   let treeView = "legacy";
   let calculating = false;
   const treeResults = { legacy: null, next: null };
@@ -288,7 +290,7 @@
 
   function template() {
     const activeGraph = treeResults[treeView];
-    const graphMarkup = calculating ? calculationStateTemplate() : treeView === "next" ? emptyGraphTemplate("Nouveau calcul : prêt pour la prochaine phase de développement.") : graphTemplate(activeGraph);
+    const graphMarkup = calculating && treeView === "next" ? calculationStateTemplate() : graphTemplate(activeGraph);
     return `<section class="breeding-page breeding-page--save" aria-label="Cumoir avec sauvegarde">
       <header class="breeding-page__header"><p class="eyebrow">Planificateur d’élevage</p><p>Le Cumoir travaille avec les Pals réellement présents dans votre sauvegarde.</p></header>
       ${activeWorld ? `<div class="breeding-top-tools breeding-top-tools--save"><section class="save-source-panel" aria-label="Sauvegarde active">${worldStatus()}</section>${inheritanceNote()}</div>` : ""}
@@ -342,7 +344,7 @@
     const nodeWidth = 220;
     const nodeHeight = 162;
     const horizontalStep = 238;
-    const verticalStep = 204;
+    const verticalStep = 220;
     function visit(node, depth = 0) {
       const key = `node-${keyCursor++}`;
       if (!node.parents) {
@@ -389,6 +391,7 @@
         }
       }
     });
+    const cakeMarkers = [];
     const paths = layout.families.map(({ parents, child }) => {
       const [left, right] = parents.map((key) => nodeByKey.get(key));
       const target = nodeByKey.get(child);
@@ -398,6 +401,7 @@
       const parentY = left.y;
       const childY = target.y + layout.nodeHeight;
       const joinY = childY + (parentY - childY) * .48;
+      if (target.node.recommendedCake) cakeMarkers.push({ x: childX, y: joinY, cake: target.node.recommendedCake });
       return `<path class="save-family-link" d="M ${leftX} ${parentY} V ${joinY} H ${rightX} V ${parentY} M ${childX} ${joinY} V ${childY}" /><circle class="save-family-junction" cx="${childX}" cy="${joinY}" r="4" />`;
     }).join("");
     const nodes = layout.nodes.map(({ key, node, x, y }) => {
@@ -413,7 +417,12 @@
         ${useful.length ? `<span class="save-tree-node__passives">${useful.map((id) => passiveChip(id)).join("")}</span>` : ""}
       </article>`;
     }).join("");
-    return `<div class="breeding-canvas__world" data-save-world><div class="breeding-tree" data-save-tree style="width:${layout.width}px;height:${layout.height}px"><svg class="breeding-tree__links" width="${layout.width}" height="${layout.height}" viewBox="0 0 ${layout.width} ${layout.height}">${paths}</svg>${nodes}</div></div>`;
+    const cakes = cakeMarkers.map(({ x, y, cake }) => {
+      const names = { standard: "Gâteau", vegetable: "Gâteau aux légumes", special: "Gâteau spécial" };
+      const assets = { standard: "cake", vegetable: "vegetable-cake", special: "special-cake" };
+      return `<span class="save-cake-marker" style="left:${x}px;top:${y}px" data-cake-tooltip="${escapeHtml(names[cake] || cake)}" tabindex="0"><img src="assets/items/${assets[cake] || "cake"}.png" alt="" /></span>`;
+    }).join("");
+    return `<div class="breeding-canvas__world" data-save-world><div class="breeding-tree" data-save-tree style="width:${layout.width}px;height:${layout.height}px"><svg class="breeding-tree__links" width="${layout.width}" height="${layout.height}" viewBox="0 0 ${layout.width} ${layout.height}">${paths}</svg>${cakes}${nodes}</div></div>`;
   }
 
   function pairIndex(a, b) {
@@ -519,7 +528,34 @@
     clearTimeout(solveTimer);
     const run = () => {
       treeResults.legacy = activeWorld ? solveTarget() : null;
+      if (!activeWorld) { probabilisticWorker?.terminate(); probabilisticWorker = null; treeResults.next = null; render(true); return; }
+      if (!state.target) { probabilisticWorker?.terminate(); probabilisticWorker = null; treeResults.next = treeResults.legacy; calculating = false; render(true); return; }
+      calculating = true;
       render(true);
+      if (state.selectedPassives.length === 0) {
+        treeResults.next = treeResults.legacy; calculating = false; render(true); return;
+      }
+      probabilisticWorker?.terminate();
+      const requestId = ++solveRequestId;
+      probabilisticWorker = new Worker("js/probabilistic-solver.worker.js?v=0.9.1");
+      probabilisticWorker.onmessage = ({ data }) => {
+        if (data.requestId !== requestId) return;
+        treeResults.next = data.type === "solved" ? data.result : { error: "Le nouveau calcul n’a pas pu être terminé." };
+        calculating = false; probabilisticWorker.terminate(); probabilisticWorker = null; render(true);
+      };
+      probabilisticWorker.onerror = (workerError) => {
+        console.error("Échec du nouveau solveur probabiliste :", workerError.message);
+        if (requestId !== solveRequestId) return;
+        treeResults.next = { error: "Le nouveau calcul n’a pas pu être terminé." };
+        calculating = false; probabilisticWorker?.terminate(); probabilisticWorker = null; render(true);
+      };
+      probabilisticWorker.postMessage({
+        type: "solve", requestId,
+        input: {
+          roster, targetId: state.target, desiredPassives: state.selectedPassives,
+          initialRoute: treeResults.legacy?.root, maxDurationMs: 4500, maxExpanded: 80000,
+        },
+      });
     };
     solveTimer = setTimeout(run, immediate ? 0 : 80);
   }
@@ -682,6 +718,7 @@
 
   function showTooltip(target) {
     const passive = target.dataset.passiveTooltip ? passiveInfo(target.dataset.passiveTooltip) : null;
+    const cake = target.dataset.cakeTooltip;
     let tooltip = document.querySelector(".save-passive-tooltip");
     if (!tooltip) {
       tooltip = document.createElement("div");
@@ -689,7 +726,9 @@
       tooltip.setAttribute("role", "tooltip");
       document.body.append(tooltip);
     }
-    tooltip.innerHTML = passive
+    tooltip.innerHTML = cake
+      ? `<strong>Gâteau conseillé : ${escapeHtml(cake)}</strong><span>Recommandation pour optimiser ce croisement.</span>`
+      : passive
       ? `<strong>${escapeHtml(passive.name)}</strong><span>${escapeHtml(passiveEffectText(passive.effect))}</span>`
       : `<strong>${escapeHtml(target.dataset.eggTooltip)}</strong><span>À obtenir par reproduction.</span>`;
     tooltip.hidden = false;
@@ -725,10 +764,10 @@
   document.addEventListener("click", handleClick);
   document.addEventListener("input", handleInput);
   document.addEventListener("change", handleChange);
-  document.addEventListener("pointerover", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-egg-tooltip]"); if (target) showTooltip(target); });
-  document.addEventListener("pointerout", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-egg-tooltip]"); if (target && !target.contains(event.relatedTarget)) hideTooltip(); });
-  document.addEventListener("focusin", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-egg-tooltip]"); if (target) showTooltip(target); });
-  document.addEventListener("focusout", (event) => { if (event.target.closest("[data-passive-tooltip], [data-egg-tooltip]")) hideTooltip(); });
+  document.addEventListener("pointerover", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-egg-tooltip], [data-cake-tooltip]"); if (target) showTooltip(target); });
+  document.addEventListener("pointerout", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-egg-tooltip], [data-cake-tooltip]"); if (target && !target.contains(event.relatedTarget)) hideTooltip(); });
+  document.addEventListener("focusin", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-egg-tooltip], [data-cake-tooltip]"); if (target) showTooltip(target); });
+  document.addEventListener("focusout", (event) => { if (event.target.closest("[data-passive-tooltip], [data-egg-tooltip], [data-cake-tooltip]")) hideTooltip(); });
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
     if (passiveModalOpen) { passiveModalOpen = false; render(false); }
@@ -762,6 +801,10 @@
         state.selectedPassives = selectedPassives;
       },
       solveTarget,
+      solveProbabilistic() {
+        return window.ProbabilisticBreedingSolver.solve({ roster, targetId: state.target, desiredPassives: state.selectedPassives, childFor, speciesIds: species.map((pal) => pal.id), initialRoute: solveTarget()?.root });
+      },
+      renderGraph: graphTemplate,
       eggKind,
       childFor,
     },
