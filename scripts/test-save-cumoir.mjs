@@ -42,6 +42,18 @@ const emptyTemplate = context.SaveCumoir.template();
 if (emptyTemplate.includes("Source des Pals") || emptyTemplate.includes("Transmission des passifs")) throw new Error("Empty save UI still exposes removed Cumoir blocks.");
 if (!(emptyTemplate.indexOf("SaveGames") < emptyTemplate.indexOf("Importer une sauvegarde"))) throw new Error("Import instructions are not ordered correctly.");
 api.loadRoster(normalized);
+const activeTemplate = context.SaveCumoir.template();
+if (activeTemplate.includes("data-save-roster") || activeTemplate.includes("data-save-search") || activeTemplate.includes("save-pal-card")) {
+  throw new Error("The active Cumoir still renders the owned-Pal browser.");
+}
+const targetAutocomplete = {
+  empty: api.targetResults("") === "",
+  oneCharacter: api.targetResults("a") === "",
+  maximumEight: (api.targetResults("an").match(/data-save-target=/g) || []).length <= 8,
+  missing: api.targetResults("zzzzzz").includes("Aucun Pal trouvé"),
+};
+if (!Object.values(targetAutocomplete).every(Boolean)) throw new Error("Target autocomplete constraints failed.");
+const plannedDepth = (node) => node?.parents ? 1 + Math.max(...node.parents.map(plannedDepth)) : 0;
 
 const target = context.BREEDING_DATA.pals.find(([id]) => id === "Anubis")?.[0];
 if (!target) throw new Error("Anubis missing from breeding data.");
@@ -68,7 +80,6 @@ if (objectives.length) {
 const anubisObjective = ["CoolTimeReduction_Up_2", "Legend", "Rare", "MoveSpeed_up_3"];
 if (anubisObjective.every((id) => available.includes(id))) {
   api.setTarget(target, anubisObjective);
-  const plannedDepth = (node) => node?.parents ? 1 + Math.max(...node.parents.map(plannedDepth)) : 0;
   const topology = (node) => node?.parents
     ? `${node.speciesId}(${topology(node.parents[0])},${topology(node.parents[1])})`
     : node?.speciesId;
@@ -86,6 +97,15 @@ if (anubisObjective.every((id) => available.includes(id))) {
     });
   }
 }
+api.setTarget("Baphomet_Dark", []);
+const incineramNoct = api.solveStructuralTarget();
+if (!incineramNoct.root) throw new Error(`Structural zero-passive route failed: ${incineramNoct.error}`);
+const zeroPassiveGraph = api.renderGraph(incineramNoct);
+if (zeroPassiveGraph.includes("save-tree-node__passives")) throw new Error("Zero-passive graph renders empty passive areas.");
+solveChecks.push({
+  count: "incineram-noct-0", solved: true, result: incineramNoct.summary,
+  owned: Boolean(incineramNoct.root.owned), depth: plannedDepth(incineramNoct.root),
+});
 const male = normalized.find((pal) => pal.sex === "Male");
 const female = normalized.find((pal) => pal.sex === "Female");
 const directResult = male && female ? api.childFor(male.speciesId, female.speciesId) : null;
@@ -102,6 +122,7 @@ console.log(JSON.stringify({
   zeroPassives: normalized.filter((pal) => pal.passives.length === 0).length,
   fourPassives: normalized.filter((pal) => pal.passives.length === 4).length,
   objectives,
+  targetAutocomplete,
   solveChecks,
   directChild: directResult,
   eggTooltips: {

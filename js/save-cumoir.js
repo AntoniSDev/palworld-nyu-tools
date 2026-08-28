@@ -21,7 +21,6 @@
   let parsing = false;
   let progress = "";
   let error = "";
-  let query = "";
   let targetQuery = "";
   let passiveQuery = "";
   let passiveModalOpen = false;
@@ -179,8 +178,10 @@
     </article>`;
   }
 
-  function rosterList() {
-    const search = normalize(query);
+  // Renderer conservé pour un futur navigateur de roster, sans être instancié
+  // ni déclencher le chargement de portraits dans le Cumoir actuel.
+  function rosterList(searchValue = "") {
+    const search = normalize(searchValue);
     const matches = currentRoster().filter((individual) => {
       const pal = palInfo(individual.speciesId);
       return pal && (!search || normalize(pal.name).includes(search));
@@ -217,10 +218,15 @@
     </div>`;
   }
 
-  function targetResults() {
-    const search = normalize(targetQuery);
-    if (search.length < 2) return search ? `<p>Saisissez au moins 2 caractères.</p>` : "";
-    const targets = species.filter((pal) => normalize(pal.name).includes(search)).slice(0, 24);
+  function targetResults(searchValue = targetQuery) {
+    const search = normalize(searchValue);
+    if (search.length < 2) return "";
+    const targets = species
+      .filter((pal) => normalize(pal.name).includes(search))
+      .sort((a, b) => Number(!normalize(a.name).startsWith(search)) - Number(!normalize(b.name).startsWith(search))
+        || normalize(a.name).indexOf(search) - normalize(b.name).indexOf(search)
+        || a.order - b.order)
+      .slice(0, 8);
     return targets.length ? targets.map((pal) => `<button type="button" data-save-target="${escapeHtml(pal.id)}"><img src="${escapeHtml(pal.portrait)}" alt="" loading="lazy" /><span>${escapeHtml(pal.name)}</span></button>`).join("") : `<p>Aucun Pal trouvé.</p>`;
   }
 
@@ -300,8 +306,6 @@
       ${activeWorld ? `<div class="breeding-layout breeding-layout--save">
         <aside class="breeding-panel save-breeding-panel">
           ${selectionSummary()}
-          <label class="breeding-search"><span class="pal-search__field"><input data-save-search type="search" placeholder="Rechercher dans mes Pals…" aria-label="Rechercher dans mes Pals" value="${escapeHtml(query)}" autocomplete="off" /><span aria-hidden="true">⌕</span></span></label>
-          <div class="save-roster" data-save-roster>${rosterList()}</div>
         </aside>
         <section class="breeding-canvas" data-save-viewport aria-label="Arbre généalogique interactif"><div class="save-tree-tabs" role="tablist" aria-label="Version du calcul"><button type="button" role="tab" data-tree-view="legacy" aria-selected="${treeView === "legacy"}">Ancien calcul</button><button type="button" role="tab" data-tree-view="next" aria-selected="${treeView === "next"}">Nouveau calcul</button></div><div class="breeding-canvas__tip">Molette : zoom · Cliquer-glisser : déplacer</div><div class="breeding-canvas__summary">${escapeHtml(activeGraph?.summary || "Arbre généalogique")}</div>${graphMarkup}</section>
       </div>` : ""}
@@ -521,7 +525,73 @@
       frontier = next.sort((a, b) => stateScore(a) - stateScore(b)).slice(0, 420);
       if (!frontier.length) break;
     }
-    return answer ? { summary: `${answer.generation} génération${answer.generation > 1 ? "s" : ""} · ${answer.newCount} Pal${answer.newCount > 1 ? "s" : ""} à obtenir`, root: answer } : { error: "Aucune route valide trouvée avec cette sauvegarde." };
+    return answer ? { summary: `${answer.newCount} étape${answer.newCount > 1 ? "s" : ""} d’élevage`, root: answer } : { error: "Aucune route valide trouvée avec cette sauvegarde." };
+  }
+
+  function solveStructuralTarget() {
+    const target = palInfo(state.target);
+    if (!target) return { error: "Choisissez un Pal cible pour calculer une route." };
+    const targetKey = target.id.toLowerCase();
+    const ownedTarget = roster
+      .filter((individual) => individual.speciesId.toLowerCase() === targetKey)
+      .sort((a, b) => b.level - a.level || a.id.localeCompare(b.id))[0];
+    if (ownedTarget) {
+      return { summary: "Déjà présent dans votre sauvegarde", root: { speciesId: target.id, mask: 0, owned: true, sex: ownedTarget.sex, individualId: ownedTarget.id } };
+    }
+
+    const compare = (a, b) => a.generation - b.generation || a.newCount - b.newCount || a.signature.localeCompare(b.signature);
+    const best = new Map();
+    const accept = (candidate) => {
+      const key = `${candidate.speciesId.toLowerCase()}|${candidate.sex}`;
+      const previous = best.get(key);
+      if (previous && compare(previous, candidate) <= 0) return false;
+      best.set(key, candidate);
+      return true;
+    };
+    const representatives = new Map();
+    roster.forEach((individual) => {
+      const pal = palInfo(individual.speciesId);
+      if (!pal) return;
+      const key = `${pal.id.toLowerCase()}|${individual.sex}`;
+      const candidate = {
+        speciesId: pal.id, mask: 0, generation: 0, newCount: 0, owned: true,
+        sex: individual.sex, individualId: individual.id,
+        signature: `0|${pal.id}|${individual.sex}|${individual.id}`,
+      };
+      const previous = representatives.get(key);
+      if (!previous || candidate.signature.localeCompare(previous.signature) < 0) representatives.set(key, candidate);
+    });
+    let frontier = [...representatives.values()].sort(compare);
+    frontier.forEach(accept);
+    if (!frontier.length) return { error: "Aucun Pal compatible n’a été trouvé dans cette sauvegarde." };
+
+    for (let generation = 1; generation <= 8; generation += 1) {
+      const pool = [...best.values()].sort(compare);
+      const next = [];
+      let answer = null;
+      for (const first of frontier) {
+        for (const second of pool) {
+          if (first.owned && second.owned && first.individualId === second.individualId) continue;
+          if (first.sex === second.sex) continue;
+          const child = childFor(first.speciesId, second.speciesId, first.sex, second.sex);
+          if (!child) continue;
+          for (const sex of ["Female", "Male"]) {
+            const candidate = {
+              speciesId: child, mask: 0, generation: Math.max(first.generation, second.generation) + 1,
+              newCount: first.newCount + second.newCount + 1, owned: false, sex,
+              parents: [first, second],
+              signature: `${generation}|${child}|${sex}|${first.signature}>${second.signature}`,
+            };
+            if (child.toLowerCase() === targetKey && (!answer || compare(candidate, answer) < 0)) answer = candidate;
+            if (accept(candidate)) next.push(candidate);
+          }
+        }
+      }
+      if (answer) return { summary: `${answer.newCount} étape${answer.newCount > 1 ? "s" : ""} d’élevage`, root: answer };
+      frontier = next.sort(compare);
+      if (!frontier.length) break;
+    }
+    return { error: "Aucune route structurelle valide trouvée avec cette sauvegarde." };
   }
 
   function scheduleSolve(immediate = false) {
@@ -533,7 +603,7 @@
       calculating = true;
       render(true);
       if (state.selectedPassives.length === 0) {
-        treeResults.next = treeResults.legacy; calculating = false; render(true); return;
+        treeResults.next = solveStructuralTarget(); calculating = false; render(true); return;
       }
       probabilisticWorker?.terminate();
       const requestId = ++solveRequestId;
@@ -648,7 +718,7 @@
         allAvailable.clear(); roster.forEach((pal) => pal.passives.forEach((id) => allAvailable.add(id)));
         state.target = previousGoal?.target || null;
         state.selectedPassives = previousGoal ? previousGoal.selectedPassives.filter((id) => allAvailable.has(id)).slice(0, 4) : [];
-        treeResults.legacy = null; treeResults.next = null; targetQuery = ""; query = "";
+        treeResults.legacy = null; treeResults.next = null; targetQuery = "";
         parsing = false; progress = ""; saveState();
         await dbPut({ activeWorld, roster }).catch((dbError) => console.error("Échec de la sauvegarde locale du roster :", dbError));
         scheduleSolve(true);
@@ -711,7 +781,6 @@
   }
 
   function handleInput(event) {
-    if (event.target.matches("[data-save-search]")) { query = event.target.value; const rosterElement = content.querySelector("[data-save-roster]"); if (rosterElement) rosterElement.innerHTML = rosterList(); }
     if (event.target.matches("[data-target-search]")) { targetQuery = event.target.value; const results = content.querySelector("[data-target-results]"); if (results) results.innerHTML = targetResults(); }
     if (event.target.matches("[data-passive-search]")) { passiveQuery = event.target.value; render(false); }
   }
@@ -801,12 +870,16 @@
         state.selectedPassives = selectedPassives;
       },
       solveTarget,
+      solveStructuralTarget,
       solveProbabilistic(options = {}) {
         return window.ProbabilisticBreedingSolver.solve({ roster, targetId: state.target, desiredPassives: state.selectedPassives, childFor, speciesIds: species.map((pal) => pal.id), initialRoute: solveTarget()?.root, ...options });
       },
       renderGraph: graphTemplate,
       eggKind,
       childFor,
+      rosterCard,
+      rosterList,
+      targetResults,
     },
   };
 })();
