@@ -2187,12 +2187,16 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 
 .breeding-manual-tools {
   display: grid;
-  grid-template-columns: minmax(300px, 430px) minmax(420px, 610px);
-  gap: 14px;
+  grid-template-columns: minmax(390px, 440px);
+  gap: 16px;
   align-items: stretch;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
-.breeding-manual-tools > .breeding-source { margin: 0; }
+.breeding-top-tools--save { display: grid; grid-template-columns: minmax(390px, 440px) minmax(0, 1fr); gap: 16px; align-items: stretch; margin-bottom: 16px; }
+.breeding-manual-tools > .breeding-source { width: 100%; margin: 0; }
+.breeding-top-tools .breeding-source { min-height: 74px; padding: 12px; }
+.breeding-top-tools .breeding-source > div { gap: 7px; }
+.breeding-top-tools .breeding-source button { height: 36px; font-size: .76rem; }
 .breeding-manual-tools + .breeding-layout .breeding-panel,
 .breeding-manual-tools + .breeding-layout .breeding-canvas { height: calc(100vh - 240px); }
 .breeding-inheritance {
@@ -2214,9 +2218,9 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 
 .save-source-panel {
   display: grid;
-  width: fit-content;
+  width: 100%;
   max-width: 100%;
-  grid-template-columns: minmax(480px, 560px);
+  grid-template-columns: 1fr;
   gap: 0;
   padding: 10px;
   border: 1px solid rgba(103, 214, 216, .24);
@@ -2227,7 +2231,8 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
   width: auto;
   max-width: none;
   margin: 0;
-  padding: 0 0 9px;
+  min-height: 64px;
+  padding: 0 0 11px;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -2300,4 +2305,83 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 
 @media (prefers-reduced-motion: reduce) {
   .save-tree-node--final { animation: none; }
+}
+
+/* v0.9 — harmonisation finale du workspace */
+.site-nav button,
+body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1.1rem; font-weight: 600; }
+
+.breeding-page:not(.breeding-page--save) .breeding-layout,
+.breeding-layout--save { grid-template-columns: minmax(390px, 440px) minmax(0, 1fr); gap: 16px; }
+.breeding-pal-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.breeding-pal-grid button { min-height: 82px; }
+.breeding-pal-grid img { width: 48px; height: 48px; }
+.breeding-selection--active::after { content: none; }
+.breeding-selections, .save-parent-slots { gap: 8px; }
+.breeding-selection, .save-parent-card {
+  position: relative;
+  min-width: 0;
+  min-height: 82px;
+  border: 1px solid rgba(100, 190, 196, .16);
+  border-radius: 9px;
+  background: rgba(4, 24, 32, .66);
+}
+.breeding-selection { display: grid; padding: 7px; align-content: center; }
+.breeding-selection--active, .save-parent-card--active {
+  border-color: #61dedb;
+  background: linear-gradient(135deg, rgba(49, 153, 163, .24), rgba(72, 59, 127, .28));
+  box-shadow: inset 0 0 0 1px rgba(99, 225, 221, .2), inset 0 -3px rgba(228, 117, 181, .32);
+}
+.breeding-selection__portrait { flex-basis: 48px; width: 48px; height: 48px; }
+.breeding-selection__portrait img { width: 43px; height: 43px; }
+.breeding-selection__pal strong { font-size: .82rem; }
+.breeding-selection:has(.breeding-parent-remove) .breeding-selection__pal,
+.save-parent-card:has(.breeding-parent-remove) .save-parent-slot { padding-right: 31px; }
+.save-parent-card { display: flex; }
+.save-parent-slot { width: 100%; height: auto; padding: 8px; border: 0; background: transparent; }
+.save-parent-slot img { width: 50px; height: 50px; }
+.save-parent-slot > b { width: 46px; height: 46px; flex: 0 0 46px; }
+.save-parent-slot small { font-size: .68rem; }
+.save-parent-slot strong { font-size: .82rem; }
+.save-parent-slot span b { margin-top: 2px; font-size: .72rem; }
+.breeding-parent-remove {
+  position: absolute;
+  z-index: 3;
+  top: 5px;
+  right: 5px;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: rgba(12, 40, 49, .62);
+  color: #9fb5b8;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  transition: border-color .12s ease, background .12s ease, color .12s ease;
+}
+.breeding-parent-remove:hover { border-color: #f0788f; background: #5a2130; color: #ffe0e6; }
+.breeding-search { margin-top: 12px; }
+.breeding-search > .pal-search__field { margin-top: 0; }
+
+body {
+  background:
+    radial-gradient(ellipse at 16% -10%, rgba(45, 150, 166, .105), transparent 42rem),
+    radial-gradient(ellipse at 92% 18%, rgba(72, 105, 160, .055), transparent 38rem),
+    linear-gradient(155deg, #081e29 0%, #071923 50%, #07151e 100%);
+}
+body::before { opacity: .32; background: radial-gradient(ellipse at 55% 72%, rgba(41, 128, 143, .045), transparent 44rem); }
+
+@media (max-width: 900px) {
+  .site-nav button { min-height: 50px; font-size: .9rem; }
+  .breeding-manual-tools, .breeding-top-tools--save { grid-template-columns: 1fr; }
+  .breeding-page:not(.breeding-page--save) .breeding-layout,
+  .breeding-layout--save { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .breeding-pal-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }

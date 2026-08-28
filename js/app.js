@@ -1139,6 +1139,7 @@ function breedingSelectedCard(slot, label, genderKey = null) {
         <span class="breeding-selection__portrait">${pal ? `<img src="${pal.portrait}" alt="" />` : "+"}</span>
         <span><small>${escapeHtml(label)}</small><strong>${pal ? escapeHtml(pal.name) : "Choisir un Pal"}</strong></span>
       </button>
+      ${pal && slot !== "target" ? `<button type="button" class="breeding-parent-remove" data-breeding-remove="${slot}" aria-label="Retirer ${escapeHtml(label)}">×</button>` : ""}
       ${pal && genderKey ? `<span class="breeding-gender" aria-label="Sexe de ${escapeHtml(pal.name)}">
         <button type="button" data-breeding-sex="${genderKey}" data-sex="Male" aria-pressed="${gender === "Male"}">♂</button>
         <button type="button" data-breeding-sex="${genderKey}" data-sex="Female" aria-pressed="${gender === "Female"}">♀</button>
@@ -1246,8 +1247,8 @@ function breedingPanelTemplate() {
       ${breedingSelectedCard("parentA", breedingState.secondRole === "target" ? "Pal de départ" : "Parent A", "sexA")}
       ${breedingSelectedCard(secondSlot, breedingState.secondRole === "target" ? "Pal cible" : "Parent B", breedingState.secondRole === "target" ? null : "sexB")}
     </div>
-    <label class="breeding-search" for="breeding-search-input"><span>Rechercher pour ${breedingSelectionSlot === "parentA" ? "le premier emplacement" : "le second"}</span>
-      <span class="pal-search__field"><input id="breeding-search-input" type="search" placeholder="Nom du Pal…" value="${escapeHtml(breedingQuery)}" autocomplete="off" spellcheck="false" /><i class="breeding-search__icon" aria-hidden="true"></i></span>
+    <label class="breeding-search" for="breeding-search-input">
+      <span class="pal-search__field"><input id="breeding-search-input" type="search" placeholder="Rechercher un Pal…" aria-label="Rechercher un Pal" value="${escapeHtml(breedingQuery)}" autocomplete="off" spellcheck="false" /><i class="breeding-search__icon" aria-hidden="true"></i></span>
     </label>
     <div class="breeding-picker__results" data-breeding-results></div>
   </aside>`;
@@ -1259,13 +1260,8 @@ function breedingTemplate() {
   const emptyMessage = graph?.error || "Sélectionnez deux paramètres pour afficher l’arbre.";
   return `<section class="breeding-page" aria-labelledby="breeding-title">
     <header class="breeding-page__header"><p class="eyebrow" id="breeding-title">Planificateur d’élevage</p><p>Deux parents pour un enfant, ou un départ et une cible pour la route la plus courte.</p></header>
-    <div class="breeding-manual-tools">
+    <div class="breeding-manual-tools breeding-top-tools">
       ${window.SaveCumoir?.sourceSwitch?.() || `<div class="breeding-source" role="group" aria-label="Source des Pals"><p class="eyebrow">Source des Pals</p><div><button type="button" data-cumoir-source="manual" aria-pressed="true">Manuel</button><button type="button" data-cumoir-source="save" aria-pressed="false">Sauvegarde</button></div></div>`}
-      <aside class="breeding-inheritance" aria-label="Estimations communautaires de transmission des passifs" title="Estimations communautaires pour le tirage initial d’héritage, non publiées officiellement par Pocketpair.">
-        <div><p class="eyebrow">Transmission des passifs</p><span>Estimations communautaires</span></div>
-        <dl><div><dt>1 passif</dt><dd>≈ 40 %</dd></div><div><dt>2 passifs</dt><dd>≈ 30 %</dd></div><div><dt>3 passifs</dt><dd>≈ 20 %</dd></div><div><dt>4 passifs</dt><dd>≈ 10 %</dd></div></dl>
-        <p>Des passifs aléatoires peuvent aussi apparaître.</p>
-      </aside>
     </div>
     <div class="breeding-layout">
       ${breedingPanelTemplate()}
@@ -1576,6 +1572,17 @@ content.addEventListener("click", (event) => {
   if (breedingPickButton) {
     breedingSelectionSlot = breedingPickButton.dataset.breedingPick;
     renderBreedingPage(true);
+    return;
+  }
+
+  const breedingRemoveButton = event.target.closest("[data-breeding-remove]");
+  if (breedingRemoveButton) {
+    const slot = breedingRemoveButton.dataset.breedingRemove;
+    breedingState[slot] = null;
+    breedingSelectionSlot = slot;
+    breedingCanvas.fitted = false;
+    saveBreedingState();
+    renderBreedingPage();
     return;
   }
 

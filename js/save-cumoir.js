@@ -168,6 +168,14 @@
     </div>`;
   }
 
+  function inheritanceNote() {
+    return `<aside class="breeding-inheritance" aria-label="Estimations communautaires de transmission des passifs" title="Estimations communautaires pour le tirage initial d’héritage, non publiées officiellement par Pocketpair.">
+      <div><p class="eyebrow">Transmission des passifs</p><span>Estimations communautaires</span></div>
+      <dl><div><dt>1 passif</dt><dd>≈ 40 %</dd></div><div><dt>2 passifs</dt><dd>≈ 30 %</dd></div><div><dt>3 passifs</dt><dd>≈ 20 %</dd></div><div><dt>4 passifs</dt><dd>≈ 10 %</dd></div></dl>
+      <p>Des passifs aléatoires peuvent aussi apparaître.</p>
+    </aside>`;
+  }
+
   function currentRoster() {
     const selected = new Set(state.selectedPassives);
     return roster.slice().sort((a, b) => {
@@ -253,7 +261,7 @@
     const b = roster.find((pal) => pal.id === state.parentB);
     const card = (individual, slot, label) => {
       const pal = individual && palInfo(individual.speciesId);
-      return `<button type="button" class="save-parent-slot${selectionSlot === slot ? " save-parent-slot--active" : ""}" data-save-slot="${slot}">${pal ? `<img src="${pal.portrait}" alt=""><span><small>${label}</small><strong>${escapeHtml(pal.name)}</strong><b>${sexSymbol(individual.sex)} · Niv. ${individual.level}</b><em>${individual.passives.map((id) => escapeHtml(passiveInfo(id).name)).join(" · ")}</em></span>` : `<b>+</b><span><small>${label}</small><strong>Choisir un Pal</strong></span>`}</button>`;
+      return `<div class="save-parent-card${selectionSlot === slot ? " save-parent-card--active" : ""}"><button type="button" class="save-parent-slot" data-save-slot="${slot}">${pal ? `<img src="${pal.portrait}" alt=""><span><small>${label}</small><strong>${escapeHtml(pal.name)}</strong><b>${sexSymbol(individual.sex)} · Niv. ${individual.level}</b></span>` : `<b>+</b><span><small>${label}</small><strong>Choisir un Pal</strong></span>`}</button>${pal ? `<button type="button" class="breeding-parent-remove" data-save-remove-parent="${slot}" aria-label="Retirer ${label}">×</button>` : ""}</div>`;
     };
     return `<div class="save-parent-slots">${card(a, "parentA", "Parent A")}${card(b, "parentB", "Parent B")}</div>${passivesPanel()}`;
   }
@@ -314,7 +322,8 @@
     const graphMarkup = graphTemplate();
     return `<section class="breeding-page breeding-page--save" aria-label="Cumoir avec sauvegarde">
       <header class="breeding-page__header"><p class="eyebrow">Planificateur d’élevage</p><p>Le Cumoir travaille avec les Pals réellement présents dans votre sauvegarde.</p></header>
-      ${activeWorld ? `<section class="save-source-panel" aria-label="Source et sauvegarde active">${sourceSwitch()}${worldStatus()}</section>` : `${sourceSwitch()}${importEmpty()}`}
+      <div class="breeding-top-tools breeding-top-tools--save"><section class="save-source-panel" aria-label="Source et sauvegarde active">${sourceSwitch()}${activeWorld ? worldStatus() : ""}</section>${inheritanceNote()}</div>
+      ${activeWorld ? "" : importEmpty()}
       ${parsing ? `<div class="save-progress"><span></span>${escapeHtml(progress || "Lecture de la sauvegarde…")}</div>` : ""}
       ${error ? `<div class="save-error">${escapeHtml(error)}</div>` : ""}
       ${activeWorld ? `<div class="breeding-layout breeding-layout--save">
@@ -322,7 +331,7 @@
           <div class="breeding-panel__heading"><p class="eyebrow">Calcul</p><button type="button" class="breeding-reset" data-save-reset>Réinitialiser</button></div>
           <div class="breeding-role" role="group" aria-label="Type de calcul"><button type="button" data-save-calculation="parents" aria-pressed="${state.calculation === "parents"}">Deux parents</button><button type="button" data-save-calculation="target" aria-pressed="${state.calculation === "target"}">Pal cible</button></div>
           ${selectionSummary()}
-          <label class="breeding-search"><span>Rechercher un Pal</span><span class="pal-search__field"><input data-save-search type="search" placeholder="Nom du Pal…" value="${escapeHtml(query)}" autocomplete="off" /><i class="breeding-search__icon"></i></span></label>
+          <label class="breeding-search"><span class="pal-search__field"><input data-save-search type="search" placeholder="Rechercher un Pal…" aria-label="Rechercher un Pal" value="${escapeHtml(query)}" autocomplete="off" /><i class="breeding-search__icon"></i></span></label>
           <div class="save-roster" data-save-roster>${rosterList()}</div>
         </aside>
         <section class="breeding-canvas" data-save-viewport aria-label="Arbre généalogique interactif"><div class="breeding-canvas__tip">Molette : zoom · Cliquer-glisser : déplacer</div><div class="breeding-canvas__summary">${escapeHtml(graph?.summary || "Arbre généalogique")}</div>${graphMarkup}</section>
@@ -693,6 +702,8 @@
     if (event.target.closest("[data-delete-save]")) { void removeSave(); return; }
     const calculation = event.target.closest("[data-save-calculation]");
     if (calculation) { state.calculation = calculation.dataset.saveCalculation; state.parentA = null; state.parentB = null; state.forced = []; selectionSlot = "parentA"; saveState(); scheduleSolve(true); return; }
+    const removeParent = event.target.closest("[data-save-remove-parent]");
+    if (removeParent) { const slot = removeParent.dataset.saveRemoveParent; state[slot] = null; selectionSlot = slot; graph = null; saveState(); scheduleSolve(true); return; }
     const slot = event.target.closest("[data-save-slot]"); if (slot) { selectionSlot = slot.dataset.saveSlot; render(false); return; }
     const palButton = event.target.closest("[data-save-pal]");
     if (palButton) {
