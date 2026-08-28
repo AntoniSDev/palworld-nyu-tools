@@ -2177,7 +2177,8 @@ body[data-view="breeding"] .site-nav button { font-size: .92rem; font-weight: 70
 }
 
 /* v0.9 — dernière passe de finition du Cumoir */
-.site-nav button { min-height: 54px; font-size: 1rem; font-weight: 600; }
+.site-nav button,
+body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem; font-weight: 600; }
 
 .save-pal-card__name small { font-size: .82rem; font-weight: 600; }
 .save-pal-card__sex { min-width: 1.15em; font-size: 1.22rem; font-weight: 700; line-height: .9; }
