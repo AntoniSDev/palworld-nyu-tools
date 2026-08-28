@@ -74,6 +74,42 @@ const branchResult = context.ProbabilisticBreedingSolver.solve({
 });
 assert.ok(branchResult.root?.parents?.every((parent) => !parent.owned), "independent planned branches");
 
+const deepBranchResult = context.ProbabilisticBreedingSolver.solve({
+  roster: [
+    { id: "a", speciesId: "A", sex: "Female", passives: ["T1"] },
+    { id: "b", speciesId: "B", sex: "Male", passives: [] },
+    { id: "d", speciesId: "D", sex: "Female", passives: ["T2"] },
+    { id: "e", speciesId: "E", sex: "Male", passives: [] },
+    { id: "h", speciesId: "H", sex: "Female", passives: ["T3"] },
+    { id: "i", speciesId: "I", sex: "Male", passives: ["T4"] },
+  ],
+  targetId: "Target", desiredPassives: ["T1", "T2", "T3", "T4"],
+  speciesIds: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "Target"],
+  childFor: (a, b) => ({
+    "A+B": "C", "D+E": "F", "C+F": "G", "H+I": "J", "G+J": "Target",
+  })[[a, b].sort().join("+")] || null,
+  maxDurationMs: 1000,
+});
+assert.ok(deepBranchResult.root?.plannedJoinCount >= 2, "multi-level planned branches remain reusable");
+const restrictedDeepBranchResult = context.ProbabilisticBreedingSolver.solve({
+  roster: [
+    { id: "a", speciesId: "A", sex: "Female", passives: ["T1"] },
+    { id: "b", speciesId: "B", sex: "Male", passives: [] },
+    { id: "d", speciesId: "D", sex: "Female", passives: ["T2"] },
+    { id: "e", speciesId: "E", sex: "Male", passives: [] },
+    { id: "h", speciesId: "H", sex: "Female", passives: ["T3"] },
+    { id: "i", speciesId: "I", sex: "Male", passives: ["T4"] },
+  ],
+  targetId: "Target", desiredPassives: ["T1", "T2", "T3", "T4"],
+  speciesIds: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "Target"],
+  childFor: (a, b) => ({
+    "A+B": "C", "D+E": "F", "C+F": "G", "H+I": "J", "G+J": "Target",
+  })[[a, b].sort().join("+")] || null,
+  allowPlannedIntermediates: false,
+  maxDurationMs: 1000,
+});
+assert.ok(!restrictedDeepBranchResult.root, "historical restriction cannot solve a multi-level planned topology");
+
 const specialSex = context.ProbabilisticBreedingSolver.solve({
   roster: [
     { id: "female", speciesId: "Kat", sex: "Female", passives: ["S1"] },
@@ -84,4 +120,4 @@ const specialSex = context.ProbabilisticBreedingSolver.solve({
 });
 assert.ok(specialSex.root, "gender-constrained special breeding");
 
-console.log(JSON.stringify({ probabilityFixtures: 10, deterministic: true, cleanSource: true, branches: true, specialSex: true, sampleMs: first.durationMs }));
+console.log(JSON.stringify({ probabilityFixtures: 10, deterministic: true, cleanSource: true, branches: true, deepBranches: true, specialSex: true, sampleMs: first.durationMs }));

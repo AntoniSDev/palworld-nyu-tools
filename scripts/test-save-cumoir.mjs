@@ -65,6 +65,27 @@ if (objectives.length) {
   }
   solveChecks.push({ count: "new", solved: Boolean(probabilistic.root), result: probabilistic.summary || probabilistic.error, durationMs: probabilistic.durationMs, expanded: probabilistic.expanded });
 }
+const anubisObjective = ["CoolTimeReduction_Up_2", "Legend", "Rare", "MoveSpeed_up_3"];
+if (anubisObjective.every((id) => available.includes(id))) {
+  api.setTarget(target, anubisObjective);
+  const plannedDepth = (node) => node?.parents ? 1 + Math.max(...node.parents.map(plannedDepth)) : 0;
+  const topology = (node) => node?.parents
+    ? `${node.speciesId}(${topology(node.parents[0])},${topology(node.parents[1])})`
+    : node?.speciesId;
+  const branchMerges = (node) => node?.parents
+    ? Number(node.parents.every((parent) => !parent.owned)) + node.parents.reduce((sum, parent) => sum + branchMerges(parent), 0)
+    : 0;
+  for (const [label, allowPlannedIntermediates, maxDurationMs] of [["anubis-4-before", false, 4500], ["anubis-4-after", true, 4500]]) {
+    const anubis = api.solveProbabilistic({ allowPlannedIntermediates, maxDurationMs, maxExpanded: 80000 });
+    solveChecks.push({
+      count: label, solved: Boolean(anubis.root), result: anubis.summary || anubis.error,
+      durationMs: anubis.durationMs, expanded: anubis.expanded, expectedBatches: anubis.expectedBatches,
+      depth: plannedDepth(anubis.root), branchMerges: branchMerges(anubis.root),
+      topology: topology(anubis.root),
+      joinStats: anubis.joinStats, bestBranched: anubis.bestBranched, truncated: anubis.truncated,
+    });
+  }
+}
 const male = normalized.find((pal) => pal.sex === "Male");
 const female = normalized.find((pal) => pal.sex === "Female");
 const directResult = male && female ? api.childFor(male.speciesId, female.speciesId) : null;

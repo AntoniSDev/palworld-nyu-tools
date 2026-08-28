@@ -537,7 +537,7 @@
       }
       probabilisticWorker?.terminate();
       const requestId = ++solveRequestId;
-      probabilisticWorker = new Worker("js/probabilistic-solver.worker.js?v=0.9.1");
+      probabilisticWorker = new Worker("js/probabilistic-solver.worker.js?v=0.9.2");
       probabilisticWorker.onmessage = ({ data }) => {
         if (data.requestId !== requestId) return;
         treeResults.next = data.type === "solved" ? data.result : { error: "Le nouveau calcul n’a pas pu être terminé." };
@@ -801,8 +801,8 @@
         state.selectedPassives = selectedPassives;
       },
       solveTarget,
-      solveProbabilistic() {
-        return window.ProbabilisticBreedingSolver.solve({ roster, targetId: state.target, desiredPassives: state.selectedPassives, childFor, speciesIds: species.map((pal) => pal.id), initialRoute: solveTarget()?.root });
+      solveProbabilistic(options = {}) {
+        return window.ProbabilisticBreedingSolver.solve({ roster, targetId: state.target, desiredPassives: state.selectedPassives, childFor, speciesIds: species.map((pal) => pal.id), initialRoute: solveTarget()?.root, ...options });
       },
       renderGraph: graphTemplate,
       eggKind,

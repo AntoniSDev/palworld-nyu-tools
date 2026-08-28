@@ -76,6 +76,7 @@
         maxUnknownExtras: passiveIds.filter((id) => !desiredIndex.has(id)).length,
         sex: normalizeSex(pal.sex), owned: true, individualId: pal.id || `owned-${index}`,
         cost: 0, stepCount: 0, ownedSources: 1,
+        plannedJoinCount: 0,
         signature: `${pal.speciesId}|${normalizeSex(pal.sex)}|${passiveIds.slice().sort().join(",")}|${pal.id || index}`,
       };
     }).sort(compareStates);
@@ -107,10 +108,13 @@
     const queue = new Queue();
     const settled = [];
     const settledBySpecies = new Map();
+    const settledByMaskAndSex = new Map();
     const targetPartners = new Map();
     const partnerActionCache = new Map();
     let bestAnswer = null;
+    let bestBranchedAnswer = null;
     let expanded = 0;
+    const joinStats = { considered: 0, noMaskGain: 0, stale: 0, invalid: 0, generated: 0 };
 
     const speciesIds = (input.speciesIds || [...new Set(owned.map((pal) => pal.speciesId))]).slice().sort();
     const sexes = ["Female", "Male"];
@@ -197,6 +201,7 @@
         cost: first.cost + second.cost + 1 / recommendation.probability,
         stepCount: first.stepCount + second.stepCount + 1,
         ownedSources: first.ownedSources + second.ownedSources,
+        plannedJoinCount: first.plannedJoinCount + second.plannedJoinCount + Number(!first.owned && !second.owned),
         signature: `warm|${first.signature}>${second.signature}|${node.speciesId}|${extras}`,
       };
     }
@@ -206,10 +211,10 @@
       if (warm && warm.speciesId.toLowerCase() === targetKey && (warm.mask & fullMask) === fullMask) bestAnswer = warm;
     }
 
-    function createChildren(a, b, finalOnly = false) {
-      if (!validPair(a, b)) return;
+    function createChildren(a, b, finalOnly = false, plannedJoin = false) {
+      if (!validPair(a, b)) { if (plannedJoin) joinStats.invalid += 1; return; }
       const childSpecies = childFor(a.speciesId, b.speciesId, a.sex, b.sex);
-      if (!childSpecies) return;
+      if (!childSpecies) { if (plannedJoin) joinStats.invalid += 1; return; }
       const nextMask = a.mask | b.mask;
       const isTarget = childSpecies.toLowerCase() === targetKey && (nextMask & fullMask) === fullMask;
       if (finalOnly && !isTarget) return;
@@ -226,12 +231,16 @@
           sex: "Unknown", owned: false, parents: [a, b], recommendedCake: recommendation.cake,
           cost, stepCount: a.stepCount + b.stepCount + 1,
           ownedSources: a.ownedSources + b.ownedSources,
+          plannedJoinCount: a.plannedJoinCount + b.plannedJoinCount + Number(!a.owned && !b.owned),
           signature: `${childSpecies}|${nextMask}|${extras}|${a.signature}>${b.signature}|${recommendation.cake}`,
         };
         if (isTarget) {
+          if (child.plannedJoinCount > 0 && (!bestBranchedAnswer || compareStates(child, bestBranchedAnswer) < 0)) bestBranchedAnswer = child;
           if (!bestAnswer || compareStates(child, bestAnswer) < 0) bestAnswer = child;
         } else {
-          for (const sex of ["Female", "Male"]) accept({ ...child, sex, signature: `${child.signature}|${sex}` });
+          for (const sex of ["Female", "Male"]) {
+            if (accept({ ...child, sex, signature: `${child.signature}|${sex}` }) && plannedJoin) joinStats.generated += 1;
+          }
         }
       }
     }
@@ -250,19 +259,49 @@
       const speciesGroup = settledBySpecies.get(current.speciesId.toLowerCase()) || [];
       speciesGroup.push(current); settledBySpecies.set(current.speciesId.toLowerCase(), speciesGroup);
       for (const partner of plannedPartnerActions(current)) createChildren(current, partner);
-      // Les branches planifiées ne sont réunies entre elles que si leur croisement produit la cible finale.
-      for (const partnerSpecies of targetPartners.get(current.speciesId.toLowerCase()) || []) {
-        for (const partner of settledBySpecies.get(partnerSpecies) || []) {
-          if (partner === current || (current.mask | partner.mask) !== fullMask) continue;
-          createChildren(current, partner, true);
+
+      if (input.allowPlannedIntermediates !== false) {
+        // Jointures multi-branches ciblées, indexées par masque et sexe. Les états
+        // sont déjà des représentants Pareto coût/propreté ; les entrées devenues
+        // dominées sont ignorées avant d'évaluer le croisement.
+        const oppositeSex = current.sex === "Female" ? "Male" : "Female";
+        for (let partnerMask = 0; partnerMask <= fullMask; partnerMask += 1) {
+          const nextMask = current.mask | partnerMask;
+          // Une jointure doit améliorer au moins l’une des deux branches. Une
+          // amélioration unilatérale reste utile pour changer d’espèce sur le
+          // chemin vers la cible, notamment avec un partenaire structurel vide.
+          if (nextMask === current.mask && nextMask === partnerMask) { joinStats.noMaskGain += 1; continue; }
+          const partners = settledByMaskAndSex.get(`${partnerMask}|${oppositeSex}`) || [];
+          for (const partner of partners) {
+            joinStats.considered += 1;
+            if (bestExact.get(keyOf(partner)) !== partner) { joinStats.stale += 1; continue; }
+            createChildren(current, partner, false, true);
+          }
+        }
+      } else {
+        // Mode de comparaison reproduisant la restriction historique du nouveau solveur.
+        for (const partnerSpecies of targetPartners.get(current.speciesId.toLowerCase()) || []) {
+          for (const partner of settledBySpecies.get(partnerSpecies) || []) {
+            if (partner === current || (current.mask | partner.mask) !== fullMask) continue;
+            createChildren(current, partner, true);
+          }
         }
       }
+
+      const maskSexGroup = settledByMaskAndSex.get(`${current.mask}|${current.sex}`) || [];
+      maskSexGroup.push(current); settledByMaskAndSex.set(`${current.mask}|${current.sex}`, maskSexGroup);
     }
 
-    if (!bestAnswer) return { error: "Aucune route probabiliste valide trouvée avec cette sauvegarde.", expanded, durationMs: performance.now() - startedAt };
+    if (!bestAnswer) return { error: "Aucune route probabiliste valide trouvée avec cette sauvegarde.", expanded, joinStats, durationMs: performance.now() - startedAt };
     return {
       summary: `${bestAnswer.stepCount} étape${bestAnswer.stepCount > 1 ? "s" : ""} d’élevage`,
       root: bestAnswer, expectedBatches: bestAnswer.cost, expanded,
+      joinStats,
+      bestBranched: bestBranchedAnswer ? {
+        expectedBatches: bestBranchedAnswer.cost,
+        stepCount: bestBranchedAnswer.stepCount,
+        plannedJoinCount: bestBranchedAnswer.plannedJoinCount,
+      } : null,
       durationMs: performance.now() - startedAt,
       truncated: queue.size > 0 && (expanded >= maxExpanded || performance.now() - startedAt >= maxDurationMs),
     };
