@@ -1973,16 +1973,6 @@ body[data-view="breeding"] footer { margin-top: 18px; }
 @keyframes save-spin { to { transform: rotate(360deg); } }
 .breeding-layout--save { grid-template-columns: minmax(310px, 370px) minmax(0, 1fr); }
 .save-breeding-panel { height: calc(100vh - 238px); min-height: 650px; }
-.save-parent-slots { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
-.save-parent-slot { display: flex; min-width: 0; height: 82px; align-items: center; gap: 7px; padding: 6px; border: 1px solid rgba(100, 190, 196, .16); border-radius: 8px; background: rgba(4, 24, 32, .66); color: #c4dcdd; cursor: pointer; text-align: left; }
-.save-parent-slot--active { border-color: #61dedb; box-shadow: inset 0 0 0 1px rgba(99, 225, 221, .2); }
-.save-parent-slot img { width: 46px; height: 46px; object-fit: contain; }
-.save-parent-slot > b { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 50%; background: rgba(91, 190, 195, .1); font-size: 1.1rem; }
-.save-parent-slot span { display: grid; min-width: 0; }
-.save-parent-slot small { color: #729297; font-size: .52rem; font-weight: 800; text-transform: uppercase; }
-.save-parent-slot strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .68rem; }
-.save-parent-slot span b { color: #77cbc9; font-size: .58rem; }
-.save-parent-slot em { display: -webkit-box; margin-top: 3px; overflow: hidden; color: #8cabad; font-size: .47rem; font-style: normal; line-height: 1.15; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .save-target-picker { display: grid; gap: 5px; }
 .save-target-picker > button { display: flex; min-height: 62px; align-items: center; gap: 9px; padding: 7px 10px; border: 1px solid rgba(104, 218, 220, .28); border-radius: 9px; background: rgba(6, 35, 44, .73); color: #e9fbfa; cursor: pointer; font: inherit; }
 .save-target-picker img { width: 50px; height: 50px; object-fit: contain; }
@@ -1992,9 +1982,8 @@ body[data-view="breeding"] footer { margin-top: 18px; }
 .save-passive-goal > div:first-child small { color: #75a4a9; font-size: .62rem; }
 .save-passive-button { min-height: 34px; border: 1px solid rgba(204, 167, 93, .3); border-radius: 7px; background: linear-gradient(110deg, rgba(86, 62, 38, .36), rgba(44, 49, 82, .45)); color: #e7cf9e; cursor: pointer; font: inherit; font-size: .68rem; font-weight: 800; }
 .save-passive-goal__chips { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; min-height: 24px; }
-.save-passive-goal__hint, .save-forced-help { color: #66868b; font-size: .58rem; line-height: 1.35; }
+.save-passive-goal__hint { color: #66868b; font-size: .58rem; line-height: 1.35; }
 .save-passive-goal__hint { grid-column: 1 / -1; }
-.save-forced-help { margin: 10px 0 2px; }
 .save-passive { position: relative; display: flex; min-width: 0; min-height: 21px; align-items: center; gap: 4px; padding: 3px 5px 3px 8px; border-left: 2px solid #c9d3d3; background: rgba(17, 37, 44, .72); color: #d8e2e2; font-size: .54rem; line-height: 1.1; }
 .save-passive > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .save-passive button { position: absolute; top: -5px; right: -5px; display: none; width: 17px; height: 17px; padding: 0; border: 1px solid rgba(239, 132, 153, .55); border-radius: 50%; background: #4a1d2b; color: #ffdbe2; cursor: pointer; font-size: .7rem; line-height: 14px; }
@@ -2014,6 +2003,7 @@ body[data-view="breeding"] footer { margin-top: 18px; }
 .save-passive-rank--negative-3 { -webkit-mask-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAABGdBTUEAALGPC/xhBQAAASVJREFUeNqFk7FNw1AQhh0hkDJAilRpzA7EYgAkkxmSDRyzQkQFSJ4iUpTWkhnAKVjBdKyQFvhysu/Zcs55ub85f/c+F6f3AlfcNGmBn3Mg9goxhz6GfyqSQSGhkilG0Hwwa+mMd8et8KuRITseJLu6V34uzMmd0I/SnHnQL0bckw0KmUxGQWAETcqPOyxd2lAjUPLMLZL6a8mXZFn3NZVpObTWdSO4UmHtX+uGaUunbJR6BIAtj5ItdNyudY+v9kR2TxNewZbQSXfKSinfaEmXMnyYkpV2d5IFn5IF0itd2bX+UfHC2PxqLLSSKUbQZIQtDcka6hH0qj1JcqS/JEQUTuhHaUFkL1/IG0fO6yg09N3WpLfWpKEeQZ98IYnr/rrQZUg4AQqLLa9rZ442AAAAAElFTkSuQmCC"); mask-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAABGdBTUEAALGPC/xhBQAAASVJREFUeNqFk7FNw1AQhh0hkDJAilRpzA7EYgAkkxmSDRyzQkQFSJ4iUpTWkhnAKVjBdKyQFvhysu/Zcs55ub85f/c+F6f3AlfcNGmBn3Mg9goxhz6GfyqSQSGhkilG0Hwwa+mMd8et8KuRITseJLu6V34uzMmd0I/SnHnQL0bckw0KmUxGQWAETcqPOyxd2lAjUPLMLZL6a8mXZFn3NZVpObTWdSO4UmHtX+uGaUunbJR6BIAtj5ItdNyudY+v9kR2TxNewZbQSXfKSinfaEmXMnyYkpV2d5IFn5IF0itd2bX+UfHC2PxqLLSSKUbQZIQtDcka6hH0qj1JcqS/JEQUTuhHaUFkL1/IG0fO6yg09N3WpLfWpKEeQZ98IYnr/rrQZUg4AQqLLa9rZ442AAAAAElFTkSuQmCC"); }
 .save-roster { flex: 1 1 auto; min-height: 0; margin-top: 9px; overflow-y: auto; padding-right: 4px; scrollbar-color: rgba(95, 201, 205, .5) transparent; scrollbar-width: thin; }
 .save-pal-card { position: relative; display: grid; width: 100%; min-height: 90px; grid-template-columns: 64px minmax(0, 1fr); gap: 7px; margin-bottom: 6px; padding: 7px; border: 1px solid rgba(98, 189, 195, .14); border-radius: 8px; background: rgba(4, 23, 31, .62); color: #c7dcdd; cursor: pointer; text-align: left; content-visibility: auto; contain-intrinsic-size: 90px; }
+.save-roster article.save-pal-card { cursor: default; }
 .save-pal-card:hover { border-color: rgba(102, 223, 220, .42); background: rgba(14, 52, 61, .64); }
 .save-pal-card--selected { border-color: #63dfdc; box-shadow: inset 0 0 0 1px rgba(91, 221, 217, .23); }
 .save-pal-card > img { width: 62px; height: 62px; align-self: center; object-fit: contain; }
@@ -2023,7 +2013,6 @@ body[data-view="breeding"] footer { margin-top: 18px; }
 .save-pal-card__name small { flex: 0 0 auto; color: #76979c; font-size: .52rem; }
 .save-pal-card__sex--male { color: #6dcfed; }.save-pal-card__sex--female { color: #ed89b8; }
 .save-pal-card__passives { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; align-content: start; }
-.save-pal-card__forced { position: absolute; left: 5px; bottom: 4px; padding: 2px 5px; border-radius: 4px; background: #217d83; color: #e6ffff; font-size: .48rem; font-style: normal; font-weight: 850; }
 .save-roster__empty { color: #708f94; font-size: .68rem; text-align: center; }
 .save-modal-backdrop { position: fixed; z-index: 1000; inset: 0; display: grid; padding: 25px; place-items: center; background: rgba(1, 9, 14, .78); backdrop-filter: blur(6px); }
 .save-modal { display: grid; width: min(820px, 96vw); max-height: min(760px, 90vh); overflow: hidden; border: 1px solid rgba(105, 226, 223, .35); border-radius: 14px; background: linear-gradient(145deg, #082a34, #151b30); box-shadow: 0 28px 80px rgba(0, 0, 0, .55); }
@@ -2088,6 +2077,12 @@ body[data-view="breeding"] footer { margin-top: 18px; }
 .save-passive-tooltip span { color: #9ab8bb; font-size: .62rem; line-height: 1.4; }
 .save-egg { position: absolute; z-index: 2; top: -13px; right: -10px; display: grid; width: 37px; height: 37px; place-items: center; border: 1px solid rgba(229, 201, 133, .5); border-radius: 50%; background: rgba(4, 20, 27, .9); box-shadow: 0 4px 10px rgba(0, 0, 0, .42); }
 .save-egg img { width: 34px; height: 34px; object-fit: contain; }
+.save-tree-tabs { position: absolute; z-index: 6; top: 38px; left: 50%; display: flex; gap: 3px; padding: 3px; border: 1px solid rgba(106, 202, 206, .2); border-radius: 7px; background: rgba(3, 21, 29, .86); transform: translateX(-50%); }
+.save-tree-tabs button { min-height: 27px; padding: 0 10px; border: 0; border-radius: 5px; background: transparent; color: #77999d; cursor: pointer; font: inherit; font-size: .68rem; font-weight: 700; }
+.save-tree-tabs button[aria-selected="true"] { background: rgba(49, 146, 153, .26); color: #dffffc; }
+.save-calculating { position: absolute; inset: 0; display: grid; place-content: center; place-items: center; gap: 10px; color: #bce8e5; }
+.save-calculating span { width: 24px; height: 24px; border: 2px solid rgba(108, 224, 222, .2); border-top-color: #6de1dd; border-radius: 50%; animation: save-spin .7s linear infinite; }
+.save-calculating strong { font-size: .82rem; font-weight: 700; }
 footer a { color: #75aaa9; }
 
 /* v0.9 — passe finale de lisibilité du Cumoir */
@@ -2105,14 +2100,9 @@ body[data-view="breeding"] .site-nav button { font-size: .92rem; font-weight: 70
 .save-world-status button { min-height: 34px; padding-inline: 12px; font-size: .76rem; font-weight: 700; }
 .save-progress, .save-error { font-size: .78rem; }
 .breeding-layout--save { grid-template-columns: minmax(390px, 440px) minmax(0, 1fr); }
-.save-parent-slot small { font-size: .68rem; font-weight: 700; }
-.save-parent-slot strong { font-size: .78rem; }
-.save-parent-slot span b { font-size: .72rem; }
-.save-parent-slot em { font-size: .65rem; line-height: 1.25; }
 .save-passive-goal > div:first-child small { font-size: .75rem; }
 .save-passive-button { min-height: 36px; font-size: .78rem; font-weight: 700; }
-.save-passive-goal__hint, .save-forced-help { color: #91b0b3; font-size: .75rem; line-height: 1.45; }
-.save-forced-help { margin: 10px 0 2px; }
+.save-passive-goal__hint { color: #91b0b3; font-size: .75rem; line-height: 1.45; }
 .save-passive { min-height: 28px; gap: 5px; padding: 4px 7px 4px 5px; font-size: .75rem; line-height: 1.2; }
 .save-passive button { z-index: 2; top: -7px; right: -7px; display: grid; width: 22px; height: 22px; padding: 0; place-items: center; border-color: rgba(160, 184, 188, .55); background: #17303a; color: #b8c8ca; font-size: .9rem; font-weight: 600; line-height: 1; transition: border-color .12s ease, background .12s ease, color .12s ease; }
 .save-passive button:hover { border-color: #f0788f; background: #5a2130; color: #ffe0e6; }
@@ -2125,7 +2115,6 @@ body[data-view="breeding"] .site-nav button { font-size: .92rem; font-weight: 70
 .save-pal-card__sex { display: inline-block; min-width: 1em; font-size: 1rem; line-height: 1; text-align: center; }
 .save-pal-card__passives { gap: 4px; }
 .save-pal-card__passives .save-passive { min-height: 30px; font-size: .72rem; }
-.save-pal-card__forced { padding: 3px 6px; font-size: .65rem; font-weight: 700; }
 .save-roster__empty { font-size: .78rem; }
 .save-modal > header p { font-size: .76rem; line-height: 1.4; }
 .save-world-list small, .save-world-modal > footer small { font-size: .72rem; }
@@ -2150,6 +2139,10 @@ body[data-view="breeding"] .site-nav button { font-size: .92rem; font-weight: 70
 .save-passive-tooltip strong { font-size: .82rem; font-weight: 700; }
 .save-passive-tooltip span { font-size: .75rem; line-height: 1.5; }
 .save-egg { cursor: help; }
+
+@media (prefers-reduced-motion: reduce) {
+  .save-calculating span { animation: none; }
+}
 
 @media (max-width: 900px) {
   body[data-view="breeding"] .page-shell { width: min(100% - 20px, 1180px); }

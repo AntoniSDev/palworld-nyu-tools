@@ -28,32 +28,23 @@
   let passiveModalOpen = false;
   let worldModalOpen = false;
   let selectedWorldIndex = 0;
-  let selectionSlot = "parentA";
+  let pickingTarget = false;
   let solveTimer = 0;
-  let graph = null;
+  let treeView = "legacy";
+  let calculating = false;
+  const treeResults = { legacy: null, next: null };
 
   const state = loadState();
 
   function loadState() {
-    const fallback = {
-      calculation: "parents",
-      parentA: null,
-      parentB: null,
-      target: null,
-      selectedPassives: [],
-      forced: [],
-    };
+    const fallback = { target: null, selectedPassives: [] };
     try {
       const saved = JSON.parse(localStorage.getItem(STATE_KEY) || "null");
       if (!saved || typeof saved !== "object") return fallback;
       return {
         ...fallback,
-        calculation: saved.calculation === "target" ? "target" : "parents",
-        parentA: typeof saved.parentA === "string" ? saved.parentA : null,
-        parentB: typeof saved.parentB === "string" ? saved.parentB : null,
         target: typeof saved.target === "string" ? saved.target : null,
         selectedPassives: Array.isArray(saved.selectedPassives) ? saved.selectedPassives.filter((id) => passiveById.has(id)).slice(0, 4) : [],
-        forced: Array.isArray(saved.forced) ? saved.forced.filter((id) => typeof id === "string").slice(0, 2) : [],
       };
     } catch {
       return fallback;
@@ -193,19 +184,16 @@
   function rosterCard(individual) {
     const pal = palInfo(individual.speciesId);
     if (!pal) return "";
-    const selected = state.parentA === individual.id || state.parentB === individual.id || state.forced.includes(individual.id);
-    const forcedIndex = state.forced.indexOf(individual.id);
-    return `<button type="button" class="save-pal-card${selected ? " save-pal-card--selected" : ""}" data-save-pal="${escapeHtml(individual.id)}">
+    return `<article class="save-pal-card">
       <img src="${escapeHtml(pal.portrait)}" alt="" loading="lazy" />
       <span class="save-pal-card__body"><span class="save-pal-card__name"><strong>${escapeHtml(pal.name)}</strong><small>Niv. ${individual.level} · <b class="save-pal-card__sex save-pal-card__sex--${individual.sex.toLowerCase()}">${sexSymbol(individual.sex)}</b></small></span>
       <span class="save-pal-card__passives">${individual.passives.map((id) => passiveChip(id)).join("")}</span></span>
-      ${forcedIndex >= 0 ? `<i class="save-pal-card__forced">Source ${forcedIndex + 1}</i>` : ""}
-    </button>`;
+    </article>`;
   }
 
   function rosterList() {
     const search = normalize(query);
-    if (state.calculation === "target" && selectionSlot === "target") {
+    if (pickingTarget) {
       const targets = species.filter((pal) => !search || normalize(pal.name).includes(search));
       return targets.map((pal) => `<button type="button" class="save-pal-card save-target-card" data-save-target="${escapeHtml(pal.id)}"><img src="${escapeHtml(pal.portrait)}" alt="" loading="lazy" /><span class="save-pal-card__body"><span class="save-pal-card__name"><strong>${escapeHtml(pal.name)}</strong></span><small>Choisir comme cible</small></span></button>`).join("");
     }
@@ -254,16 +242,7 @@
   }
 
   function selectionSummary() {
-    if (state.calculation === "target") {
-      return `${targetPicker()}${passivesPanel()}<p class="save-forced-help">Vous pouvez imposer jusqu’à 2 Pals de départ. Sinon, le Cumoir choisit automatiquement les meilleurs Pals de votre sauvegarde.</p>`;
-    }
-    const a = roster.find((pal) => pal.id === state.parentA);
-    const b = roster.find((pal) => pal.id === state.parentB);
-    const card = (individual, slot, label) => {
-      const pal = individual && palInfo(individual.speciesId);
-      return `<div class="save-parent-card${selectionSlot === slot ? " save-parent-card--active" : ""}"><button type="button" class="save-parent-slot" data-save-slot="${slot}">${pal ? `<img src="${pal.portrait}" alt=""><span><small>${label}</small><strong>${escapeHtml(pal.name)}</strong><b>${sexSymbol(individual.sex)} · Niv. ${individual.level}</b></span>` : `<b>+</b><span><small>${label}</small><strong>Choisir un Pal</strong></span>`}</button>${pal ? `<button type="button" class="breeding-parent-remove" data-save-remove-parent="${slot}" aria-label="Retirer ${label}">×</button>` : ""}</div>`;
-    };
-    return `<div class="save-parent-slots">${card(a, "parentA", "Parent A")}${card(b, "parentB", "Parent B")}</div>${passivesPanel()}`;
+    return `${targetPicker()}${passivesPanel()}`;
   }
 
   function modalTemplates() {
@@ -319,7 +298,8 @@
   }
 
   function template() {
-    const graphMarkup = graphTemplate();
+    const activeGraph = treeResults[treeView];
+    const graphMarkup = calculating ? calculationStateTemplate() : treeView === "next" ? `<div class="breeding-canvas__empty"><span aria-hidden="true">⌁</span><p>Nouveau calcul : prêt pour la prochaine phase de développement.</p></div>` : graphTemplate(activeGraph);
     return `<section class="breeding-page breeding-page--save" aria-label="Cumoir avec sauvegarde">
       <header class="breeding-page__header"><p class="eyebrow">Planificateur d’élevage</p><p>Le Cumoir travaille avec les Pals réellement présents dans votre sauvegarde.</p></header>
       <div class="breeding-top-tools breeding-top-tools--save"><section class="save-source-panel" aria-label="Source et sauvegarde active">${sourceSwitch()}${activeWorld ? worldStatus() : ""}</section>${inheritanceNote()}</div>
@@ -329,20 +309,20 @@
       ${activeWorld ? `<div class="breeding-layout breeding-layout--save">
         <aside class="breeding-panel save-breeding-panel">
           <div class="breeding-panel__heading"><p class="eyebrow">Calcul</p><button type="button" class="breeding-reset" data-save-reset>Réinitialiser</button></div>
-          <div class="breeding-role" role="group" aria-label="Type de calcul"><button type="button" data-save-calculation="parents" aria-pressed="${state.calculation === "parents"}">Deux parents</button><button type="button" data-save-calculation="target" aria-pressed="${state.calculation === "target"}">Pal cible</button></div>
           ${selectionSummary()}
           <label class="breeding-search"><span class="pal-search__field"><input data-save-search type="search" placeholder="Rechercher un Pal…" aria-label="Rechercher un Pal" value="${escapeHtml(query)}" autocomplete="off" /><span aria-hidden="true">⌕</span></span></label>
           <div class="save-roster" data-save-roster>${rosterList()}</div>
         </aside>
-        <section class="breeding-canvas" data-save-viewport aria-label="Arbre généalogique interactif"><div class="breeding-canvas__tip">Molette : zoom · Cliquer-glisser : déplacer</div><div class="breeding-canvas__summary">${escapeHtml(graph?.summary || "Arbre généalogique")}</div>${graphMarkup}</section>
+        <section class="breeding-canvas" data-save-viewport aria-label="Arbre généalogique interactif"><div class="save-tree-tabs" role="tablist" aria-label="Version du calcul"><button type="button" role="tab" data-tree-view="legacy" aria-selected="${treeView === "legacy"}">Ancien calcul</button><button type="button" role="tab" data-tree-view="next" aria-selected="${treeView === "next"}">Nouveau calcul</button></div><div class="breeding-canvas__tip">Molette : zoom · Cliquer-glisser : déplacer</div><div class="breeding-canvas__summary">${escapeHtml(activeGraph?.summary || "Arbre généalogique")}</div>${graphMarkup}</section>
       </div>` : ""}
       ${modalTemplates()}
     </section>`;
   }
 
   function eggKind(palId) {
-    const element = palInfo(palId)?.elements?.[0] || "Neutre";
-    return ({
+    const pal = palInfo(palId);
+    const element = pal?.elements?.[0] || "Neutre";
+    const [suffix, name] = ({
       Feu: ["fire_01", "Œuf brûlant"],
       Eau: ["water_01", "Œuf humide"],
       Ténèbres: ["dark_01", "Œuf sombre"],
@@ -353,6 +333,13 @@
       Plante: ["leaf_01", "Œuf verdoyant"],
       Neutre: ["", "Œuf commun"],
     })[element] || ["", "Œuf commun"];
+    const size = window.PAL_EGG_SIZES?.[pal?.id] || "regular";
+    const sizeLabel = size === "giant" ? "taille géante" : size === "large" ? "grande taille" : "taille normale";
+    return [suffix, `${name} · ${sizeLabel}`];
+  }
+
+  function calculationStateTemplate() {
+    return `<div class="save-calculating" role="status"><span aria-hidden="true"></span><strong>Calcul en cours…</strong></div>`;
   }
 
   function treeToGraph(root) {
@@ -384,9 +371,9 @@
     return { nodes, families, nodeWidth, nodeHeight, width: Math.max(560, leafCursor * horizontalStep + 128), height: maxDepth * verticalStep + nodeHeight + 84 };
   }
 
-  function graphTemplate() {
-    if (!graph?.root) return `<div class="breeding-canvas__empty"><span aria-hidden="true">⌁</span><p>${escapeHtml(graph?.error || (state.calculation === "target" ? "Choisissez un Pal cible pour calculer une route." : "Choisissez deux individus de votre sauvegarde."))}</p></div>`;
-    const layout = treeToGraph(graph.root);
+  function graphTemplate(result) {
+    if (!result?.root) return `<div class="breeding-canvas__empty"><span aria-hidden="true">⌁</span><p>${escapeHtml(result?.error || "Choisissez un Pal cible pour calculer une route.")}</p></div>`;
+    const layout = treeToGraph(result.root);
     const nodeByKey = new Map(layout.nodes.map((entry) => [entry.key, entry]));
     const requiredSexByKey = new Map();
     layout.families.forEach(({ parents, child }) => {
@@ -423,7 +410,7 @@
     }).join("");
     const nodes = layout.nodes.map(({ key, node, x, y }) => {
       const pal = palInfo(node.speciesId); if (!pal) return "";
-      const final = node === graph.root;
+      const final = node === result.root;
       const requiredSex = requiredSexByKey.get(key);
       const useful = state.selectedPassives.filter((id) => (node.mask & (1 << state.selectedPassives.indexOf(id))) !== 0);
       const [eggSuffix, eggName] = eggKind(node.speciesId);
@@ -478,9 +465,7 @@
     const target = palInfo(state.target);
     if (!target) return { error: "Choisissez un Pal cible pour calculer une route." };
     const fullMask = (1 << state.selectedPassives.length) - 1;
-    const forcedBits = new Map(state.forced.map((id, index) => [id, 1 << index]));
-    const allForced = (1 << state.forced.length) - 1;
-    const existing = roster.filter((individual) => individual.speciesId.toLowerCase() === target.id.toLowerCase() && (maskFor(individual) & fullMask) === fullMask && (!state.forced.length || state.forced.every((id) => id === individual.id)));
+    const existing = roster.filter((individual) => individual.speciesId.toLowerCase() === target.id.toLowerCase() && (maskFor(individual) & fullMask) === fullMask);
     if (existing.length) {
       const individual = existing.sort((a, b) => a.passives.length - b.passives.length || b.level - a.level)[0];
       return { summary: "Déjà présent dans votre sauvegarde", root: { speciesId: target.id, mask: fullMask, owned: true, sex: individual.sex, individualId: individual.id } };
@@ -489,7 +474,6 @@
     const seeds = roster.map((individual) => ({
       speciesId: palInfo(individual.speciesId)?.id,
       mask: maskFor(individual),
-      forcedMask: forcedBits.get(individual.id) || 0,
       generation: 0,
       newCount: 0,
       parasites: individual.passives.filter((id) => !state.selectedPassives.includes(id)).length,
@@ -501,7 +485,7 @@
 
     const best = new Map();
     const accept = (item) => {
-      const key = `${item.speciesId}|${item.mask}|${item.forcedMask}`;
+      const key = `${item.speciesId}|${item.mask}`;
       const previous = best.get(key);
       if (!previous || stateScore(item) < stateScore(previous)) { best.set(key, item); return true; }
       return false;
@@ -520,7 +504,6 @@
           const item = {
             speciesId: child,
             mask: a.mask | b.mask,
-            forcedMask: a.forcedMask | b.forcedMask,
             generation: Math.max(a.generation, b.generation) + 1,
             newCount: a.newCount + b.newCount + 1,
             parasites: a.parasites + b.parasites,
@@ -529,7 +512,7 @@
             parents: [a, b],
           };
           if (accept(item)) next.push(item);
-          if (child.toLowerCase() === target.id.toLowerCase() && item.mask === fullMask && item.forcedMask === allForced) {
+          if (child.toLowerCase() === target.id.toLowerCase() && item.mask === fullMask) {
             if (!answer || stateScore(item) < stateScore(answer)) answer = item;
           }
         }
@@ -540,24 +523,10 @@
     return answer ? { summary: `${answer.generation} génération${answer.generation > 1 ? "s" : ""} · ${answer.newCount} Pal${answer.newCount > 1 ? "s" : ""} à obtenir`, root: answer } : { error: "Aucune route valide trouvée avec cette sauvegarde." };
   }
 
-  function solveDirect() {
-    const a = roster.find((pal) => pal.id === state.parentA);
-    const b = roster.find((pal) => pal.id === state.parentB);
-    if (!a || !b) return { error: "Choisissez deux individus de votre sauvegarde." };
-    if (a.sex !== "Unknown" && b.sex !== "Unknown" && a.sex === b.sex) return { error: "Un couple doit comporter un Pal mâle et un Pal femelle." };
-    const child = childFor(a.speciesId, b.speciesId, a.sex, b.sex);
-    if (!child) return { error: "Aucun croisement valide pour ces deux individus." };
-    const selectedMask = maskFor(a) | maskFor(b);
-    return { summary: "Croisement direct", root: { speciesId: child, mask: selectedMask, owned: false, parents: [
-      { speciesId: palInfo(a.speciesId).id, mask: maskFor(a), owned: true, sex: a.sex, individualId: a.id },
-      { speciesId: palInfo(b.speciesId).id, mask: maskFor(b), owned: true, sex: b.sex, individualId: b.id },
-    ] } };
-  }
-
   function scheduleSolve(immediate = false) {
     clearTimeout(solveTimer);
     const run = () => {
-      graph = activeWorld ? (state.calculation === "target" ? solveTarget() : solveDirect()) : null;
+      treeResults.legacy = activeWorld ? solveTarget() : null;
       render(true);
     };
     solveTimer = setTimeout(run, immediate ? 0 : 80);
@@ -631,8 +600,6 @@
     const previousGoal = replacingSameWorld ? {
       target: state.target,
       selectedPassives: [...state.selectedPassives],
-      forced: [...state.forced],
-      calculation: state.calculation,
     } : null;
     parsing = true; error = ""; progress = "Préparation de la sauvegarde…"; worldModalOpen = false; render();
     try {
@@ -651,12 +618,9 @@
         roster = data.result.roster.filter((individual) => palInfo(individual.speciesId));
         activeWorld = { label: world.metadata?.name || world.label, path: world.path, modified: world.modified, players: data.result.players, parseMs: data.result.parseMs, warnings: data.result.warnings };
         allAvailable.clear(); roster.forEach((pal) => pal.passives.forEach((id) => allAvailable.add(id)));
-        state.parentA = null; state.parentB = null;
         state.target = previousGoal?.target || null;
         state.selectedPassives = previousGoal ? previousGoal.selectedPassives.filter((id) => allAvailable.has(id)).slice(0, 4) : [];
-        state.forced = previousGoal ? previousGoal.forced.filter((id) => roster.some((pal) => pal.id === id)).slice(0, 2) : [];
-        state.calculation = previousGoal?.calculation || "parents";
-        graph = null; selectionSlot = "parentA"; query = "";
+        treeResults.legacy = null; treeResults.next = null; pickingTarget = false; query = "";
         parsing = false; progress = ""; saveState();
         await dbPut({ activeWorld, roster }).catch((dbError) => console.error("Échec de la sauvegarde locale du roster :", dbError));
         scheduleSolve(true);
@@ -671,8 +635,8 @@
   }
 
   async function removeSave() {
-    await dbDelete(); roster = []; activeWorld = null; allAvailable.clear(); graph = null; error = "";
-    Object.assign(state, { parentA: null, parentB: null, target: null, selectedPassives: [], forced: [] }); saveState(); render();
+    await dbDelete(); roster = []; activeWorld = null; allAvailable.clear(); treeResults.legacy = null; treeResults.next = null; error = "";
+    Object.assign(state, { target: null, selectedPassives: [] }); saveState(); render();
   }
 
   function handleClick(event) {
@@ -700,25 +664,12 @@
       return;
     }
     if (event.target.closest("[data-delete-save]")) { void removeSave(); return; }
-    const calculation = event.target.closest("[data-save-calculation]");
-    if (calculation) { state.calculation = calculation.dataset.saveCalculation; state.parentA = null; state.parentB = null; state.forced = []; selectionSlot = "parentA"; saveState(); scheduleSolve(true); return; }
-    const removeParent = event.target.closest("[data-save-remove-parent]");
-    if (removeParent) { const slot = removeParent.dataset.saveRemoveParent; state[slot] = null; selectionSlot = slot; graph = null; saveState(); scheduleSolve(true); return; }
-    const slot = event.target.closest("[data-save-slot]"); if (slot) { selectionSlot = slot.dataset.saveSlot; render(false); return; }
-    const palButton = event.target.closest("[data-save-pal]");
-    if (palButton) {
-      const id = palButton.dataset.savePal;
-      if (state.calculation === "parents") {
-        state[selectionSlot] = id; selectionSlot = selectionSlot === "parentA" ? "parentB" : "parentA";
-      } else {
-        state.forced = state.forced.includes(id) ? state.forced.filter((entry) => entry !== id) : state.forced.length < 2 ? [...state.forced, id] : [state.forced[1], id];
-      }
-      saveState(); scheduleSolve(); return;
-    }
+    const treeTab = event.target.closest("[data-tree-view]");
+    if (treeTab) { treeView = treeTab.dataset.treeView; render(true); return; }
     const targetButton = event.target.closest("[data-save-target]");
     if (targetButton) {
       state.target = targetButton.dataset.saveTarget;
-      selectionSlot = null;
+      pickingTarget = false;
       query = "";
       saveState(); scheduleSolve(true); return;
     }
@@ -735,8 +686,8 @@
     const worldChoice = event.target.closest("[data-world-index]"); if (worldChoice) { selectedWorldIndex = Number(worldChoice.dataset.worldIndex); render(false); return; }
     if (event.target.closest("[data-import-world]")) { const world = pendingWorlds[selectedWorldIndex]; if (world) void parseWorld(world); return; }
     if (event.target.matches(".save-modal-backdrop[data-close-world-modal]") || event.target.closest("button[data-close-world-modal]")) { worldModalOpen = false; render(false); return; }
-    if (event.target.closest("[data-save-reset]")) { Object.assign(state, { parentA: null, parentB: null, target: null, selectedPassives: [], forced: [] }); graph = null; saveState(); render(); return; }
-    if (event.target.closest("[data-open-target]")) { selectionSlot = "target"; query = ""; render(false); content.querySelector("[data-save-search]")?.focus(); }
+    if (event.target.closest("[data-save-reset]")) { Object.assign(state, { target: null, selectedPassives: [] }); treeResults.legacy = null; treeResults.next = null; saveState(); render(); return; }
+    if (event.target.closest("[data-open-target]")) { pickingTarget = true; query = ""; render(false); content.querySelector("[data-save-search]")?.focus(); }
   }
 
   function handleInput(event) {
@@ -804,7 +755,6 @@
     if (!saved?.activeWorld || !Array.isArray(saved.roster)) return;
     activeWorld = saved.activeWorld; roster = saved.roster;
     allAvailable.clear(); roster.forEach((pal) => pal.passives.forEach((id) => allAvailable.add(id)));
-    state.forced = state.forced.filter((id) => roster.some((pal) => pal.id === id));
     if (mode === "save") scheduleSolve(true);
   }).catch(() => {});
 
@@ -813,20 +763,24 @@
     sourceSwitch,
     template,
     render,
+    setCalculating(value) { calculating = Boolean(value); render(false); },
+    setTreeResult(kind, result) {
+      if (!(kind in treeResults)) return;
+      treeResults[kind] = result;
+      if (treeView === kind) render(true);
+    },
     __test: {
       loadRoster(items) {
         roster = items;
         activeWorld = { label: "Fixture", players: [] };
         allAvailable.clear(); roster.forEach((pal) => pal.passives.forEach((id) => allAvailable.add(id)));
       },
-      setTarget(target, selectedPassives = [], forced = []) {
-        state.calculation = "target";
+      setTarget(target, selectedPassives = []) {
         state.target = target;
         state.selectedPassives = selectedPassives;
-        state.forced = forced;
       },
       solveTarget,
-      solveDirect,
+      eggKind,
       childFor,
     },
   };

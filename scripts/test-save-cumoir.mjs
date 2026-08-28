@@ -24,7 +24,7 @@ const context = vm.createContext({
   window: {},
 });
 context.window = context;
-for (const file of ["js/condensation-data.js", "js/breeding-data.js", "js/passive-data.js", "js/save-cumoir.js"]) {
+for (const file of ["js/condensation-data.js", "js/egg-size-data.js", "js/breeding-data.js", "js/passive-data.js", "js/save-cumoir.js"]) {
   vm.runInContext(fs.readFileSync(new URL(`../${file}`, import.meta.url), "utf8"), context, { filename: file });
 }
 
@@ -49,14 +49,13 @@ for (let count = 0; count <= 4; count += 1) {
   if (!result.root && !result.error) throw new Error(`Solver returned neither a plan nor an explicit error (${count} passives).`);
   solveChecks.push({ count, solved: Boolean(result.root), result: result.summary || result.error });
 }
-const forced = normalized.filter((pal) => pal.sex !== "Unknown").slice(0, 2).map((pal) => pal.id);
-api.setTarget(target, objectives.slice(0, 2), forced);
-const forcedResult = api.solveTarget();
-if (!forcedResult.root && !forcedResult.error) throw new Error("Forced-source solver returned no result.");
 const male = normalized.find((pal) => pal.sex === "Male");
 const female = normalized.find((pal) => pal.sex === "Female");
 const directResult = male && female ? api.childFor(male.speciesId, female.speciesId) : null;
 if (!directResult) throw new Error("Direct breeding lookup failed for imported individuals.");
+if (api.eggKind("Anubis")[1] !== "Œuf rocailleux · taille géante") throw new Error("Anubis egg tooltip is incorrect.");
+if (!api.eggKind("CaptainPenguin")[1].endsWith("grande taille")) throw new Error("Large egg tooltip is incorrect.");
+if (!api.eggKind("SheepBall")[1].endsWith("taille normale")) throw new Error("Regular egg tooltip is incorrect.");
 
 const duplicateSpecies = Object.values(Object.groupBy(normalized, (pal) => pal.speciesId)).filter((group) => group.length > 1).length;
 console.log(JSON.stringify({
@@ -67,6 +66,10 @@ console.log(JSON.stringify({
   fourPassives: normalized.filter((pal) => pal.passives.length === 4).length,
   objectives,
   solveChecks,
-  forcedSources: { count: forced.length, solved: Boolean(forcedResult.root), result: forcedResult.summary || forcedResult.error },
   directChild: directResult,
+  eggTooltips: {
+    anubis: api.eggKind("Anubis")[1],
+    penking: api.eggKind("CaptainPenguin")[1],
+    lamball: api.eggKind("SheepBall")[1],
+  },
 }));
