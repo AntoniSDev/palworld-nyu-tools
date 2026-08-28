@@ -230,6 +230,7 @@
     return `<div class="save-target-picker">
       <span class="eyebrow">Pal cible</span>
       <button type="button" data-open-target>${target ? `<img src="${target.portrait}" alt="" /><strong>${escapeHtml(target.name)}</strong>` : `<b>+</b><strong>Choisir une espèce</strong>`}</button>
+      ${target ? `<button type="button" class="breeding-parent-remove" data-clear-save-target aria-label="Retirer ${escapeHtml(target.name)}">×</button>` : ""}
     </div>`;
   }
 
@@ -308,7 +309,6 @@
       ${error ? `<div class="save-error">${escapeHtml(error)}</div>` : ""}
       ${activeWorld ? `<div class="breeding-layout breeding-layout--save">
         <aside class="breeding-panel save-breeding-panel">
-          <div class="breeding-panel__heading"><p class="eyebrow">Calcul</p><button type="button" class="breeding-reset" data-save-reset>Réinitialiser</button></div>
           ${selectionSummary()}
           <label class="breeding-search"><span class="pal-search__field"><input data-save-search type="search" placeholder="Rechercher un Pal…" aria-label="Rechercher un Pal" value="${escapeHtml(query)}" autocomplete="off" /><span aria-hidden="true">⌕</span></span></label>
           <div class="save-roster" data-save-roster>${rosterList()}</div>
@@ -686,7 +686,7 @@
     const worldChoice = event.target.closest("[data-world-index]"); if (worldChoice) { selectedWorldIndex = Number(worldChoice.dataset.worldIndex); render(false); return; }
     if (event.target.closest("[data-import-world]")) { const world = pendingWorlds[selectedWorldIndex]; if (world) void parseWorld(world); return; }
     if (event.target.matches(".save-modal-backdrop[data-close-world-modal]") || event.target.closest("button[data-close-world-modal]")) { worldModalOpen = false; render(false); return; }
-    if (event.target.closest("[data-save-reset]")) { Object.assign(state, { target: null, selectedPassives: [] }); treeResults.legacy = null; treeResults.next = null; saveState(); render(); return; }
+    if (event.target.closest("[data-clear-save-target]")) { state.target = null; treeResults.legacy = null; treeResults.next = null; saveState(); scheduleSolve(true); return; }
     if (event.target.closest("[data-open-target]")) { pickingTarget = true; query = ""; render(false); content.querySelector("[data-save-search]")?.focus(); }
   }
 

@@ -1973,10 +1973,11 @@ body[data-view="breeding"] footer { margin-top: 18px; }
 @keyframes save-spin { to { transform: rotate(360deg); } }
 .breeding-layout--save { grid-template-columns: minmax(310px, 370px) minmax(0, 1fr); }
 .save-breeding-panel { height: calc(100vh - 238px); min-height: 650px; }
-.save-target-picker { display: grid; gap: 5px; }
-.save-target-picker > button { display: flex; min-height: 62px; align-items: center; gap: 9px; padding: 7px 10px; border: 1px solid rgba(104, 218, 220, .28); border-radius: 9px; background: rgba(6, 35, 44, .73); color: #e9fbfa; cursor: pointer; font: inherit; }
+.save-target-picker { position: relative; display: grid; gap: 5px; }
+.save-target-picker > button[data-open-target] { display: flex; min-height: 62px; align-items: center; gap: 9px; padding: 7px 38px 7px 10px; border: 1px solid rgba(104, 218, 220, .28); border-radius: 9px; background: rgba(6, 35, 44, .73); color: #e9fbfa; cursor: pointer; font: inherit; }
 .save-target-picker img { width: 50px; height: 50px; object-fit: contain; }
 .save-target-picker b { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 50%; background: rgba(94, 207, 209, .12); }
+.save-target-picker > .breeding-parent-remove { top: 25px; }
 .save-passive-goal { display: grid; gap: 8px; margin-top: 12px; }
 .save-passive-goal > div:first-child { display: flex; align-items: center; justify-content: space-between; }
 .save-passive-goal > div:first-child small { color: #75a4a9; font-size: .62rem; }
