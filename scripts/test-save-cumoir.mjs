@@ -36,6 +36,9 @@ const normalized = parsed.pals.map((pal) => ({
   passives: Array.isArray(pal.passives) ? pal.passives.slice(0, 4) : [],
 }));
 const api = context.SaveCumoir.__test;
+const emptyTemplate = context.SaveCumoir.template();
+if (emptyTemplate.includes("Source des Pals") || emptyTemplate.includes("Transmission des passifs")) throw new Error("Empty save UI still exposes removed Cumoir blocks.");
+if (!(emptyTemplate.indexOf("SaveGames") < emptyTemplate.indexOf("Importer une sauvegarde"))) throw new Error("Import instructions are not ordered correctly.");
 api.loadRoster(normalized);
 
 const target = context.BREEDING_DATA.pals.find(([id]) => id === "Anubis")?.[0];

@@ -2,7 +2,6 @@
 (() => {
   "use strict";
 
-  const MODE_KEY = "palworld-nyu-tools:cumoir-source";
   const STATE_KEY = "palworld-nyu-tools:cumoir-save-state-v1";
   const DB_NAME = "palworld-nyu-tools";
   const DB_STORE = "cumoir-save";
@@ -16,7 +15,6 @@
   const condensationByCode = new Map(condensation.map((pal) => [String(pal.code).toLowerCase(), pal]));
   const allAvailable = new Set();
 
-  let mode = localStorage.getItem(MODE_KEY) === "save" ? "save" : "manual";
   let roster = [];
   let activeWorld = null;
   let pendingWorlds = [];
@@ -24,11 +22,11 @@
   let progress = "";
   let error = "";
   let query = "";
+  let targetQuery = "";
   let passiveQuery = "";
   let passiveModalOpen = false;
   let worldModalOpen = false;
   let selectedWorldIndex = 0;
-  let pickingTarget = false;
   let solveTimer = 0;
   let treeView = "legacy";
   let calculating = false;
@@ -147,18 +145,6 @@
     }).finally(() => db.close());
   }
 
-  function persistMode(next) {
-    mode = next;
-    localStorage.setItem(MODE_KEY, next);
-  }
-
-  function sourceSwitch() {
-    return `<div class="breeding-source" role="group" aria-label="Source des Pals">
-      <p class="eyebrow">Source des Pals</p>
-      <div><button type="button" data-cumoir-source="manual" aria-pressed="${mode === "manual"}">Manuel</button><button type="button" data-cumoir-source="save" aria-pressed="${mode === "save"}">Sauvegarde</button></div>
-    </div>`;
-  }
-
   function inheritanceNote() {
     return `<aside class="breeding-inheritance" aria-label="Estimations communautaires de transmission des passifs" title="Estimations communautaires pour le tirage initial d’héritage, non publiées officiellement par Pocketpair.">
       <div><p class="eyebrow">Transmission des passifs</p><span>Estimations communautaires</span></div>
@@ -193,10 +179,6 @@
 
   function rosterList() {
     const search = normalize(query);
-    if (pickingTarget) {
-      const targets = species.filter((pal) => !search || normalize(pal.name).includes(search));
-      return targets.map((pal) => `<button type="button" class="save-pal-card save-target-card" data-save-target="${escapeHtml(pal.id)}"><img src="${escapeHtml(pal.portrait)}" alt="" loading="lazy" /><span class="save-pal-card__body"><span class="save-pal-card__name"><strong>${escapeHtml(pal.name)}</strong></span><small>Choisir comme cible</small></span></button>`).join("");
-    }
     const matches = currentRoster().filter((individual) => {
       const pal = palInfo(individual.speciesId);
       return pal && (!search || normalize(pal.name).includes(search));
@@ -208,10 +190,10 @@
     return `<div class="save-import-empty">
       <div class="save-import-empty__icon" aria-hidden="true">⇩</div>
       <strong>Importez votre sauvegarde Steam</strong>
-      <p>Tout est lu localement dans votre navigateur. Aucun fichier n’est envoyé.</p>
-      <button type="button" class="save-primary" data-import-save>Importer une sauvegarde</button>
       <div class="save-import-path"><code>%localappdata%\\Pal\\Saved\\SaveGames</code><button type="button" data-copy-save-path>Copier le chemin</button></div>
-      <ol><li>Ouvrez le sélecteur.</li><li>Collez ce chemin dans la barre d’adresse.</li><li>Sélectionnez le dossier <code>SaveGames</code>, puis votre monde.</li></ol>
+      <ol><li>Ouvrez le sélecteur.</li><li>Collez le chemin.</li><li>Sélectionnez le dossier <code>SaveGames</code>, puis votre monde.</li></ol>
+      <button type="button" class="save-primary" data-import-save>Importer une sauvegarde</button>
+      <p>Lecture locale : aucun fichier n’est envoyé.</p>
       <input class="save-file-input" data-save-directory type="file" webkitdirectory directory multiple />
     </div>`;
   }
@@ -219,7 +201,7 @@
   function worldStatus() {
     const player = activeWorld?.players?.[0];
     return `<div class="save-world-status">
-      <div><small>Sauvegarde active</small><strong>${escapeHtml(activeWorld?.label || "Monde Palworld")}</strong><span>${player ? `${escapeHtml(player.name)} · niveau ${player.level} · ` : ""}${roster.length.toLocaleString("fr-FR")} Pals</span></div>
+      <div><small>Sauvegarde active</small><strong>${escapeHtml(activeWorld?.label || "Monde Palworld")}</strong><span class="save-world-status__details">${player ? `<b>${escapeHtml(player.name)}</b><i>Niveau ${player.level}</i>` : ""}<i>${roster.length.toLocaleString("fr-FR")} Pals détectés</i></span></div>
       <div><button type="button" data-import-save>Mettre à jour</button><button type="button" class="save-danger" data-delete-save>Supprimer</button></div>
       <input class="save-file-input" data-save-directory type="file" webkitdirectory directory multiple />
     </div>`;
@@ -229,9 +211,15 @@
     const target = palInfo(state.target);
     return `<div class="save-target-picker">
       <span class="eyebrow">Pal cible</span>
-      <button type="button" data-open-target>${target ? `<img src="${target.portrait}" alt="" /><strong>${escapeHtml(target.name)}</strong>` : `<b>+</b><strong>Choisir une espèce</strong>`}</button>
-      ${target ? `<button type="button" class="breeding-parent-remove" data-clear-save-target aria-label="Retirer ${escapeHtml(target.name)}">×</button>` : ""}
+      ${target ? `<div class="save-target-selected"><img src="${target.portrait}" alt="" /><strong>${escapeHtml(target.name)}</strong><button type="button" class="breeding-parent-remove" data-clear-save-target aria-label="Retirer ${escapeHtml(target.name)}">×</button></div>` : `<label class="save-target-search"><span class="pal-search__field"><input data-target-search type="search" placeholder="Rechercher un Pal cible…" aria-label="Rechercher un Pal cible" value="${escapeHtml(targetQuery)}" autocomplete="off" /><span aria-hidden="true">⌕</span></span></label><div class="save-target-results" data-target-results>${targetResults()}</div>`}
     </div>`;
+  }
+
+  function targetResults() {
+    const search = normalize(targetQuery);
+    if (search.length < 2) return search ? `<p>Saisissez au moins 2 caractères.</p>` : "";
+    const targets = species.filter((pal) => normalize(pal.name).includes(search)).slice(0, 24);
+    return targets.length ? targets.map((pal) => `<button type="button" data-save-target="${escapeHtml(pal.id)}"><img src="${escapeHtml(pal.portrait)}" alt="" loading="lazy" /><span>${escapeHtml(pal.name)}</span></button>`).join("") : `<p>Aucun Pal trouvé.</p>`;
   }
 
   function passivesPanel() {
@@ -300,17 +288,17 @@
 
   function template() {
     const activeGraph = treeResults[treeView];
-    const graphMarkup = calculating ? calculationStateTemplate() : treeView === "next" ? `<div class="breeding-canvas__empty"><span aria-hidden="true">⌁</span><p>Nouveau calcul : prêt pour la prochaine phase de développement.</p></div>` : graphTemplate(activeGraph);
+    const graphMarkup = calculating ? calculationStateTemplate() : treeView === "next" ? emptyGraphTemplate("Nouveau calcul : prêt pour la prochaine phase de développement.") : graphTemplate(activeGraph);
     return `<section class="breeding-page breeding-page--save" aria-label="Cumoir avec sauvegarde">
       <header class="breeding-page__header"><p class="eyebrow">Planificateur d’élevage</p><p>Le Cumoir travaille avec les Pals réellement présents dans votre sauvegarde.</p></header>
-      <div class="breeding-top-tools breeding-top-tools--save"><section class="save-source-panel" aria-label="Source et sauvegarde active">${sourceSwitch()}${activeWorld ? worldStatus() : ""}</section>${inheritanceNote()}</div>
+      ${activeWorld ? `<div class="breeding-top-tools breeding-top-tools--save"><section class="save-source-panel" aria-label="Sauvegarde active">${worldStatus()}</section>${inheritanceNote()}</div>` : ""}
       ${activeWorld ? "" : importEmpty()}
       ${parsing ? `<div class="save-progress"><span></span>${escapeHtml(progress || "Lecture de la sauvegarde…")}</div>` : ""}
       ${error ? `<div class="save-error">${escapeHtml(error)}</div>` : ""}
       ${activeWorld ? `<div class="breeding-layout breeding-layout--save">
         <aside class="breeding-panel save-breeding-panel">
           ${selectionSummary()}
-          <label class="breeding-search"><span class="pal-search__field"><input data-save-search type="search" placeholder="Rechercher un Pal…" aria-label="Rechercher un Pal" value="${escapeHtml(query)}" autocomplete="off" /><span aria-hidden="true">⌕</span></span></label>
+          <label class="breeding-search"><span class="pal-search__field"><input data-save-search type="search" placeholder="Rechercher dans mes Pals…" aria-label="Rechercher dans mes Pals" value="${escapeHtml(query)}" autocomplete="off" /><span aria-hidden="true">⌕</span></span></label>
           <div class="save-roster" data-save-roster>${rosterList()}</div>
         </aside>
         <section class="breeding-canvas" data-save-viewport aria-label="Arbre généalogique interactif"><div class="save-tree-tabs" role="tablist" aria-label="Version du calcul"><button type="button" role="tab" data-tree-view="legacy" aria-selected="${treeView === "legacy"}">Ancien calcul</button><button type="button" role="tab" data-tree-view="next" aria-selected="${treeView === "next"}">Nouveau calcul</button></div><div class="breeding-canvas__tip">Molette : zoom · Cliquer-glisser : déplacer</div><div class="breeding-canvas__summary">${escapeHtml(activeGraph?.summary || "Arbre généalogique")}</div>${graphMarkup}</section>
@@ -340,6 +328,10 @@
 
   function calculationStateTemplate() {
     return `<div class="save-calculating" role="status"><span aria-hidden="true"></span><strong>Calcul en cours…</strong></div>`;
+  }
+
+  function emptyGraphTemplate(message) {
+    return `<div class="breeding-canvas__empty"><img src="assets/ui/gerard-empty.webp" alt="" /><p>${escapeHtml(message)}</p></div>`;
   }
 
   function treeToGraph(root) {
@@ -372,7 +364,7 @@
   }
 
   function graphTemplate(result) {
-    if (!result?.root) return `<div class="breeding-canvas__empty"><span aria-hidden="true">⌁</span><p>${escapeHtml(result?.error || "Choisissez un Pal cible pour calculer une route.")}</p></div>`;
+    if (!result?.root) return emptyGraphTemplate(result?.error || "Choisissez un Pal cible pour calculer une route.");
     const layout = treeToGraph(result.root);
     const nodeByKey = new Map(layout.nodes.map((entry) => [entry.key, entry]));
     const requiredSexByKey = new Map();
@@ -533,7 +525,7 @@
   }
 
   function render(fit = true) {
-    if (mode !== "save" || !content || document.querySelector("#breeding-view")?.classList.contains("active") !== true) return;
+    if (!content || document.querySelector("#breeding-view")?.classList.contains("active") !== true) return;
     content.innerHTML = template();
     bindCanvas(fit);
     const search = content.querySelector("[data-passive-search]");
@@ -620,7 +612,7 @@
         allAvailable.clear(); roster.forEach((pal) => pal.passives.forEach((id) => allAvailable.add(id)));
         state.target = previousGoal?.target || null;
         state.selectedPassives = previousGoal ? previousGoal.selectedPassives.filter((id) => allAvailable.has(id)).slice(0, 4) : [];
-        treeResults.legacy = null; treeResults.next = null; pickingTarget = false; query = "";
+        treeResults.legacy = null; treeResults.next = null; targetQuery = ""; query = "";
         parsing = false; progress = ""; saveState();
         await dbPut({ activeWorld, roster }).catch((dbError) => console.error("Échec de la sauvegarde locale du roster :", dbError));
         scheduleSolve(true);
@@ -640,13 +632,7 @@
   }
 
   function handleClick(event) {
-    const source = event.target.closest("[data-cumoir-source]");
-    if (source) {
-      persistMode(source.dataset.cumoirSource);
-      if (mode === "manual") window.renderBreedingPage?.(); else scheduleSolve(true);
-      return;
-    }
-    if (mode !== "save" || !event.target.closest(".breeding-page--save")) return;
+    if (!event.target.closest(".breeding-page--save")) return;
     if (event.target.closest("[data-import-save]")) { content.querySelector("[data-save-directory]")?.click(); return; }
     if (event.target.closest("[data-copy-save-path]")) {
       const path = "%localappdata%\\Pal\\Saved\\SaveGames";
@@ -669,8 +655,7 @@
     const targetButton = event.target.closest("[data-save-target]");
     if (targetButton) {
       state.target = targetButton.dataset.saveTarget;
-      pickingTarget = false;
-      query = "";
+      targetQuery = "";
       saveState(); scheduleSolve(true); return;
     }
     if (event.target.closest("[data-open-passives]")) { passiveModalOpen = true; passiveQuery = ""; render(false); return; }
@@ -687,12 +672,11 @@
     if (event.target.closest("[data-import-world]")) { const world = pendingWorlds[selectedWorldIndex]; if (world) void parseWorld(world); return; }
     if (event.target.matches(".save-modal-backdrop[data-close-world-modal]") || event.target.closest("button[data-close-world-modal]")) { worldModalOpen = false; render(false); return; }
     if (event.target.closest("[data-clear-save-target]")) { state.target = null; treeResults.legacy = null; treeResults.next = null; saveState(); scheduleSolve(true); return; }
-    if (event.target.closest("[data-open-target]")) { pickingTarget = true; query = ""; render(false); content.querySelector("[data-save-search]")?.focus(); }
   }
 
   function handleInput(event) {
-    if (mode !== "save") return;
     if (event.target.matches("[data-save-search]")) { query = event.target.value; const rosterElement = content.querySelector("[data-save-roster]"); if (rosterElement) rosterElement.innerHTML = rosterList(); }
+    if (event.target.matches("[data-target-search]")) { targetQuery = event.target.value; const results = content.querySelector("[data-target-results]"); if (results) results.innerHTML = targetResults(); }
     if (event.target.matches("[data-passive-search]")) { passiveQuery = event.target.value; render(false); }
   }
 
@@ -746,7 +730,7 @@
   document.addEventListener("focusin", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-egg-tooltip]"); if (target) showTooltip(target); });
   document.addEventListener("focusout", (event) => { if (event.target.closest("[data-passive-tooltip], [data-egg-tooltip]")) hideTooltip(); });
   document.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape" || mode !== "save") return;
+    if (event.key !== "Escape") return;
     if (passiveModalOpen) { passiveModalOpen = false; render(false); }
     else if (worldModalOpen) { worldModalOpen = false; render(false); }
   });
@@ -755,12 +739,10 @@
     if (!saved?.activeWorld || !Array.isArray(saved.roster)) return;
     activeWorld = saved.activeWorld; roster = saved.roster;
     allAvailable.clear(); roster.forEach((pal) => pal.passives.forEach((id) => allAvailable.add(id)));
-    if (mode === "save") scheduleSolve(true);
+    scheduleSolve(true);
   }).catch(() => {});
 
   window.SaveCumoir = {
-    isSaveMode: () => mode === "save",
-    sourceSwitch,
     template,
     render,
     setCalculating(value) { calculating = Boolean(value); render(false); },

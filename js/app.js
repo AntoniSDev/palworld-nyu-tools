@@ -1254,25 +1254,7 @@ function breedingPanelTemplate() {
 }
 
 function breedingTemplate() {
-  if (window.SaveCumoir?.isSaveMode?.()) return window.SaveCumoir.template();
-  const graph = buildBreedingGraph();
-  const emptyMessage = graph?.error || "Sélectionnez deux paramètres pour afficher l’arbre.";
-  return `<section class="breeding-page" aria-labelledby="breeding-title">
-    <header class="breeding-page__header"><p class="eyebrow" id="breeding-title">Planificateur d’élevage</p><p>Deux parents pour un enfant, ou un départ et une cible pour la route la plus courte.</p></header>
-    <div class="breeding-manual-tools breeding-top-tools">
-      ${window.SaveCumoir?.sourceSwitch?.() || `<div class="breeding-source" role="group" aria-label="Source des Pals"><p class="eyebrow">Source des Pals</p><div><button type="button" data-cumoir-source="manual" aria-pressed="true">Manuel</button><button type="button" data-cumoir-source="save" aria-pressed="false">Sauvegarde</button></div></div>`}
-    </div>
-    <div class="breeding-layout">
-      ${breedingPanelTemplate()}
-      <section class="breeding-canvas" data-breeding-viewport aria-label="Arbre généalogique interactif">
-        <div class="breeding-canvas__tip">Molette : zoom · Cliquer-glisser : déplacer</div>
-        <div class="breeding-canvas__summary">${graph?.summary ? escapeHtml(graph.summary) : "Arbre généalogique"}</div>
-        ${graph && !graph.error
-          ? `<div class="breeding-canvas__world" data-breeding-world>${breedingGraphTemplate(graph)}</div>`
-          : `<div class="breeding-canvas__empty"><span aria-hidden="true">⌁</span><p>${escapeHtml(emptyMessage)}</p></div>`}
-      </section>
-    </div>
-  </section>`;
+  return window.SaveCumoir?.template?.() || "";
 }
 
 function renderBreedingPickerResults() {
@@ -1349,16 +1331,7 @@ function bindBreedingCanvas() {
 }
 
 function renderBreedingPage(focusSearch = false, preserveCanvas = false) {
-  if (window.SaveCumoir?.isSaveMode?.()) {
-    window.SaveCumoir.render(!preserveCanvas);
-    return;
-  }
-  content.innerHTML = breedingTemplate();
-  renderBreedingPickerResults();
-  bindBreedingCanvas();
-  if (preserveCanvas && breedingCanvas.fitted) applyBreedingCanvasTransform();
-  else requestAnimationFrame(fitBreedingCanvas);
-  if (focusSearch) content.querySelector("#breeding-search-input")?.focus();
+  window.SaveCumoir?.render(!preserveCanvas);
 }
 
 window.renderBreedingPage = renderBreedingPage;
