@@ -331,7 +331,7 @@
           <div class="breeding-panel__heading"><p class="eyebrow">Calcul</p><button type="button" class="breeding-reset" data-save-reset>Réinitialiser</button></div>
           <div class="breeding-role" role="group" aria-label="Type de calcul"><button type="button" data-save-calculation="parents" aria-pressed="${state.calculation === "parents"}">Deux parents</button><button type="button" data-save-calculation="target" aria-pressed="${state.calculation === "target"}">Pal cible</button></div>
           ${selectionSummary()}
-          <label class="breeding-search"><span class="pal-search__field"><input data-save-search type="search" placeholder="Rechercher un Pal…" aria-label="Rechercher un Pal" value="${escapeHtml(query)}" autocomplete="off" /><i class="breeding-search__icon"></i></span></label>
+          <label class="breeding-search"><span class="pal-search__field"><input data-save-search type="search" placeholder="Rechercher un Pal…" aria-label="Rechercher un Pal" value="${escapeHtml(query)}" autocomplete="off" /><span aria-hidden="true">⌕</span></span></label>
           <div class="save-roster" data-save-roster>${rosterList()}</div>
         </aside>
         <section class="breeding-canvas" data-save-viewport aria-label="Arbre généalogique interactif"><div class="breeding-canvas__tip">Molette : zoom · Cliquer-glisser : déplacer</div><div class="breeding-canvas__summary">${escapeHtml(graph?.summary || "Arbre généalogique")}</div>${graphMarkup}</section>

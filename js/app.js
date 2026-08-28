@@ -916,9 +916,8 @@ function condensationTemplate() {
     <section class="condensation-simulator" aria-labelledby="condensation-title">
       <p id="condensation-title" class="info-section-copy">Recherchez un Pal et choisissez son niveau de condensation pour voir directement l’évolution de ses aptitudes de travail.</p>
       <div class="pal-search">
-        <label for="pal-search-input">Rechercher un Pal</label>
         <div class="pal-search__field">
-          <input id="pal-search-input" type="search" placeholder="Rechercher un Pal…" value="${escapeHtml(condensationQuery)}" autocomplete="off" spellcheck="false" />
+          <input id="pal-search-input" type="search" placeholder="Rechercher un Pal…" aria-label="Rechercher un Pal" value="${escapeHtml(condensationQuery)}" autocomplete="off" spellcheck="false" />
           <span aria-hidden="true">⌕</span>
         </div>
         <div class="pal-search__results" data-pal-search-results></div>
@@ -1248,7 +1247,7 @@ function breedingPanelTemplate() {
       ${breedingSelectedCard(secondSlot, breedingState.secondRole === "target" ? "Pal cible" : "Parent B", breedingState.secondRole === "target" ? null : "sexB")}
     </div>
     <label class="breeding-search" for="breeding-search-input">
-      <span class="pal-search__field"><input id="breeding-search-input" type="search" placeholder="Rechercher un Pal…" aria-label="Rechercher un Pal" value="${escapeHtml(breedingQuery)}" autocomplete="off" spellcheck="false" /><i class="breeding-search__icon" aria-hidden="true"></i></span>
+      <span class="pal-search__field"><input id="breeding-search-input" type="search" placeholder="Rechercher un Pal…" aria-label="Rechercher un Pal" value="${escapeHtml(breedingQuery)}" autocomplete="off" spellcheck="false" /><span aria-hidden="true">⌕</span></span>
     </label>
     <div class="breeding-picker__results" data-breeding-results></div>
   </aside>`;
