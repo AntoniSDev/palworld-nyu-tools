@@ -2175,3 +2175,96 @@ body[data-view="breeding"] .site-nav button { font-size: .92rem; font-weight: 70
 @media (prefers-reduced-motion: reduce) {
   .save-progress span { animation: none; }
 }
+
+/* v0.9 — dernière passe de finition du Cumoir */
+.site-nav button { min-height: 54px; font-size: 1rem; font-weight: 600; }
+
+.save-pal-card__name small { font-size: .82rem; font-weight: 600; }
+.save-pal-card__sex { min-width: 1.15em; font-size: 1.22rem; font-weight: 700; line-height: .9; }
+.save-pal-card__sex--male { color: #65d8ff; }
+.save-pal-card__sex--female { color: #ff8fbd; }
+
+.save-source-panel {
+  display: grid;
+  width: fit-content;
+  max-width: 100%;
+  grid-template-columns: minmax(480px, 560px);
+  gap: 0;
+  padding: 10px;
+  border: 1px solid rgba(103, 214, 216, .24);
+  border-radius: 11px;
+  background: linear-gradient(120deg, rgba(7, 48, 58, .74), rgba(22, 32, 55, .7));
+}
+.save-source-panel > .breeding-source {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 0 0 9px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.save-source-panel > .save-world-status {
+  width: auto;
+  max-width: none;
+  padding: 10px 3px 2px;
+  border: 0;
+  border-top: 1px solid rgba(105, 214, 216, .18);
+  border-radius: 0;
+  background: transparent;
+}
+.save-source-panel .save-world-status small { font-size: .68rem; }
+.save-source-panel .save-world-status strong { font-size: .88rem; }
+.save-source-panel .save-world-status span { font-size: .75rem; }
+.save-source-panel .save-world-status button { min-height: 32px; }
+
+.save-passive-goal__chips { gap: 7px; min-height: 32px; }
+.save-passive-goal__chips .save-passive { min-height: 34px; padding: 6px 32px 6px 7px; }
+.save-passive button {
+  top: 50%;
+  right: 5px;
+  width: 22px;
+  height: 22px;
+  border-color: transparent;
+  background: transparent;
+  transform: translateY(-50%);
+}
+.save-passive button:hover { border-color: rgba(240, 120, 143, .55); background: rgba(90, 33, 48, .72); }
+
+.save-tree-node .breeding-node__sex {
+  display: inline-grid;
+  width: 1.1em;
+  margin-top: 2px;
+  place-items: center;
+  font-family: "Nunito Sans", sans-serif;
+  font-size: 1.18rem;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: none;
+}
+.breeding-node__sex--male { color: #65d8ff; }
+.breeding-node__sex--female { color: #ff8fbd; }
+
+.save-egg { top: -17px; right: -13px; width: 45px; height: 45px; }
+.save-egg img { width: 41px; height: 41px; }
+
+.save-tree-node--final {
+  border: 1px solid rgba(239, 205, 137, .86);
+  background: linear-gradient(140deg, rgba(15, 68, 74, .98), rgba(49, 40, 78, .98));
+  box-shadow: 0 14px 30px rgba(0, 8, 14, .34), 0 0 14px rgba(229, 199, 135, .1);
+  animation: final-pal-breathe 7s ease-in-out infinite;
+}
+.save-tree-node--final::after { inset: 4px; border: 1px solid rgba(239, 210, 151, .2); }
+@keyframes final-pal-breathe {
+  0%, 100% { border-color: rgba(239, 205, 137, .76); box-shadow: 0 14px 30px rgba(0, 8, 14, .34), 0 0 12px rgba(229, 199, 135, .07); }
+  50% { border-color: rgba(248, 220, 161, .94); box-shadow: 0 14px 30px rgba(0, 8, 14, .34), 0 0 18px rgba(229, 199, 135, .15); }
+}
+
+@media (max-width: 900px) {
+  .site-nav button { min-height: 50px; font-size: .82rem; }
+  .save-source-panel { width: auto; grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .save-tree-node--final { animation: none; }
+}

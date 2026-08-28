@@ -314,8 +314,7 @@
     const graphMarkup = graphTemplate();
     return `<section class="breeding-page breeding-page--save" aria-label="Cumoir avec sauvegarde">
       <header class="breeding-page__header"><p class="eyebrow">Planificateur d’élevage</p><p>Le Cumoir travaille avec les Pals réellement présents dans votre sauvegarde.</p></header>
-      ${sourceSwitch()}
-      ${activeWorld ? worldStatus() : importEmpty()}
+      ${activeWorld ? `<section class="save-source-panel" aria-label="Source et sauvegarde active">${sourceSwitch()}${worldStatus()}</section>` : `${sourceSwitch()}${importEmpty()}`}
       ${parsing ? `<div class="save-progress"><span></span>${escapeHtml(progress || "Lecture de la sauvegarde…")}</div>` : ""}
       ${error ? `<div class="save-error">${escapeHtml(error)}</div>` : ""}
       ${activeWorld ? `<div class="breeding-layout breeding-layout--save">
@@ -380,6 +379,28 @@
     if (!graph?.root) return `<div class="breeding-canvas__empty"><span aria-hidden="true">⌁</span><p>${escapeHtml(graph?.error || (state.calculation === "target" ? "Choisissez un Pal cible pour calculer une route." : "Choisissez deux individus de votre sauvegarde."))}</p></div>`;
     const layout = treeToGraph(graph.root);
     const nodeByKey = new Map(layout.nodes.map((entry) => [entry.key, entry]));
+    const requiredSexByKey = new Map();
+    layout.families.forEach(({ parents, child }) => {
+      const [left, right] = parents.map((key) => nodeByKey.get(key));
+      const target = nodeByKey.get(child);
+      const leftPal = palInfo(left?.node.speciesId);
+      const rightPal = palInfo(right?.node.speciesId);
+      const childPal = palInfo(target?.node.speciesId);
+      if (!leftPal || !rightPal || !childPal) return;
+      for (const combo of breedingRaw.genderCombos || []) {
+        if (combo[4] !== childPal.order) continue;
+        if (combo[0] === leftPal.order && combo[2] === rightPal.order) {
+          requiredSexByKey.set(parents[0], combo[1] === "M" ? "Male" : "Female");
+          requiredSexByKey.set(parents[1], combo[3] === "M" ? "Male" : "Female");
+          break;
+        }
+        if (combo[0] === rightPal.order && combo[2] === leftPal.order) {
+          requiredSexByKey.set(parents[0], combo[3] === "M" ? "Male" : "Female");
+          requiredSexByKey.set(parents[1], combo[1] === "M" ? "Male" : "Female");
+          break;
+        }
+      }
+    });
     const paths = layout.families.map(({ parents, child }) => {
       const [left, right] = parents.map((key) => nodeByKey.get(key));
       const target = nodeByKey.get(child);
@@ -391,15 +412,16 @@
       const joinY = childY + (parentY - childY) * .48;
       return `<path class="save-family-link" d="M ${leftX} ${parentY} V ${joinY} H ${rightX} V ${parentY} M ${childX} ${joinY} V ${childY}" /><circle class="save-family-junction" cx="${childX}" cy="${joinY}" r="4" />`;
     }).join("");
-    const nodes = layout.nodes.map(({ node, x, y }) => {
+    const nodes = layout.nodes.map(({ key, node, x, y }) => {
       const pal = palInfo(node.speciesId); if (!pal) return "";
       const final = node === graph.root;
+      const requiredSex = requiredSexByKey.get(key);
       const useful = state.selectedPassives.filter((id) => (node.mask & (1 << state.selectedPassives.indexOf(id))) !== 0);
       const [eggSuffix, eggName] = eggKind(node.speciesId);
       const eggAsset = `assets/eggs/t_itemicon_material_palegg${eggSuffix ? `_${eggSuffix}` : ""}.webp`;
       return `<article class="breeding-node save-tree-node${final ? " save-tree-node--final" : ""}" style="left:${x}px;top:${y}px">
         ${node.owned ? "" : `<span class="save-egg" data-egg-tooltip="${escapeHtml(eggName)}" tabindex="0"><img src="${eggAsset}" alt="${escapeHtml(eggName)}" /></span>`}
-        <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span><strong>${escapeHtml(pal.name)}</strong>${node.sex ? `<b class="breeding-node__sex breeding-node__sex--${node.sex.toLowerCase()}">${sexSymbol(node.sex)}</b>` : ""}</span></span>
+        <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span><strong>${escapeHtml(pal.name)}</strong>${requiredSex ? `<b class="breeding-node__sex breeding-node__sex--${requiredSex.toLowerCase()}" aria-label="${requiredSex === "Male" ? "Mâle requis" : "Femelle requise"}">${sexSymbol(requiredSex)}</b>` : ""}</span></span>
         ${useful.length ? `<span class="save-tree-node__passives">${useful.map((id) => passiveChip(id)).join("")}</span>` : ""}
       </article>`;
     }).join("");
