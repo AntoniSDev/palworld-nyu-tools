@@ -2180,10 +2180,37 @@ body[data-view="breeding"] .site-nav button { font-size: .92rem; font-weight: 70
 .site-nav button,
 body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem; font-weight: 600; }
 
-.save-pal-card__name small { font-size: .82rem; font-weight: 600; }
-.save-pal-card__sex { min-width: 1.15em; font-size: 1.22rem; font-weight: 700; line-height: .9; }
+.save-pal-card__name small { color: #9ab8bb; font-size: .82rem; font-weight: 700; }
+.save-pal-card__sex { min-width: 1.15em; font-size: 1.24rem; font-weight: 800; line-height: .9; }
 .save-pal-card__sex--male { color: #65d8ff; }
 .save-pal-card__sex--female { color: #ff8fbd; }
+
+.breeding-manual-tools {
+  display: grid;
+  grid-template-columns: minmax(300px, 430px) minmax(420px, 610px);
+  gap: 14px;
+  align-items: stretch;
+  margin-bottom: 18px;
+}
+.breeding-manual-tools > .breeding-source { margin: 0; }
+.breeding-manual-tools + .breeding-layout .breeding-panel,
+.breeding-manual-tools + .breeding-layout .breeding-canvas { height: calc(100vh - 240px); }
+.breeding-inheritance {
+  display: grid;
+  min-width: 0;
+  padding: 9px 12px;
+  border: 1px solid rgba(103, 214, 216, .2);
+  border-radius: 9px;
+  background: linear-gradient(120deg, rgba(7, 48, 58, .62), rgba(22, 32, 55, .58));
+}
+.breeding-inheritance > div:first-child { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.breeding-inheritance .eyebrow { margin: 0; color: #f3d79b; font-size: .7rem; }
+.breeding-inheritance > div:first-child span { color: #789ba1; font-size: .65rem; font-weight: 700; }
+.breeding-inheritance dl { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 6px 0 4px; }
+.breeding-inheritance dl div { display: flex; min-width: 0; justify-content: space-between; gap: 5px; padding: 4px 6px; border-radius: 5px; background: rgba(3, 21, 29, .52); }
+.breeding-inheritance dt { color: #9bb8bb; font-size: .67rem; }
+.breeding-inheritance dd { margin: 0; color: #7cebe6; font-size: .68rem; font-weight: 800; white-space: nowrap; }
+.breeding-inheritance > p { margin: 0; color: #789ba1; font-size: .64rem; }
 
 .save-source-panel {
   display: grid;
@@ -2250,12 +2277,12 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 .save-egg img { width: 41px; height: 41px; }
 
 .save-tree-node--final {
-  border: 1px solid rgba(239, 205, 137, .86);
+  border: 2px solid rgba(239, 205, 137, .9);
   background: linear-gradient(140deg, rgba(15, 68, 74, .98), rgba(49, 40, 78, .98));
   box-shadow: 0 14px 30px rgba(0, 8, 14, .34), 0 0 14px rgba(229, 199, 135, .1);
   animation: final-pal-breathe 7s ease-in-out infinite;
 }
-.save-tree-node--final::after { inset: 4px; border: 1px solid rgba(239, 210, 151, .2); }
+.save-tree-node--final::after { inset: 4px; border: 1px solid rgba(239, 210, 151, .16); }
 @keyframes final-pal-breathe {
   0%, 100% { border-color: rgba(239, 205, 137, .76); box-shadow: 0 14px 30px rgba(0, 8, 14, .34), 0 0 12px rgba(229, 199, 135, .07); }
   50% { border-color: rgba(248, 220, 161, .94); box-shadow: 0 14px 30px rgba(0, 8, 14, .34), 0 0 18px rgba(229, 199, 135, .15); }
@@ -2263,7 +2290,12 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 
 @media (max-width: 900px) {
   .site-nav button { min-height: 50px; font-size: .82rem; }
+  .breeding-manual-tools { grid-template-columns: 1fr; }
   .save-source-panel { width: auto; grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .breeding-inheritance dl { grid-template-columns: 1fr 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

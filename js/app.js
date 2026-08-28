@@ -1237,7 +1237,6 @@ function breedingGraphTemplate(graph) {
 function breedingPanelTemplate() {
   const secondSlot = breedingState.secondRole === "target" ? "target" : "parentB";
   return `<aside class="breeding-panel">
-    ${window.SaveCumoir?.sourceSwitch?.() || `<div class="breeding-source" role="group" aria-label="Source des Pals"><p class="eyebrow">Source des Pals</p><div><button type="button" data-cumoir-source="manual" aria-pressed="true">Manuel</button><button type="button" data-cumoir-source="save" aria-pressed="false">Sauvegarde</button></div></div>`}
     <div class="breeding-panel__heading"><p class="eyebrow">Sélection</p><button type="button" class="breeding-reset" data-breeding-reset>Réinitialiser</button></div>
     <div class="breeding-role" role="group" aria-label="Type de calcul">
       <button type="button" data-breeding-second-role="parentB" aria-pressed="${breedingState.secondRole === "parentB"}">Deux parents</button>
@@ -1260,6 +1259,14 @@ function breedingTemplate() {
   const emptyMessage = graph?.error || "Sélectionnez deux paramètres pour afficher l’arbre.";
   return `<section class="breeding-page" aria-labelledby="breeding-title">
     <header class="breeding-page__header"><p class="eyebrow" id="breeding-title">Planificateur d’élevage</p><p>Deux parents pour un enfant, ou un départ et une cible pour la route la plus courte.</p></header>
+    <div class="breeding-manual-tools">
+      ${window.SaveCumoir?.sourceSwitch?.() || `<div class="breeding-source" role="group" aria-label="Source des Pals"><p class="eyebrow">Source des Pals</p><div><button type="button" data-cumoir-source="manual" aria-pressed="true">Manuel</button><button type="button" data-cumoir-source="save" aria-pressed="false">Sauvegarde</button></div></div>`}
+      <aside class="breeding-inheritance" aria-label="Estimations communautaires de transmission des passifs" title="Estimations communautaires pour le tirage initial d’héritage, non publiées officiellement par Pocketpair.">
+        <div><p class="eyebrow">Transmission des passifs</p><span>Estimations communautaires</span></div>
+        <dl><div><dt>1 passif</dt><dd>≈ 40 %</dd></div><div><dt>2 passifs</dt><dd>≈ 30 %</dd></div><div><dt>3 passifs</dt><dd>≈ 20 %</dd></div><div><dt>4 passifs</dt><dd>≈ 10 %</dd></div></dl>
+        <p>Des passifs aléatoires peuvent aussi apparaître.</p>
+      </aside>
+    </div>
     <div class="breeding-layout">
       ${breedingPanelTemplate()}
       <section class="breeding-canvas" data-breeding-viewport aria-label="Arbre généalogique interactif">
