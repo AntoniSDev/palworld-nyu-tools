@@ -112,7 +112,7 @@
   function passiveChip(id, removable = false) {
     const passive = passiveInfo(id);
     return `<span class="save-passive ${passiveClass(passive.rank)}" data-passive-id="${escapeHtml(id)}" data-passive-tooltip="${escapeHtml(id)}" tabindex="0">
-      <span>${escapeHtml(passive.name)}</span>${passiveRankIcon(passive)}${removable ? `<button type="button" data-remove-passive="${escapeHtml(id)}" aria-label="Retirer ${escapeHtml(passive.name)}">×</button>` : ""}
+      ${passiveRankIcon(passive)}<span>${escapeHtml(passive.name)}</span>${removable ? `<button type="button" data-remove-passive="${escapeHtml(id)}" aria-label="Retirer ${escapeHtml(passive.name)}">×</button>` : ""}
     </span>`;
   }
 
@@ -241,13 +241,13 @@
     return `<section class="save-passive-goal">
       <div><span class="eyebrow">Passifs désirés</span><small>${state.selectedPassives.length}/4</small></div>
       <button type="button" class="save-passive-button" data-open-passives>✦ Choisir les passifs</button>
-      <div class="save-passive-goal__chips">${state.selectedPassives.length ? state.selectedPassives.map((id) => passiveChip(id, true)).join("") : `<span class="save-passive-goal__hint">Facultatif — jusqu’à quatre passifs présents dans la sauvegarde.</span>`}</div>
+      <div class="save-passive-goal__chips">${state.selectedPassives.length ? state.selectedPassives.map((id) => passiveChip(id, true)).join("") : `<span class="save-passive-goal__hint">Optionnel : choisissez jusqu’à 4 passifs présents dans votre sauvegarde.</span>`}</div>
     </section>`;
   }
 
   function selectionSummary() {
     if (state.calculation === "target") {
-      return `${targetPicker()}${passivesPanel()}<p class="save-forced-help">Cliquez sur une carte du roster pour forcer jusqu’à deux sources. Sans sélection, le Cumoir choisit automatiquement.</p>`;
+      return `${targetPicker()}${passivesPanel()}<p class="save-forced-help">Vous pouvez imposer jusqu’à 2 Pals de départ. Sinon, le Cumoir choisit automatiquement les meilleurs Pals de votre sauvegarde.</p>`;
     }
     const a = roster.find((pal) => pal.id === state.parentA);
     const b = roster.find((pal) => pal.id === state.parentB);
@@ -303,7 +303,7 @@
         return `<section class="save-passive-tier"><header><strong>${group.label}</strong><span>${groupRows.length}</span></header><div>${groupRows.map((passive) => {
           const available = allAvailable.has(passive.id);
           const selected = state.selectedPassives.includes(passive.id);
-          return `<button type="button" data-toggle-passive="${escapeHtml(passive.id)}" data-passive-tooltip="${escapeHtml(passive.id)}" class="${passiveClass(passive.rank)}${selected ? " is-selected" : ""}" ${available ? "" : "disabled"}><strong>${escapeHtml(passive.name)}</strong>${passiveRankIcon(passive)}<span aria-hidden="true">${selected ? "✓" : available ? "+" : "—"}</span></button>`;
+          return `<button type="button" data-toggle-passive="${escapeHtml(passive.id)}" data-passive-tooltip="${escapeHtml(passive.id)}" class="${passiveClass(passive.rank)}${selected ? " is-selected" : ""}" ${available ? "" : "disabled"}>${passiveRankIcon(passive)}<strong>${escapeHtml(passive.name)}</strong><span aria-hidden="true">${selected ? "✓" : available ? "+" : "—"}</span></button>`;
         }).join("")}</div></section>`;
       }).join("")}</div>
       <footer><span>${rows.length} compétence${rows.length > 1 ? "s" : ""}</span><button type="button" class="save-primary" data-close-passive-modal>Terminer</button></footer>
@@ -352,10 +352,10 @@
     const families = [];
     let leafCursor = 0;
     let keyCursor = 0;
-    const nodeWidth = 210;
-    const nodeHeight = 150;
-    const horizontalStep = 226;
-    const verticalStep = 192;
+    const nodeWidth = 220;
+    const nodeHeight = 162;
+    const horizontalStep = 238;
+    const verticalStep = 204;
     function visit(node, depth = 0) {
       const key = `node-${keyCursor++}`;
       if (!node.parents) {
@@ -398,8 +398,8 @@
       const [eggSuffix, eggName] = eggKind(node.speciesId);
       const eggAsset = `assets/eggs/t_itemicon_material_palegg${eggSuffix ? `_${eggSuffix}` : ""}.webp`;
       return `<article class="breeding-node save-tree-node${final ? " save-tree-node--final" : ""}" style="left:${x}px;top:${y}px">
-        ${node.owned ? "" : `<span class="save-egg" title="À obtenir par reproduction · ${escapeHtml(eggName)}"><img src="${eggAsset}" alt="${escapeHtml(eggName)}" /></span>`}
-        <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span><strong>${escapeHtml(pal.name)}</strong>${node.sex ? `<b class="breeding-node__sex">${sexSymbol(node.sex)}</b>` : ""}</span></span>
+        ${node.owned ? "" : `<span class="save-egg" data-egg-tooltip="${escapeHtml(eggName)}" tabindex="0"><img src="${eggAsset}" alt="${escapeHtml(eggName)}" /></span>`}
+        <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span><strong>${escapeHtml(pal.name)}</strong>${node.sex ? `<b class="breeding-node__sex breeding-node__sex--${node.sex.toLowerCase()}">${sexSymbol(node.sex)}</b>` : ""}</span></span>
         ${useful.length ? `<span class="save-tree-node__passives">${useful.map((id) => passiveChip(id)).join("")}</span>` : ""}
       </article>`;
     }).join("");
@@ -712,8 +712,8 @@
     if (event.target.matches("[data-passive-search]")) { passiveQuery = event.target.value; render(false); }
   }
 
-  function showPassiveTooltip(target) {
-    const passive = passiveInfo(target.dataset.passiveTooltip);
+  function showTooltip(target) {
+    const passive = target.dataset.passiveTooltip ? passiveInfo(target.dataset.passiveTooltip) : null;
     let tooltip = document.querySelector(".save-passive-tooltip");
     if (!tooltip) {
       tooltip = document.createElement("div");
@@ -721,7 +721,9 @@
       tooltip.setAttribute("role", "tooltip");
       document.body.append(tooltip);
     }
-    tooltip.innerHTML = `<strong>${escapeHtml(passive.name)}</strong><span>${escapeHtml(passiveEffectText(passive.effect))}</span>`;
+    tooltip.innerHTML = passive
+      ? `<strong>${escapeHtml(passive.name)}</strong><span>${escapeHtml(passiveEffectText(passive.effect))}</span>`
+      : `<strong>${escapeHtml(target.dataset.eggTooltip)}</strong><span>À obtenir par reproduction.</span>`;
     tooltip.hidden = false;
     const rect = target.getBoundingClientRect();
     const tooltipRect = tooltip.getBoundingClientRect();
@@ -731,7 +733,7 @@
     tooltip.style.top = `${above >= 8 ? above : rect.bottom + 9}px`;
   }
 
-  function hidePassiveTooltip() {
+  function hideTooltip() {
     const tooltip = document.querySelector(".save-passive-tooltip");
     if (tooltip) tooltip.hidden = true;
   }
@@ -755,10 +757,10 @@
   document.addEventListener("click", handleClick);
   document.addEventListener("input", handleInput);
   document.addEventListener("change", handleChange);
-  document.addEventListener("pointerover", (event) => { const target = event.target.closest("[data-passive-tooltip]"); if (target) showPassiveTooltip(target); });
-  document.addEventListener("pointerout", (event) => { const target = event.target.closest("[data-passive-tooltip]"); if (target && !target.contains(event.relatedTarget)) hidePassiveTooltip(); });
-  document.addEventListener("focusin", (event) => { const target = event.target.closest("[data-passive-tooltip]"); if (target) showPassiveTooltip(target); });
-  document.addEventListener("focusout", (event) => { if (event.target.closest("[data-passive-tooltip]")) hidePassiveTooltip(); });
+  document.addEventListener("pointerover", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-egg-tooltip]"); if (target) showTooltip(target); });
+  document.addEventListener("pointerout", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-egg-tooltip]"); if (target && !target.contains(event.relatedTarget)) hideTooltip(); });
+  document.addEventListener("focusin", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-egg-tooltip]"); if (target) showTooltip(target); });
+  document.addEventListener("focusout", (event) => { if (event.target.closest("[data-passive-tooltip], [data-egg-tooltip]")) hideTooltip(); });
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape" || mode !== "save") return;
     if (passiveModalOpen) { passiveModalOpen = false; render(false); }
