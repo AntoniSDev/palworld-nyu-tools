@@ -2094,7 +2094,7 @@ body[data-view="breeding"] footer { margin-top: 18px; }
 .save-passive-tooltip span { color: #9ab8bb; font-size: .62rem; line-height: 1.4; }
 .save-egg { position: absolute; z-index: 2; top: -13px; right: -10px; display: grid; width: 37px; height: 37px; place-items: center; border: 1px solid rgba(229, 201, 133, .5); border-radius: 50%; background: rgba(4, 20, 27, .9); box-shadow: 0 4px 10px rgba(0, 0, 0, .42); }
 .save-egg img { width: 34px; height: 34px; object-fit: contain; }
-.save-tree-node__new { position: absolute; z-index: 2; right: 8px; bottom: -8px; padding: 2px 6px; border: 1px solid rgba(106, 255, 223, .7); border-radius: 999px; background: rgba(7, 83, 73, .94); box-shadow: 0 0 10px rgba(78, 245, 213, .3); color: #aaffed; font-size: .48rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.save-tree-node__new { display: inline-flex; justify-self: center; padding: 2px 6px; border: 1px solid rgba(106, 255, 223, .7); border-radius: 999px; background: rgba(7, 83, 73, .94); box-shadow: 0 0 10px rgba(78, 245, 213, .3); color: #aaffed; font-size: .48rem; font-weight: 900; letter-spacing: .06em; line-height: 1.1; text-transform: uppercase; }
 .save-calculating { position: absolute; inset: 0; display: grid; place-content: center; place-items: center; gap: 10px; color: #bce8e5; }
 .save-calculating span { width: 24px; height: 24px; border: 2px solid rgba(108, 224, 222, .2); border-top-color: #6de1dd; border-radius: 50%; animation: save-spin .7s linear infinite; }
 .save-calculating strong { font-size: 1rem; font-weight: 700; }

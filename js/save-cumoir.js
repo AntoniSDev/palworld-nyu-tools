@@ -421,8 +421,7 @@
       const eggAsset = `assets/eggs/t_itemicon_material_palegg${eggSuffix ? `_${eggSuffix}` : ""}.webp`;
       return `<article class="breeding-node save-tree-node${final ? " save-tree-node--final" : ""}" style="left:${x}px;top:${y}px">
         ${node.owned ? "" : `<span class="save-egg" data-egg-tooltip="${escapeHtml(eggName)}" tabindex="0"><img src="${eggAsset}" alt="${escapeHtml(eggName)}" /></span>`}
-        ${ownedSpecies.has(pal.id.toLowerCase()) ? "" : `<span class="save-tree-node__new">Nouveau</span>`}
-        <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span><strong>${escapeHtml(pal.name)}</strong>${requiredSex ? `<b class="breeding-node__sex breeding-node__sex--${requiredSex.toLowerCase()}" aria-label="${requiredSex === "Male" ? "Mâle requis" : "Femelle requise"}">${sexSymbol(requiredSex)}</b>` : ""}</span></span>
+        <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span>${ownedSpecies.has(pal.id.toLowerCase()) ? "" : `<span class="save-tree-node__new">Nouveau</span>`}<strong>${escapeHtml(pal.name)}</strong>${requiredSex ? `<b class="breeding-node__sex breeding-node__sex--${requiredSex.toLowerCase()}" aria-label="${requiredSex === "Male" ? "Mâle requis" : "Femelle requise"}">${sexSymbol(requiredSex)}</b>` : ""}</span></span>
         ${useful.length ? `<span class="save-tree-node__passives">${useful.map((id) => passiveChip(id)).join("")}</span>` : ""}
       </article>`;
     }).join("");
