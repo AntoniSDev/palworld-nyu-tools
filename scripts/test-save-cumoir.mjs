@@ -59,6 +59,12 @@ const movementSearch = api.searchPassives("vi");
 if (!movementSearch.length || !movementSearch.some((passive) => !passive.name.toLowerCase().includes("vi") && passive.effect.toLowerCase().includes("vi"))) {
   throw new Error("Passive search does not include effect-only matches.");
 }
+const passiveModal = api.passiveModal();
+if (!passiveModal.includes("Rechercher par nom ou effet")
+  || !passiveModal.includes('placeholder="Vitesse, attaque, satiété…"')
+  || !passiveModal.includes('aria-hidden="true">⌕</span>')) {
+  throw new Error("Passive search guidance or icon is missing from the modal.");
+}
 const plannedDepth = (node) => node?.parents ? 1 + Math.max(...node.parents.map(plannedDepth)) : 0;
 
 const target = context.BREEDING_DATA.pals.find(([id]) => id === "Anubis")?.[0];
