@@ -42,6 +42,7 @@ const unknownSpecies = [...new Set(normalized.filter((pal) => !breedingSpeciesId
 if (unknownSpecies.length) throw new Error(`Imported species missing from breeding data: ${unknownSpecies.join(", ")}`);
 const api = context.SaveCumoir.__test;
 const styles = fs.readFileSync(new URL("../css/styles.css", import.meta.url), "utf8");
+const saveCumoirSource = fs.readFileSync(new URL("../js/save-cumoir.js", import.meta.url), "utf8");
 if (!/\.save-tree-node__new\s*\{[^}]*position:\s*absolute;[^}]*top:\s*7px;[^}]*left:\s*50%;[^}]*transform:\s*translateX\(-50%\)/s.test(styles)) {
   throw new Error("The Nouveau badge is not positioned at the centered top of the Pal card.");
 }
@@ -71,8 +72,8 @@ if (!Object.values(targetAutocomplete).every(Boolean)) throw new Error("Target a
 const ownedSpeciesId = normalized[0]?.speciesId;
 const absentSpeciesId = context.BREEDING_DATA.pals.find(([id]) => !normalized.some((pal) => pal.speciesId.toLowerCase() === id.toLowerCase()))?.[0];
 if (!ownedSpeciesId || !absentSpeciesId) throw new Error("Owned/unowned species fixtures are unavailable.");
-if (!api.renderGraph({ status: "found", root: { speciesId: ownedSpeciesId, mask: 0, sex: "Male", owned: false } }).includes('save-tree-node__new">Nouveau')) {
-  throw new Error("A planned individual of an owned species is missing the Nouveau badge.");
+if (api.renderGraph({ status: "found", root: { speciesId: ownedSpeciesId, mask: 0, sex: "Male", owned: false } }).includes('save-tree-node__new">Nouveau')) {
+  throw new Error("A planned individual of an owned species is incorrectly marked Nouveau.");
 }
 if (!api.renderGraph({ root: { speciesId: absentSpeciesId, mask: 0, owned: false } }).includes('save-tree-node__new">Nouveau')) {
   throw new Error("An unowned species is missing the Nouveau badge.");
@@ -80,6 +81,10 @@ if (!api.renderGraph({ root: { speciesId: absentSpeciesId, mask: 0, owned: false
 if (api.renderGraph({ status: "already-owned", root: { speciesId: ownedSpeciesId, mask: 0, sex: "Female", owned: true, individualId: "fixture" } }).includes('save-tree-node__new">Nouveau')) {
   throw new Error("An owned individual is incorrectly marked Nouveau.");
 }
+const available = [...new Set(normalized.flatMap((pal) => pal.passives))];
+const objectives = available.filter((id) => context.PALWORLD_PASSIVES.some((passive) => passive.id === id)).slice(0, 4);
+const target = context.BREEDING_DATA.pals.find(([id]) => id === "Anubis")?.[0];
+if (!target) throw new Error("Anubis missing from breeding data.");
 const movementSearch = api.searchPassives("vi");
 if (!movementSearch.length || !movementSearch.some((passive) => !passive.name.toLowerCase().includes("vi") && passive.effect.toLowerCase().includes("vi"))) {
   throw new Error("Passive search does not include effect-only matches.");
@@ -90,12 +95,43 @@ if (!passiveModal.includes("Rechercher par nom ou effet")
   || !passiveModal.includes('aria-hidden="true">⌕</span>')) {
   throw new Error("Passive search guidance or icon is missing from the modal.");
 }
+const unavailablePassive = context.PALWORLD_PASSIVES.find((passive) => !available?.includes?.(passive.id));
+if (!unavailablePassive || !passiveModal.includes(`data-toggle-passive="${unavailablePassive.id}"`) || !passiveModal.includes(`data-toggle-passive="${unavailablePassive.id}" data-passive-tooltip="${unavailablePassive.id}" class="${api.passiveClass(unavailablePassive.rank)} is-unowned" disabled aria-disabled="true"`)) {
+  throw new Error("Unavailable passives are not kept visible and disabled.");
+}
+if (!api.searchPassives(unavailablePassive.name).some((passive) => passive.id === unavailablePassive.id)) {
+  throw new Error("Search does not return an unavailable passive.");
+}
+if (api.passiveClass(2) !== "save-passive--rare") throw new Error("Positive rank-2 passives do not use the gold style.");
+for (let count = 0; count <= 4; count += 1) {
+  api.setTarget(target, objectives.slice(0, count));
+  const panel = api.passivesPanel();
+  const addButtons = (panel.match(/data-open-passives/g) || []).length;
+  if (addButtons !== Number(count < 4)) throw new Error(`Passive slot layout failed at ${count} selected passives.`);
+  if (count && !panel.includes(`data-remove-passive="${objectives[0]}"`)) throw new Error(`Passive chips are missing at ${count} selected passives.`);
+}
+const backdrop = { matches: (selector) => selector === ".save-modal-backdrop" };
+const input = { matches: () => false };
+api.handlePointerDown({ target: input });
+if (api.shouldCloseFromBackdrop(backdrop)) throw new Error("A text selection ending on the backdrop closes the modal.");
+api.handlePointerDown({ target: backdrop });
+if (!api.shouldCloseFromBackdrop(backdrop)) throw new Error("A direct backdrop click does not close the modal.");
+const zoomed = api.cameraAroundPoint(.5, { x: 300, y: 200 }, { x: 100, y: 50, scale: 1 });
+if (zoomed.x !== 200 || zoomed.y !== 125 || zoomed.scale !== .5) throw new Error("Pointer-centered camera zoom is incorrect.");
+if (api.cameraAroundPoint(.01, { x: 0, y: 0 }, { x: 0, y: 0, scale: 1 }).scale !== .1) throw new Error("Camera cannot reach the 10% minimum zoom.");
+const fitted = api.fittedCamera(1600, 900, 20000, 8000);
+if (fitted.scale !== .1) throw new Error("Fit does not handle a very large tree at the 10% minimum zoom.");
+const panned = api.pannedCamera({ x: 0, y: 0, scale: 1 }, { x: 200, y: 150 }, { x: -1800, y: 2350 });
+if (panned.x !== -2000 || panned.y !== 2200) throw new Error("Camera pan is not 1:1 or is clamped.");
+if (!activeTemplate.includes("data-canvas-zoom-out") || !activeTemplate.includes("data-canvas-zoom-in") || !activeTemplate.includes("data-canvas-fit") || !activeTemplate.includes("data-canvas-scale")) {
+  throw new Error("Canvas controls are missing.");
+}
+if (!saveCumoirSource.includes("translate3d(${canvas.x}px, ${canvas.y}px, 0) scale(${canvas.scale})") || /style\.zoom|world\.style\.left|world\.style\.top/.test(saveCumoirSource)) {
+  throw new Error("The canvas still mixes old and new camera systems.");
+}
+if (!passiveModal.includes('data-close-passive-modal aria-label="Fermer"') || !passiveModal.includes('data-close-passive-modal>Terminer')) throw new Error("Explicit modal close controls are missing.");
+if (activeTemplate.includes("Gâteau") || activeTemplate.includes("Special Cake")) throw new Error("Cake guidance leaked into the carrier Cumoir.");
 const plannedDepth = (node) => node?.parents ? 1 + Math.max(...node.parents.map(plannedDepth)) : 0;
-
-const target = context.BREEDING_DATA.pals.find(([id]) => id === "Anubis")?.[0];
-if (!target) throw new Error("Anubis missing from breeding data.");
-const available = [...new Set(normalized.flatMap((pal) => pal.passives))];
-const objectives = available.filter((id) => context.PALWORLD_PASSIVES.some((passive) => passive.id === id)).slice(0, 4);
 const benchmarkTarget = process.argv.find((argument) => argument.startsWith("--benchmark="))?.split("=")[1];
 if (benchmarkTarget) {
   const benchmarkPassives = ["CoolTimeReduction_Up_2", "Legend", "Rare", "MoveSpeed_up_3"];
@@ -120,7 +156,7 @@ if (objectives.length) {
   if (carrier.root) {
     const graph = api.renderGraph(carrier);
     if (graph.includes("data-cake-tooltip") || graph.includes("assets/items/") || graph.includes("recommendedCake")) throw new Error("Cake recommendations remain in the tree renderer.");
-    if (!graph.includes('save-tree-node__new">Nouveau')) throw new Error("Planned intermediates are missing the Nouveau badge.");
+    if (graph.includes("data-egg-tooltip") || graph.includes('save-egg" tabindex=')) throw new Error("Egg tooltips remain in the tree renderer.");
     if (graph.includes("expectedBatches") || graph.includes("probability")) throw new Error("Retired probability data leaked into the UI.");
   }
   solveChecks.push({ count: "carrier", solved: Boolean(carrier.root), status: carrier.status, breedingCount: carrier.breedingCount, durationMs: carrier.durationMs, expanded: carrier.stats?.expanded });
