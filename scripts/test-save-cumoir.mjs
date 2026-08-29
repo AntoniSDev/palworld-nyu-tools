@@ -79,6 +79,15 @@ if (!Object.values(targetAutocomplete).every(Boolean)) throw new Error("Target a
 const ownedSpeciesId = normalized[0]?.speciesId;
 const absentSpeciesId = context.BREEDING_DATA.pals.find(([id]) => !normalized.some((pal) => pal.speciesId.toLowerCase() === id.toLowerCase()))?.[0];
 if (!ownedSpeciesId || !absentSpeciesId) throw new Error("Owned/unowned species fixtures are unavailable.");
+const maleSvg = api.sexIcon("Male");
+const femaleSvg = api.sexIcon("Female");
+if (!maleSvg.includes('viewBox="0 0 24 24"') || !maleSvg.includes('M13.9 10.1 20 4') || !femaleSvg.includes('M12 13.7V21M8.6 17.6h6.8')) {
+  throw new Error("Exact inline sex SVGs are missing.");
+}
+const finalSexRule = styles.slice(styles.lastIndexOf(".save-tree-node .breeding-node__sex")).match(/\.save-tree-node \.breeding-node__sex\s*\{([^}]*)\}/s)?.[1] || "";
+if (maleSvg.includes("♂") || femaleSvg.includes("♀") || !finalSexRule.includes("text-shadow: none") || !finalSexRule.includes("filter: none")) {
+  throw new Error("Legacy sex glyphs or glow remain.");
+}
 if (api.renderGraph({ status: "found", root: { speciesId: ownedSpeciesId, mask: 0, sex: "Male", owned: false } }).includes('save-tree-node__new">Nouveau')) {
   throw new Error("A planned individual of an owned species is incorrectly marked Nouveau.");
 }
@@ -92,6 +101,26 @@ const available = [...new Set(normalized.flatMap((pal) => pal.passives))];
 const objectives = available.filter((id) => context.PALWORLD_PASSIVES.some((passive) => passive.id === id)).slice(0, 4);
 const target = context.BREEDING_DATA.pals.find(([id]) => id === "Anubis")?.[0];
 if (!target) throw new Error("Anubis missing from breeding data.");
+const historySeed = Array.from({ length: 11 }, (_, index) => ({ id: `recent-${index}`, target, selectedPassives: objectives.slice(0, index % 5), pinned: false, updatedAt: index }));
+const trimmedHistory = api.normalizeHistoryEntries(historySeed);
+if (trimmedHistory.length !== 10 || trimmedHistory.some((entry) => entry.id === "recent-0")) throw new Error("History does not keep exactly ten recent entries.");
+historySeed[0].pinned = true;
+const pinnedHistory = api.normalizeHistoryEntries(historySeed);
+if (pinnedHistory.length !== 11 || pinnedHistory[0].id !== "recent-0") throw new Error("Pinned history is not retained before recent entries.");
+const firstPlan = { target, selectedPassives: objectives.slice(0, 2) };
+const firstInsert = api.upsertHistoryEntries([], firstPlan, null, 100, () => "plan-a");
+const reorderedDuplicate = api.upsertHistoryEntries(firstInsert.entries, { target, selectedPassives: [...firstPlan.selectedPassives].reverse() }, null, 200, () => "plan-b");
+if (reorderedDuplicate.entries.length !== 1 || reorderedDuplicate.activeId !== "plan-a") throw new Error("History does not deduplicate reordered passive sets.");
+reorderedDuplicate.entries[0].pinned = true;
+const modified = api.upsertHistoryEntries(reorderedDuplicate.entries, { target: ownedSpeciesId, selectedPassives: objectives.slice(0, 1) }, "plan-a", 300);
+if (modified.entries.length !== 1 || modified.entries[0].target.toLowerCase() !== ownedSpeciesId.toLowerCase() || !modified.entries[0].pinned) throw new Error("Loaded history is not updated in place.");
+const mergeBase = [
+  { id: "loaded", target, selectedPassives: objectives.slice(0, 1), pinned: true, updatedAt: 1 },
+  { id: "duplicate", target: ownedSpeciesId, selectedPassives: objectives.slice(0, 2), pinned: false, updatedAt: 2 },
+];
+const merged = api.upsertHistoryEntries(mergeBase, { target: ownedSpeciesId, selectedPassives: objectives.slice(0, 2) }, "loaded", 400);
+if (merged.entries.length !== 1 || merged.activeId !== "duplicate" || !merged.entries[0].pinned) throw new Error("History duplicate merge does not preserve pinning.");
+if (api.normalizeHistoryEntries(null).length || api.normalizeHistoryEntries([{ broken: true }]).length) throw new Error("Corrupted history fallback is unsafe.");
 const movementSearch = api.searchPassives("vi");
 if (!movementSearch.length || !movementSearch.some((passive) => !passive.name.toLowerCase().includes("vi") && passive.effect.toLowerCase().includes("vi"))) {
   throw new Error("Passive search does not include effect-only matches.");

@@ -2137,7 +2137,7 @@ body[data-view="breeding"] .site-nav button { font-size: .92rem; font-weight: 70
 .save-passive-tooltip { gap: 6px; padding: 11px 13px; }
 .save-passive-tooltip strong { font-size: .82rem; font-weight: 700; }
 .save-passive-tooltip span { font-size: .75rem; line-height: 1.5; }
-.breeding-canvas__world { left: 0; top: 0; will-change: transform; }
+.breeding-canvas__world { left: 0; top: 0; }
 .breeding-canvas__controls {
   position: absolute; z-index: 5; top: 42px; right: 12px; display: flex; align-items: center; gap: 4px; padding: 4px;
   border: 1px solid rgba(103, 210, 214, .27); border-radius: 8px; background: rgba(4, 24, 33, .9); box-shadow: 0 8px 22px rgba(0, 7, 12, .3);
@@ -2253,41 +2253,60 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 
 .save-tree-node .breeding-node__sex {
   display: inline-grid;
-  width: 1.1em;
+  width: 24px;
+  height: 24px;
   margin-top: 2px;
   place-items: center;
-  font-family: "Nunito Sans", sans-serif;
-  font-size: 1.32rem;
-  font-weight: 900;
-  line-height: 1;
-  text-shadow: 0 0 5px currentColor;
+  text-shadow: none;
+  filter: none;
 }
+.sex-icon { display: block; width: 22px; height: 22px; overflow: visible; }
+.save-pal-card__sex { display: inline-grid; width: 20px; height: 20px; place-items: center; text-shadow: none; filter: none; vertical-align: middle; }
+.save-pal-card__sex .sex-icon { width: 18px; height: 18px; }
 .breeding-node__sex--male { color: #65d8ff; }
 .breeding-node__sex--female { color: #ff8fbd; }
 
 .save-egg { top: -17px; right: -13px; width: 45px; height: 45px; }
 .save-egg img { width: 41px; height: 41px; }
 
+.save-tree-node {
+  border-color: rgba(82, 137, 148, .58);
+  background: linear-gradient(145deg, #102d36, #192b3b);
+  box-shadow: 0 12px 24px rgba(0, 8, 14, .38), inset 0 1px rgba(190, 228, 226, .035);
+}
 .save-tree-node--final {
-  border: 2px solid rgba(239, 205, 137, .9);
-  background: linear-gradient(140deg, rgba(15, 68, 74, .98), rgba(49, 40, 78, .98));
-  box-shadow: 0 14px 30px rgba(0, 8, 14, .34), 0 0 14px rgba(229, 199, 135, .1);
-  animation: final-pal-breathe 7s ease-in-out infinite;
+  border: 2px solid #c9a65a;
+  background: linear-gradient(145deg, #183b3c 0%, #263947 52%, #403842 100%);
+  box-shadow: 0 16px 30px rgba(0, 7, 12, .48), inset 0 1px #f0d394, inset 0 -3px #75572e;
 }
-.save-tree-node--final::after { inset: 4px; border: 1px solid rgba(239, 210, 151, .16); }
-@keyframes final-pal-breathe {
-  0%, 100% { border-color: rgba(239, 205, 137, .76); box-shadow: 0 14px 30px rgba(0, 8, 14, .34), 0 0 12px rgba(229, 199, 135, .07); }
-  50% { border-color: rgba(248, 220, 161, .94); box-shadow: 0 14px 30px rgba(0, 8, 14, .34), 0 0 18px rgba(229, 199, 135, .15); }
-}
+.save-tree-node--final::before { position: absolute; z-index: 1; top: -2px; left: 21%; width: 58%; height: 3px; border-radius: 0 0 3px 3px; background: linear-gradient(90deg, #7b5b2d, #f1d58f 45%, #b8883e); content: ""; pointer-events: none; }
+.save-tree-node--final::after { inset: 5px; border: 1px solid rgba(242, 213, 151, .42); border-radius: 10px; }
+.save-tree-node--final .save-egg { top: -20px; right: -16px; width: 51px; height: 51px; border-color: rgba(239, 206, 133, .78); }
+.save-tree-node--final .save-egg img { width: 47px; height: 47px; }
+.save-target-selected { border-color: rgba(202, 166, 90, .62); background: linear-gradient(110deg, rgba(14, 55, 59, .82), rgba(48, 43, 55, .75)); box-shadow: inset 0 -2px rgba(184, 136, 62, .35); }
+
+.save-history { display: grid; gap: 7px; margin-top: 15px; padding-top: 12px; border-top: 1px solid rgba(103, 190, 196, .14); }
+.save-history > header { display: flex; align-items: center; justify-content: space-between; }
+.save-history > p { margin: 0; color: #6f9196; font-size: .72rem; }
+.save-history > div { display: grid; max-height: 310px; gap: 5px; overflow-y: auto; padding-right: 2px; scrollbar-color: rgba(95, 201, 205, .42) transparent; scrollbar-width: thin; }
+.save-history__entry { display: grid; min-width: 0; grid-template-columns: minmax(0, 1fr) 28px 28px; align-items: center; gap: 3px; border: 1px solid rgba(91, 158, 166, .2); border-radius: 7px; background: rgba(4, 24, 32, .58); }
+.save-history__entry:hover, .save-history__entry.is-active { border-color: rgba(109, 213, 211, .46); background: rgba(14, 48, 57, .7); }
+.save-history__entry button { border: 0; background: transparent; color: #90aeb1; cursor: pointer; font: inherit; }
+.save-history__load { display: grid; min-width: 0; height: 42px; grid-template-columns: 34px minmax(0, 1fr); align-items: center; gap: 7px; padding: 3px 5px; text-align: left; }
+.save-history__load img { width: 32px; height: 32px; object-fit: contain; }
+.save-history__load span { overflow: hidden; color: #dceeee; font-size: .74rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.save-history__pin, .save-history__delete { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 5px !important; font-size: .76rem !important; }
+.save-history__pin:hover, .save-history__pin.is-pinned { color: #e3bd68; background: rgba(110, 82, 38, .35) !important; }
+.save-history__delete { font-size: 1rem !important; }
+.save-history__delete:hover { color: #f0a3b2; background: rgba(101, 34, 48, .38) !important; }
+.save-history-tooltip { width: min(360px, calc(100vw - 20px)); }
+.save-history-tooltip__chips { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; color: #a9c2c4 !important; }
+.save-history-tooltip__chips .save-passive { font-size: .67rem; }
 
 @media (max-width: 900px) {
   .site-nav button { min-height: 50px; font-size: .82rem; }
   .breeding-manual-tools { grid-template-columns: 1fr; }
   .save-source-panel { width: auto; grid-template-columns: 1fr; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .save-tree-node--final { animation: none; }
 }
 
 /* v0.9 — harmonisation finale du workspace */

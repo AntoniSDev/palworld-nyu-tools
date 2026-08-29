@@ -3,6 +3,9 @@
   "use strict";
 
   const STATE_KEY = "palworld-nyu-tools:cumoir-save-state-v1";
+  const HISTORY_KEY = "palworld-nyu-tools:cumoir-history-v1";
+  const MAX_RECENT_HISTORY = 10;
+  const MAX_PINNED_HISTORY = 40;
   const DB_NAME = "palworld-nyu-tools";
   const DB_STORE = "cumoir-save";
   const content = document.querySelector("#content");
@@ -34,6 +37,8 @@
   let treeResult = null;
   let modalPointerDownOnBackdrop = null;
   let passiveSearchShouldFocus = false;
+  let history = loadHistory();
+  let activeHistoryId = null;
 
   const MIN_SCALE = .10;
   const MAX_SCALE = 2.50;
@@ -113,8 +118,70 @@
     </${tag}>`;
   }
 
-  function sexSymbol(sex) {
-    return sex === "Male" ? "♂" : sex === "Female" ? "♀" : "?";
+  function sexIcon(sex) {
+    if (sex === "Male") return `<svg class="sex-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9.8" cy="14.2" r="5.2" fill="none" stroke="currentColor" stroke-width="2.4"></circle><path d="M13.9 10.1 20 4m0 0h-5.2M20 4v5.2" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+    if (sex === "Female") return `<svg class="sex-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="8.5" r="5.2" fill="none" stroke="currentColor" stroke-width="2.4"></circle><path d="M12 13.7V21M8.6 17.6h6.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"></path></svg>`;
+    return `<span aria-hidden="true">?</span>`;
+  }
+
+  function historyPlanKey(target, selectedPassives) {
+    return `${String(target || "").toLowerCase()}|${[...new Set(selectedPassives || [])].sort().join("|")}`;
+  }
+
+  function normalizeHistoryEntries(raw) {
+    if (!Array.isArray(raw)) return [];
+    const seenIds = new Set();
+    const entries = raw.flatMap((entry) => {
+      if (!entry || typeof entry !== "object") return [];
+      const target = typeof entry.target === "string" && palInfo(entry.target) ? palInfo(entry.target).id : null;
+      const selectedPassives = Array.isArray(entry.selectedPassives) ? [...new Set(entry.selectedPassives.filter((id) => passiveById.has(id)))].slice(0, 4) : [];
+      const id = typeof entry.id === "string" && entry.id && !seenIds.has(entry.id) ? entry.id : null;
+      if (!target || !id) return [];
+      seenIds.add(id);
+      return [{ id, target, selectedPassives, pinned: entry.pinned === true, updatedAt: Number.isFinite(entry.updatedAt) ? entry.updatedAt : 0 }];
+    });
+    const sorted = entries.sort((a, b) => Number(b.pinned) - Number(a.pinned) || b.updatedAt - a.updatedAt);
+    return [...sorted.filter((entry) => entry.pinned).slice(0, MAX_PINNED_HISTORY), ...sorted.filter((entry) => !entry.pinned).slice(0, MAX_RECENT_HISTORY)];
+  }
+
+  function loadHistory() {
+    try { return normalizeHistoryEntries(JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]")); }
+    catch { return []; }
+  }
+
+  function saveHistory() {
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); }
+    catch (storageError) { console.warn("Historique du Cumoir non sauvegardé :", storageError); }
+  }
+
+  function historyId() {
+    return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
+
+  function upsertHistoryEntries(entries, plan, currentId = null, now = Date.now(), createId = historyId) {
+    const clean = normalizeHistoryEntries(entries).map((entry) => ({ ...entry, selectedPassives: [...entry.selectedPassives] }));
+    const key = historyPlanKey(plan.target, plan.selectedPassives);
+    const active = clean.find((entry) => entry.id === currentId);
+    const duplicate = clean.find((entry) => entry.id !== currentId && historyPlanKey(entry.target, entry.selectedPassives) === key);
+    let nextId = currentId;
+    if (active && duplicate) {
+      duplicate.pinned = duplicate.pinned || active.pinned; duplicate.updatedAt = now;
+      clean.splice(clean.indexOf(active), 1); nextId = duplicate.id;
+    } else if (active) {
+      active.target = plan.target; active.selectedPassives = [...new Set(plan.selectedPassives)].sort(); active.updatedAt = now;
+    } else if (duplicate) {
+      duplicate.updatedAt = now; nextId = duplicate.id;
+    } else {
+      nextId = createId();
+      clean.push({ id: nextId, target: plan.target, selectedPassives: [...new Set(plan.selectedPassives)].sort(), pinned: false, updatedAt: now });
+    }
+    return { entries: normalizeHistoryEntries(clean), activeId: nextId };
+  }
+
+  function recordHistory() {
+    if (!state.target || !treeResult?.root || !["found", "already-owned"].includes(treeResult.status)) return;
+    const next = upsertHistoryEntries(history, { target: state.target, selectedPassives: state.selectedPassives }, activeHistoryId);
+    history = next.entries; activeHistoryId = next.activeId; saveHistory();
   }
 
   function dbOpen() {
@@ -172,7 +239,7 @@
     if (!pal) return "";
     return `<article class="save-pal-card">
       <img src="${escapeHtml(pal.portrait)}" alt="" loading="lazy" />
-      <span class="save-pal-card__body"><span class="save-pal-card__name"><strong>${escapeHtml(pal.name)}</strong><small>Niv. ${individual.level} · <b class="save-pal-card__sex save-pal-card__sex--${individual.sex.toLowerCase()}">${sexSymbol(individual.sex)}</b></small></span>
+      <span class="save-pal-card__body"><span class="save-pal-card__name"><strong>${escapeHtml(pal.name)}</strong><small>Niv. ${individual.level} · <b class="save-pal-card__sex save-pal-card__sex--${individual.sex.toLowerCase()}">${sexIcon(individual.sex)}</b></small></span>
       <span class="save-pal-card__passives">${individual.passives.map((id) => passiveChip(id)).join("")}</span></span>
     </article>`;
   }
@@ -243,7 +310,19 @@
   }
 
   function selectionSummary() {
-    return `${targetPicker()}${passivesPanel()}`;
+    return `${targetPicker()}${passivesPanel()}${historyPanel()}`;
+  }
+
+  function historyPanel() {
+    if (!history.length) return `<section class="save-history"><header><span class="eyebrow">Historique</span></header><p>Aucun calcul récent.</p></section>`;
+    return `<section class="save-history"><header><span class="eyebrow">Historique</span></header><div>${history.map((entry) => {
+      const pal = palInfo(entry.target); if (!pal) return "";
+      return `<article class="save-history__entry${entry.id === activeHistoryId ? " is-active" : ""}" data-history-tooltip="${escapeHtml(entry.id)}">
+        <button type="button" class="save-history__load" data-load-history="${escapeHtml(entry.id)}"><img src="${escapeHtml(pal.portrait)}" alt="" /><span>${escapeHtml(pal.name)}</span></button>
+        <button type="button" class="save-history__pin${entry.pinned ? " is-pinned" : ""}" data-pin-history="${escapeHtml(entry.id)}" aria-label="${entry.pinned ? "Désépingler" : "Épingler"} ${escapeHtml(pal.name)}" aria-pressed="${entry.pinned}">◆</button>
+        <button type="button" class="save-history__delete" data-delete-history="${escapeHtml(entry.id)}" aria-label="Supprimer ${escapeHtml(pal.name)} de l’historique">×</button>
+      </article>`;
+    }).join("")}</div></section>`;
   }
 
   function modalTemplates() {
@@ -297,7 +376,7 @@
         return `<section class="save-passive-tier"><header><strong>${group.label}</strong><span>${groupRows.length}</span></header><div>${groupRows.map((passive) => {
           const selected = state.selectedPassives.includes(passive.id);
           const owned = allAvailable.has(passive.id);
-          const blocked = !owned || (state.selectedPassives.length >= 4 && !selected);
+          const blocked = (!owned && !selected) || (state.selectedPassives.length >= 4 && !selected);
           return `<button type="button" data-toggle-passive="${escapeHtml(passive.id)}" data-passive-tooltip="${escapeHtml(passive.id)}" aria-pressed="${selected}" class="${passiveClass(passive.rank)}${selected ? " is-selected" : ""}${owned ? "" : " is-unowned"}${blocked && owned ? " is-limit-blocked" : ""}" ${blocked ? `disabled aria-disabled="true"` : ""}><strong>${escapeHtml(passive.name)}</strong>${passiveRankIcon(passive)}<span class="save-passive-tier__selection" aria-hidden="true">${selected ? "✓" : "+"}</span></button>`;
         }).join("")}</div></section>`;
       }).join("")}</div>
@@ -424,7 +503,7 @@
       return `<article class="breeding-node save-tree-node${final ? " save-tree-node--final" : ""}" style="left:${x}px;top:${y}px">
         ${node.owned ? "" : `<span class="save-egg"><img src="${eggAsset}" alt="${escapeHtml(eggName)}" /></span>`}
         ${isNewSpecies ? `<span class="save-tree-node__new">Nouveau</span>` : ""}
-        <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span><strong>${escapeHtml(pal.name)}</strong>${requiredSex ? `<b class="breeding-node__sex breeding-node__sex--${requiredSex.toLowerCase()}" aria-label="${requiredSex === "Male" ? "Mâle requis" : "Femelle requise"}">${sexSymbol(requiredSex)}</b>` : ""}</span></span>
+        <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span><strong>${escapeHtml(pal.name)}</strong>${requiredSex ? `<b class="breeding-node__sex breeding-node__sex--${requiredSex.toLowerCase()}" aria-label="${requiredSex === "Male" ? "Mâle requis" : "Femelle requise"}">${sexIcon(requiredSex)}</b>` : ""}</span></span>
         ${useful.length ? `<span class="save-tree-node__passives">${useful.map((id) => passiveChip(id)).join("")}</span>` : ""}
       </article>`;
     }).join("");
@@ -490,7 +569,7 @@
       carrierWorker.onmessage = ({ data }) => {
         if (data.requestId !== requestId) return;
         treeResult = data.type === "solved" ? data.result : { error: "Le calcul n’a pas pu être terminé." };
-        calculating = false; carrierWorker.terminate(); carrierWorker = null; render(true);
+        calculating = false; carrierWorker.terminate(); carrierWorker = null; recordHistory(); render(true);
       };
       carrierWorker.onerror = (workerError) => {
         console.error("Échec du solveur :", workerError.message);
@@ -661,6 +740,7 @@
     const targetButton = event.target.closest("[data-save-target]");
     if (targetButton) {
       state.target = targetButton.dataset.saveTarget;
+      activeHistoryId = null;
       targetQuery = "";
       saveState(); scheduleSolve(true); return;
     }
@@ -672,11 +752,29 @@
       saveState(); render(false); scheduleSolve(); return;
     }
     if (event.target.closest("[data-clear-passives]")) { state.selectedPassives = []; saveState(); render(false); scheduleSolve(); return; }
+    const historyPin = event.target.closest("[data-pin-history]");
+    if (historyPin) {
+      const entry = history.find((item) => item.id === historyPin.dataset.pinHistory);
+      if (entry) { entry.pinned = !entry.pinned; history = normalizeHistoryEntries(history); saveHistory(); render(false); }
+      return;
+    }
+    const historyDelete = event.target.closest("[data-delete-history]");
+    if (historyDelete) {
+      const id = historyDelete.dataset.deleteHistory; history = history.filter((entry) => entry.id !== id);
+      if (activeHistoryId === id) activeHistoryId = null;
+      saveHistory(); render(false); return;
+    }
+    const historyLoad = event.target.closest("[data-load-history]");
+    if (historyLoad) {
+      const entry = history.find((item) => item.id === historyLoad.dataset.loadHistory);
+      if (entry) { activeHistoryId = entry.id; state.target = entry.target; state.selectedPassives = [...entry.selectedPassives]; targetQuery = ""; saveState(); scheduleSolve(true); }
+      return;
+    }
     if (event.target.closest("button[data-close-passive-modal]") || (event.target.matches("[data-close-passive-modal]") && shouldCloseFromBackdrop(event.target))) { passiveModalOpen = false; modalPointerDownOnBackdrop = null; render(false); return; }
     const worldChoice = event.target.closest("[data-world-index]"); if (worldChoice) { selectedWorldIndex = Number(worldChoice.dataset.worldIndex); render(false); return; }
     if (event.target.closest("[data-import-world]")) { const world = pendingWorlds[selectedWorldIndex]; if (world) void parseWorld(world); return; }
     if (event.target.closest("button[data-close-world-modal]") || (event.target.matches("[data-close-world-modal]") && shouldCloseFromBackdrop(event.target))) { worldModalOpen = false; modalPointerDownOnBackdrop = null; render(false); return; }
-    if (event.target.closest("[data-clear-save-target]")) { state.target = null; treeResult = null; saveState(); scheduleSolve(true); return; }
+    if (event.target.closest("[data-clear-save-target]")) { state.target = null; activeHistoryId = null; treeResult = null; saveState(); scheduleSolve(true); return; }
   }
 
   function handleInput(event) {
@@ -693,6 +791,7 @@
   }
 
   function showTooltip(target) {
+    const historyEntry = target.dataset.historyTooltip && history.find((entry) => entry.id === target.dataset.historyTooltip);
     const passive = passiveInfo(target.dataset.passiveTooltip);
     let tooltip = document.querySelector(".save-passive-tooltip");
     if (!tooltip) {
@@ -701,7 +800,10 @@
       tooltip.setAttribute("role", "tooltip");
       document.body.append(tooltip);
     }
-    tooltip.innerHTML = `<strong>${escapeHtml(passive.name)}</strong><span>${escapeHtml(passiveEffectText(passive.effect))}</span>`;
+    tooltip.classList.toggle("save-history-tooltip", Boolean(historyEntry));
+    tooltip.innerHTML = historyEntry
+      ? `<strong>${escapeHtml(palInfo(historyEntry.target)?.name || historyEntry.target)}</strong><span class="save-history-tooltip__chips">${historyEntry.selectedPassives.length ? historyEntry.selectedPassives.map((id) => passiveChip(id)).join("") : "Aucun passif demandé"}</span>`
+      : `<strong>${escapeHtml(passive.name)}</strong><span>${escapeHtml(passiveEffectText(passive.effect))}</span>`;
     tooltip.hidden = false;
     const rect = target.getBoundingClientRect();
     const tooltipRect = tooltip.getBoundingClientRect();
@@ -736,10 +838,10 @@
   document.addEventListener("input", handleInput);
   document.addEventListener("change", handleChange);
   document.addEventListener("pointerdown", handlePointerDown);
-  document.addEventListener("pointerover", (event) => { const target = event.target.closest("[data-passive-tooltip]"); if (target) showTooltip(target); });
-  document.addEventListener("pointerout", (event) => { const target = event.target.closest("[data-passive-tooltip]"); if (target && !target.contains(event.relatedTarget)) hideTooltip(); });
-  document.addEventListener("focusin", (event) => { const target = event.target.closest("[data-passive-tooltip]"); if (target) showTooltip(target); });
-  document.addEventListener("focusout", (event) => { if (event.target.closest("[data-passive-tooltip]")) hideTooltip(); });
+  document.addEventListener("pointerover", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-history-tooltip]"); if (target) showTooltip(target); });
+  document.addEventListener("pointerout", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-history-tooltip]"); if (target && !target.contains(event.relatedTarget)) hideTooltip(); });
+  document.addEventListener("focusin", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-history-tooltip]"); if (target) showTooltip(target); });
+  document.addEventListener("focusout", (event) => { if (event.target.closest("[data-passive-tooltip], [data-history-tooltip]")) hideTooltip(); });
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
     if (passiveModalOpen) { passiveModalOpen = false; render(false); }
@@ -788,6 +890,11 @@
       scaleLimits: { min: MIN_SCALE, max: MAX_SCALE },
       handlePointerDown,
       shouldCloseFromBackdrop,
+      sexIcon,
+      historyPlanKey,
+      normalizeHistoryEntries,
+      upsertHistoryEntries,
+      historyPanel,
     },
   };
 })();
