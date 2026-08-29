@@ -29,7 +29,7 @@ const roster = [
   { id: "b", speciesId: "B", sex: "Female", passives: ["P2"] },
   { id: "d", speciesId: "D", sex: "Female", passives: [] },
 ];
-const solve = (desiredPassives) => context.ProbabilisticBreedingSolver.solve({ roster, targetId: "Target", desiredPassives, childFor, maxDurationMs: 1000 });
+const solve = (desiredPassives) => context.ProbabilisticBreedingSolver.solve({ roster, targetId: "Target", desiredPassives, childFor, speciesIds: ["A", "B", "C", "D", "Target"], maxDurationMs: 1000 });
 for (let count = 1; count <= 2; count += 1) {
   const result = solve(["P1", "P2"].slice(0, count));
   assert.ok(result.root, `route ${count} passive(s)`);
@@ -91,25 +91,6 @@ const deepBranchResult = context.ProbabilisticBreedingSolver.solve({
   maxDurationMs: 1000,
 });
 assert.ok(deepBranchResult.root?.plannedJoinCount >= 2, "multi-level planned branches remain reusable");
-const restrictedDeepBranchResult = context.ProbabilisticBreedingSolver.solve({
-  roster: [
-    { id: "a", speciesId: "A", sex: "Female", passives: ["T1"] },
-    { id: "b", speciesId: "B", sex: "Male", passives: [] },
-    { id: "d", speciesId: "D", sex: "Female", passives: ["T2"] },
-    { id: "e", speciesId: "E", sex: "Male", passives: [] },
-    { id: "h", speciesId: "H", sex: "Female", passives: ["T3"] },
-    { id: "i", speciesId: "I", sex: "Male", passives: ["T4"] },
-  ],
-  targetId: "Target", desiredPassives: ["T1", "T2", "T3", "T4"],
-  speciesIds: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "Target"],
-  childFor: (a, b) => ({
-    "A+B": "C", "D+E": "F", "C+F": "G", "H+I": "J", "G+J": "Target",
-  })[[a, b].sort().join("+")] || null,
-  allowPlannedIntermediates: false,
-  maxDurationMs: 1000,
-});
-assert.ok(!restrictedDeepBranchResult.root, "historical restriction cannot solve a multi-level planned topology");
-
 const specialSex = context.ProbabilisticBreedingSolver.solve({
   roster: [
     { id: "female", speciesId: "Kat", sex: "Female", passives: ["S1"] },
@@ -120,4 +101,26 @@ const specialSex = context.ProbabilisticBreedingSolver.solve({
 });
 assert.ok(specialSex.root, "gender-constrained special breeding");
 
-console.log(JSON.stringify({ probabilityFixtures: 10, deterministic: true, cleanSource: true, branches: true, deepBranches: true, specialSex: true, sampleMs: first.durationMs }));
+const interrupted = context.ProbabilisticBreedingSolver.solve({
+  roster, targetId: "Target", desiredPassives: ["P1", "P2"], childFor,
+  speciesIds: ["A", "B", "C", "D", "Target"], maxDurationMs: 0,
+});
+assert.equal(interrupted.truncated, true, "interrupted search is explicit");
+assert.equal(interrupted.timeout, true, "timeout is explicit");
+assert.match(interrupted.error, /interrompue/i);
+
+const largeRoster = Array.from({ length: 690 }, (_, index) => ({
+  id: `large-${index}`,
+  speciesId: ["A", "B", "D"][index % 3],
+  sex: index % 2 ? "Male" : "Female",
+  passives: index < 4 ? [`L${index + 1}`] : [],
+}));
+const largeStartedAt = performance.now();
+const largeResult = context.ProbabilisticBreedingSolver.solve({
+  roster: largeRoster, targetId: "Target", desiredPassives: ["L1", "L2", "L3", "L4"],
+  childFor, speciesIds: ["A", "B", "C", "D", "Target"], maxDurationMs: 3000,
+});
+assert.ok(largeResult.root || largeResult.truncated, "large roster returns a route or an explicit interruption");
+assert.ok(performance.now() - largeStartedAt < 3500, "large roster remains bounded");
+
+console.log(JSON.stringify({ probabilityFixtures: 10, deterministic: true, cleanSource: true, branches: true, deepBranches: true, specialSex: true, sampleMs: first.durationMs, largeRosterMs: largeResult.durationMs, largeRosterExpanded: largeResult.expanded }));

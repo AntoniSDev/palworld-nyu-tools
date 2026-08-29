@@ -46,6 +46,9 @@ const activeTemplate = context.SaveCumoir.template();
 if (activeTemplate.includes("data-save-roster") || activeTemplate.includes("data-save-search") || activeTemplate.includes("save-pal-card")) {
   throw new Error("The active Cumoir still renders the owned-Pal browser.");
 }
+if (activeTemplate.includes("Ancien calcul") || activeTemplate.includes("Nouveau calcul") || activeTemplate.includes("data-tree-view")) {
+  throw new Error("The retired solver switch is still rendered.");
+}
 const targetAutocomplete = {
   empty: api.targetResults("") === "",
   oneCharacter: api.targetResults("a") === "",
@@ -74,7 +77,7 @@ const objectives = available.filter((id) => context.PALWORLD_PASSIVES.some((pass
 const solveChecks = [];
 for (let count = 0; count <= 4; count += 1) {
   api.setTarget(target, objectives.slice(0, count));
-  const result = api.solveTarget();
+  const result = api.solveProbabilistic({ maxDurationMs: 5000 });
   if (!result.root && !result.error) throw new Error(`Solver returned neither a plan nor an explicit error (${count} passives).`);
   solveChecks.push({ count, solved: Boolean(result.root), result: result.summary || result.error });
 }
@@ -85,9 +88,10 @@ if (objectives.length) {
   if (probabilistic.root) {
     const graph = api.renderGraph(probabilistic);
     if (!graph.includes("data-cake-tooltip=\"") || !graph.includes("assets/items/")) throw new Error("Cake recommendation is missing from the shared tree renderer.");
+    if (!graph.includes('save-tree-node__new">Nouveau')) throw new Error("Planned intermediates are missing the Nouveau badge.");
     if (graph.includes("expectedBatches") || graph.includes("probability")) throw new Error("Internal probability data leaked into the UI.");
   }
-  solveChecks.push({ count: "new", solved: Boolean(probabilistic.root), result: probabilistic.summary || probabilistic.error, durationMs: probabilistic.durationMs, expanded: probabilistic.expanded });
+  solveChecks.push({ count: "unified", solved: Boolean(probabilistic.root), result: probabilistic.summary || probabilistic.error, durationMs: probabilistic.durationMs, expanded: probabilistic.expanded });
 }
 const anubisObjective = ["CoolTimeReduction_Up_2", "Legend", "Rare", "MoveSpeed_up_3"];
 if (anubisObjective.every((id) => available.includes(id))) {
@@ -98,19 +102,21 @@ if (anubisObjective.every((id) => available.includes(id))) {
   const branchMerges = (node) => node?.parents
     ? Number(node.parents.every((parent) => !parent.owned)) + node.parents.reduce((sum, parent) => sum + branchMerges(parent), 0)
     : 0;
-  for (const [label, allowPlannedIntermediates, maxDurationMs] of [["anubis-4-before", false, 4500], ["anubis-4-after", true, 4500]]) {
-    const anubis = api.solveProbabilistic({ allowPlannedIntermediates, maxDurationMs, maxExpanded: 80000 });
-    solveChecks.push({
-      count: label, solved: Boolean(anubis.root), result: anubis.summary || anubis.error,
-      durationMs: anubis.durationMs, expanded: anubis.expanded, expectedBatches: anubis.expectedBatches,
-      depth: plannedDepth(anubis.root), branchMerges: branchMerges(anubis.root),
-      topology: topology(anubis.root),
-      joinStats: anubis.joinStats, bestBranched: anubis.bestBranched, truncated: anubis.truncated,
-    });
-  }
+  const anubis = api.solveProbabilistic({ maxDurationMs: 5000 });
+  solveChecks.push({ count: "anubis-4", solved: Boolean(anubis.root), result: anubis.summary || anubis.error,
+    durationMs: anubis.durationMs, expanded: anubis.expanded, generated: anubis.generated,
+    expectedBatches: anubis.expectedBatches, depth: plannedDepth(anubis.root), branchMerges: branchMerges(anubis.root),
+    topology: topology(anubis.root), joinsConsidered: anubis.joinsConsidered, truncated: anubis.truncated });
+
+  api.setTarget("SheepBall", anubisObjective);
+  const lamball = api.solveProbabilistic({ maxDurationMs: 5000 });
+  if (!lamball.root) throw new Error(`Lamball four-passive benchmark failed: ${JSON.stringify(lamball)}`);
+  solveChecks.push({ count: "lamball-4", solved: true, result: lamball.summary, durationMs: lamball.durationMs,
+    expanded: lamball.expanded, generated: lamball.generated, expectedBatches: lamball.expectedBatches,
+    depth: plannedDepth(lamball.root), joinsConsidered: lamball.joinsConsidered });
 }
 api.setTarget("Baphomet_Dark", []);
-const incineramNoct = api.solveStructuralTarget();
+const incineramNoct = api.solveProbabilistic({ maxDurationMs: 5000 });
 if (!incineramNoct.root) throw new Error(`Structural zero-passive route failed: ${incineramNoct.error}`);
 const zeroPassiveGraph = api.renderGraph(incineramNoct);
 if (zeroPassiveGraph.includes("save-tree-node__passives")) throw new Error("Zero-passive graph renders empty passive areas.");

@@ -29,9 +29,8 @@
   let solveTimer = 0;
   let probabilisticWorker = null;
   let solveRequestId = 0;
-  let treeView = "legacy";
   let calculating = false;
-  const treeResults = { legacy: null, next: null };
+  let treeResult = null;
 
   const state = loadState();
 
@@ -300,8 +299,7 @@
   }
 
   function template() {
-    const activeGraph = treeResults[treeView];
-    const graphMarkup = calculating && treeView === "next" ? calculationStateTemplate() : graphTemplate(activeGraph);
+    const graphMarkup = calculating ? calculationStateTemplate() : graphTemplate(treeResult);
     return `<section class="breeding-page breeding-page--save" aria-label="Cumoir avec sauvegarde">
       <header class="breeding-page__header"><p class="eyebrow">Planificateur d’élevage</p><p>Le Cumoir travaille avec les Pals réellement présents dans votre sauvegarde.</p></header>
       ${activeWorld ? `<div class="breeding-top-tools breeding-top-tools--save"><section class="save-source-panel" aria-label="Sauvegarde active">${worldStatus()}</section>${inheritanceNote()}</div>` : ""}
@@ -312,7 +310,7 @@
         <aside class="breeding-panel save-breeding-panel">
           ${selectionSummary()}
         </aside>
-        <section class="breeding-canvas" data-save-viewport aria-label="Arbre généalogique interactif"><div class="save-tree-tabs" role="tablist" aria-label="Version du calcul"><button type="button" role="tab" data-tree-view="legacy" aria-selected="${treeView === "legacy"}">Ancien calcul</button><button type="button" role="tab" data-tree-view="next" aria-selected="${treeView === "next"}">Nouveau calcul</button></div><div class="breeding-canvas__tip">Molette : zoom · Cliquer-glisser : déplacer</div><div class="breeding-canvas__summary">${escapeHtml(activeGraph?.summary || "Arbre généalogique")}</div>${graphMarkup}</section>
+        <section class="breeding-canvas" data-save-viewport aria-label="Arbre généalogique interactif"><div class="breeding-canvas__tip">Molette : zoom · Cliquer-glisser : déplacer</div><div class="breeding-canvas__summary">${escapeHtml(treeResult?.summary || "Arbre généalogique")}</div>${graphMarkup}</section>
       </div>` : ""}
       ${modalTemplates()}
     </section>`;
@@ -422,6 +420,7 @@
       const eggAsset = `assets/eggs/t_itemicon_material_palegg${eggSuffix ? `_${eggSuffix}` : ""}.webp`;
       return `<article class="breeding-node save-tree-node${final ? " save-tree-node--final" : ""}" style="left:${x}px;top:${y}px">
         ${node.owned ? "" : `<span class="save-egg" data-egg-tooltip="${escapeHtml(eggName)}" tabindex="0"><img src="${eggAsset}" alt="${escapeHtml(eggName)}" /></span>`}
+        ${node.owned ? "" : `<span class="save-tree-node__new">Nouveau</span>`}
         <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span><strong>${escapeHtml(pal.name)}</strong>${requiredSex ? `<b class="breeding-node__sex breeding-node__sex--${requiredSex.toLowerCase()}" aria-label="${requiredSex === "Male" ? "Mâle requis" : "Femelle requise"}">${sexSymbol(requiredSex)}</b>` : ""}</span></span>
         ${useful.length ? `<span class="save-tree-node__passives">${useful.map((id) => passiveChip(id)).join("")}</span>` : ""}
       </article>`;
@@ -463,172 +462,31 @@
     return childIndex >= 0 ? species[childIndex]?.id || null : null;
   }
 
-  function maskFor(individual) {
-    return state.selectedPassives.reduce((mask, id, index) => individual.passives.includes(id) ? mask | (1 << index) : mask, 0);
-  }
-
-  function stateScore(item) {
-    return item.newCount * 10000 + item.generation * 100 + item.parasites * 3 + item.speciesId.toLowerCase().charCodeAt(0);
-  }
-
-  function solveTarget() {
-    const target = palInfo(state.target);
-    if (!target) return { error: "Choisissez un Pal cible pour calculer une route." };
-    const fullMask = (1 << state.selectedPassives.length) - 1;
-    const existing = roster.filter((individual) => individual.speciesId.toLowerCase() === target.id.toLowerCase() && (maskFor(individual) & fullMask) === fullMask);
-    if (existing.length) {
-      const individual = existing.sort((a, b) => a.passives.length - b.passives.length || b.level - a.level)[0];
-      return { summary: "Déjà présent dans votre sauvegarde", root: { speciesId: target.id, mask: fullMask, owned: true, sex: individual.sex, individualId: individual.id } };
-    }
-
-    const seeds = roster.map((individual) => ({
-      speciesId: palInfo(individual.speciesId)?.id,
-      mask: maskFor(individual),
-      generation: 0,
-      newCount: 0,
-      parasites: individual.passives.filter((id) => !state.selectedPassives.includes(id)).length,
-      owned: true,
-      sex: individual.sex,
-      individualId: individual.id,
-    })).filter((item) => item.speciesId);
-    if (!seeds.length) return { error: "Aucun Pal compatible n’a été trouvé dans cette sauvegarde." };
-
-    const best = new Map();
-    const accept = (item) => {
-      const key = `${item.speciesId}|${item.mask}`;
-      const previous = best.get(key);
-      if (!previous || stateScore(item) < stateScore(previous)) { best.set(key, item); return true; }
-      return false;
-    };
-    seeds.forEach(accept);
-    let frontier = Array.from(best.values()).sort((a, b) => stateScore(a) - stateScore(b)).slice(0, 420);
-    let answer = null;
-    for (let round = 1; round <= 5 && !answer; round++) {
-      const pool = Array.from(best.values()).sort((a, b) => stateScore(a) - stateScore(b)).slice(0, 520);
-      const next = [];
-      for (const a of frontier) {
-        for (const b of pool) {
-          if (a === b && a.owned) continue;
-          if (a.owned && b.owned && a.sex !== "Unknown" && b.sex !== "Unknown" && a.sex === b.sex) continue;
-          const child = childFor(a.speciesId, b.speciesId, a.sex, b.sex); if (!child) continue;
-          const item = {
-            speciesId: child,
-            mask: a.mask | b.mask,
-            generation: Math.max(a.generation, b.generation) + 1,
-            newCount: a.newCount + b.newCount + 1,
-            parasites: a.parasites + b.parasites,
-            owned: false,
-            sex: null,
-            parents: [a, b],
-          };
-          if (accept(item)) next.push(item);
-          if (child.toLowerCase() === target.id.toLowerCase() && item.mask === fullMask) {
-            if (!answer || stateScore(item) < stateScore(answer)) answer = item;
-          }
-        }
-      }
-      frontier = next.sort((a, b) => stateScore(a) - stateScore(b)).slice(0, 420);
-      if (!frontier.length) break;
-    }
-    return answer ? { summary: `${answer.newCount} étape${answer.newCount > 1 ? "s" : ""} d’élevage`, root: answer } : { error: "Aucune route valide trouvée avec cette sauvegarde." };
-  }
-
-  function solveStructuralTarget() {
-    const target = palInfo(state.target);
-    if (!target) return { error: "Choisissez un Pal cible pour calculer une route." };
-    const targetKey = target.id.toLowerCase();
-    const ownedTarget = roster
-      .filter((individual) => individual.speciesId.toLowerCase() === targetKey)
-      .sort((a, b) => b.level - a.level || a.id.localeCompare(b.id))[0];
-    if (ownedTarget) {
-      return { summary: "Déjà présent dans votre sauvegarde", root: { speciesId: target.id, mask: 0, owned: true, sex: ownedTarget.sex, individualId: ownedTarget.id } };
-    }
-
-    const compare = (a, b) => a.generation - b.generation || a.newCount - b.newCount || a.signature.localeCompare(b.signature);
-    const best = new Map();
-    const accept = (candidate) => {
-      const key = `${candidate.speciesId.toLowerCase()}|${candidate.sex}`;
-      const previous = best.get(key);
-      if (previous && compare(previous, candidate) <= 0) return false;
-      best.set(key, candidate);
-      return true;
-    };
-    const representatives = new Map();
-    roster.forEach((individual) => {
-      const pal = palInfo(individual.speciesId);
-      if (!pal) return;
-      const key = `${pal.id.toLowerCase()}|${individual.sex}`;
-      const candidate = {
-        speciesId: pal.id, mask: 0, generation: 0, newCount: 0, owned: true,
-        sex: individual.sex, individualId: individual.id,
-        signature: `0|${pal.id}|${individual.sex}|${individual.id}`,
-      };
-      const previous = representatives.get(key);
-      if (!previous || candidate.signature.localeCompare(previous.signature) < 0) representatives.set(key, candidate);
-    });
-    let frontier = [...representatives.values()].sort(compare);
-    frontier.forEach(accept);
-    if (!frontier.length) return { error: "Aucun Pal compatible n’a été trouvé dans cette sauvegarde." };
-
-    for (let generation = 1; generation <= 8; generation += 1) {
-      const pool = [...best.values()].sort(compare);
-      const next = [];
-      let answer = null;
-      for (const first of frontier) {
-        for (const second of pool) {
-          if (first.owned && second.owned && first.individualId === second.individualId) continue;
-          if (first.sex === second.sex) continue;
-          const child = childFor(first.speciesId, second.speciesId, first.sex, second.sex);
-          if (!child) continue;
-          for (const sex of ["Female", "Male"]) {
-            const candidate = {
-              speciesId: child, mask: 0, generation: Math.max(first.generation, second.generation) + 1,
-              newCount: first.newCount + second.newCount + 1, owned: false, sex,
-              parents: [first, second],
-              signature: `${generation}|${child}|${sex}|${first.signature}>${second.signature}`,
-            };
-            if (child.toLowerCase() === targetKey && (!answer || compare(candidate, answer) < 0)) answer = candidate;
-            if (accept(candidate)) next.push(candidate);
-          }
-        }
-      }
-      if (answer) return { summary: `${answer.newCount} étape${answer.newCount > 1 ? "s" : ""} d’élevage`, root: answer };
-      frontier = next.sort(compare);
-      if (!frontier.length) break;
-    }
-    return { error: "Aucune route structurelle valide trouvée avec cette sauvegarde." };
-  }
-
   function scheduleSolve(immediate = false) {
     clearTimeout(solveTimer);
     const run = () => {
-      treeResults.legacy = activeWorld ? solveTarget() : null;
-      if (!activeWorld) { probabilisticWorker?.terminate(); probabilisticWorker = null; treeResults.next = null; render(true); return; }
-      if (!state.target) { probabilisticWorker?.terminate(); probabilisticWorker = null; treeResults.next = treeResults.legacy; calculating = false; render(true); return; }
+      if (!activeWorld) { probabilisticWorker?.terminate(); probabilisticWorker = null; treeResult = null; render(true); return; }
+      if (!state.target) { probabilisticWorker?.terminate(); probabilisticWorker = null; treeResult = null; calculating = false; render(true); return; }
       calculating = true;
       render(true);
-      if (state.selectedPassives.length === 0) {
-        treeResults.next = solveStructuralTarget(); calculating = false; render(true); return;
-      }
       probabilisticWorker?.terminate();
       const requestId = ++solveRequestId;
-      probabilisticWorker = new Worker("js/probabilistic-solver.worker.js?v=0.9.2");
+      probabilisticWorker = new Worker("js/probabilistic-solver.worker.js?v=0.9.3");
       probabilisticWorker.onmessage = ({ data }) => {
         if (data.requestId !== requestId) return;
-        treeResults.next = data.type === "solved" ? data.result : { error: "Le nouveau calcul n’a pas pu être terminé." };
+        treeResult = data.type === "solved" ? data.result : { error: "Le calcul n’a pas pu être terminé." };
         calculating = false; probabilisticWorker.terminate(); probabilisticWorker = null; render(true);
       };
       probabilisticWorker.onerror = (workerError) => {
-        console.error("Échec du nouveau solveur probabiliste :", workerError.message);
+        console.error("Échec du solveur :", workerError.message);
         if (requestId !== solveRequestId) return;
-        treeResults.next = { error: "Le nouveau calcul n’a pas pu être terminé." };
+        treeResult = { error: "Le calcul n’a pas pu être terminé." };
         calculating = false; probabilisticWorker?.terminate(); probabilisticWorker = null; render(true);
       };
       probabilisticWorker.postMessage({
         type: "solve", requestId,
         input: {
           roster, targetId: state.target, desiredPassives: state.selectedPassives,
-          initialRoute: treeResults.legacy?.root, maxDurationMs: 4500, maxExpanded: 80000,
         },
       });
     };
@@ -723,7 +581,7 @@
         allAvailable.clear(); roster.forEach((pal) => pal.passives.forEach((id) => allAvailable.add(id)));
         state.target = previousGoal?.target || null;
         state.selectedPassives = previousGoal ? previousGoal.selectedPassives.filter((id) => allAvailable.has(id)).slice(0, 4) : [];
-        treeResults.legacy = null; treeResults.next = null; targetQuery = "";
+        treeResult = null; targetQuery = "";
         parsing = false; progress = ""; saveState();
         await dbPut({ activeWorld, roster }).catch((dbError) => console.error("Échec de la sauvegarde locale du roster :", dbError));
         scheduleSolve(true);
@@ -738,7 +596,7 @@
   }
 
   async function removeSave() {
-    await dbDelete(); roster = []; activeWorld = null; allAvailable.clear(); treeResults.legacy = null; treeResults.next = null; error = "";
+    await dbDelete(); roster = []; activeWorld = null; allAvailable.clear(); treeResult = null; error = "";
     Object.assign(state, { target: null, selectedPassives: [] }); saveState(); render();
   }
 
@@ -761,8 +619,6 @@
       return;
     }
     if (event.target.closest("[data-delete-save]")) { void removeSave(); return; }
-    const treeTab = event.target.closest("[data-tree-view]");
-    if (treeTab) { treeView = treeTab.dataset.treeView; render(true); return; }
     const targetButton = event.target.closest("[data-save-target]");
     if (targetButton) {
       state.target = targetButton.dataset.saveTarget;
@@ -782,7 +638,7 @@
     const worldChoice = event.target.closest("[data-world-index]"); if (worldChoice) { selectedWorldIndex = Number(worldChoice.dataset.worldIndex); render(false); return; }
     if (event.target.closest("[data-import-world]")) { const world = pendingWorlds[selectedWorldIndex]; if (world) void parseWorld(world); return; }
     if (event.target.matches(".save-modal-backdrop[data-close-world-modal]") || event.target.closest("button[data-close-world-modal]")) { worldModalOpen = false; render(false); return; }
-    if (event.target.closest("[data-clear-save-target]")) { state.target = null; treeResults.legacy = null; treeResults.next = null; saveState(); scheduleSolve(true); return; }
+    if (event.target.closest("[data-clear-save-target]")) { state.target = null; treeResult = null; saveState(); scheduleSolve(true); return; }
   }
 
   function handleInput(event) {
@@ -859,11 +715,6 @@
     template,
     render,
     setCalculating(value) { calculating = Boolean(value); render(false); },
-    setTreeResult(kind, result) {
-      if (!(kind in treeResults)) return;
-      treeResults[kind] = result;
-      if (treeView === kind) render(true);
-    },
     __test: {
       loadRoster(items) {
         roster = items;
@@ -874,10 +725,8 @@
         state.target = target;
         state.selectedPassives = selectedPassives;
       },
-      solveTarget,
-      solveStructuralTarget,
       solveProbabilistic(options = {}) {
-        return window.ProbabilisticBreedingSolver.solve({ roster, targetId: state.target, desiredPassives: state.selectedPassives, childFor, speciesIds: species.map((pal) => pal.id), initialRoute: solveTarget()?.root, ...options });
+        return window.ProbabilisticBreedingSolver.solve({ roster, targetId: state.target, desiredPassives: state.selectedPassives, childFor, speciesIds: species.map((pal) => pal.id), ...options });
       },
       renderGraph: graphTemplate,
       eggKind,

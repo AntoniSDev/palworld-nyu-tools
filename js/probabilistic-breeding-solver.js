@@ -1,311 +1,66 @@
-/* Palworld Nyu Tools — solveur probabiliste indépendant du calcul historique. GPL-3.0. */
+/* Palworld Nyu Tools — solveur d’élevage compact et autonome. GPL-3.0. */
 (() => {
   "use strict";
-
   const EPSILON = 1e-9;
-
-  function bits(value) {
-    let count = 0;
-    for (let remaining = value; remaining; remaining &= remaining - 1) count += 1;
-    return count;
-  }
-
-  function normalizeSex(sex) {
-    return sex === "Male" || sex === "Female" ? sex : "Unknown";
-  }
-
-  function compareStates(a, b) {
-    if (Math.abs(a.cost - b.cost) > EPSILON) return a.cost - b.cost;
-    return a.stepCount - b.stepCount
-      || a.maxUnknownExtras - b.maxUnknownExtras
-      || b.ownedSources - a.ownedSources
-      || a.speciesId.localeCompare(b.speciesId)
-      || String(a.individualId || a.signature).localeCompare(String(b.individualId || b.signature));
-  }
+  const CAKES = [null, "standard", "vegetable", "special"];
+  function bits(value) { let count = 0; for (; value; value &= value - 1) count += 1; return count; }
+  function normalizeSex(sex) { return sex === "Male" || sex === "Female" ? sex : "Unknown"; }
+  function compareStates(a, b) { return Math.abs(a.cost - b.cost) > EPSILON ? a.cost - b.cost : a.stepCount - b.stepCount || (a.depth || 0) - (b.depth || 0); }
 
   class Queue {
-    constructor() { this.items = []; }
-    get size() { return this.items.length; }
-    push(item) {
-      let index = this.items.length;
-      this.items.push(item);
-      while (index) {
-        const parent = Math.floor((index - 1) / 2);
-        if (compareStates(this.items[parent], item) <= 0) break;
-        this.items[index] = this.items[parent]; index = parent;
-      }
-      this.items[index] = item;
-    }
-    pop() {
-      if (!this.items.length) return null;
-      const first = this.items[0];
-      const tail = this.items.pop();
-      if (this.items.length) {
-        let index = 0;
-        while (true) {
-          const left = index * 2 + 1;
-          if (left >= this.items.length) break;
-          const right = left + 1;
-          const child = right < this.items.length && compareStates(this.items[right], this.items[left]) < 0 ? right : left;
-          if (compareStates(tail, this.items[child]) <= 0) break;
-          this.items[index] = this.items[child]; index = child;
-        }
-        this.items[index] = tail;
-      }
-      return first;
-    }
+    constructor(capacity, cost, priority, steps, depth) { this.heap = new Int32Array(capacity); this.pos = new Int32Array(capacity); this.pos.fill(-1); this.length = 0; this.cost = cost; this.priority = priority; this.steps = steps; this.depth = depth; }
+    get size() { return this.length; }
+    less(a, b) { const difference = this.priority[a] - this.priority[b]; return Math.abs(difference) > EPSILON ? difference < 0 : this.cost[a] < this.cost[b] - EPSILON || (Math.abs(this.cost[a] - this.cost[b]) <= EPSILON && (this.steps[a] < this.steps[b] || (this.steps[a] === this.steps[b] && (this.depth[a] < this.depth[b] || (this.depth[a] === this.depth[b] && a < b))))); }
+    swap(a, b) { const x = this.heap[a]; const y = this.heap[b]; this.heap[a] = y; this.heap[b] = x; this.pos[x] = b; this.pos[y] = a; }
+    update(state) { let index = this.pos[state]; if (index < 0) { index = this.length++; this.heap[index] = state; this.pos[state] = index; } while (index) { const parent = (index - 1) >> 1; if (!this.less(this.heap[index], this.heap[parent])) break; this.swap(index, parent); index = parent; } }
+    pop() { if (!this.length) return -1; const result = this.heap[0]; this.pos[result] = -1; this.length -= 1; if (this.length) { const tail = this.heap[this.length]; this.heap[0] = tail; this.pos[tail] = 0; let index = 0; while (true) { const left = index * 2 + 1; if (left >= this.length) break; const right = left + 1; const child = right < this.length && this.less(this.heap[right], this.heap[left]) ? right : left; if (!this.less(this.heap[child], this.heap[index])) break; this.swap(index, child); index = child; } } return result; }
   }
 
   function solve(input) {
-    const probability = window.PassiveProbability;
-    if (!probability) return { error: "Le module de probabilités n’est pas disponible." };
-    const { roster, targetId, desiredPassives, childFor } = input;
-    const startedAt = performance.now();
-    const desiredIndex = new Map(desiredPassives.map((id, index) => [id, index]));
-    const fullMask = (1 << desiredPassives.length) - 1;
-    const targetKey = String(targetId).toLowerCase();
-    const unique = (ids) => [...new Set(ids || [])];
-    const maskOf = (ids) => unique(ids).reduce((mask, id) => {
-      const index = desiredIndex.get(id); return index === undefined ? mask : mask | (1 << index);
-    }, 0);
-    const owned = roster.map((pal, index) => {
-      const passiveIds = unique(pal.passives);
-      const mask = maskOf(passiveIds);
-      return {
-        speciesId: pal.speciesId, mask, exactPassives: passiveIds,
-        maxUnknownExtras: passiveIds.filter((id) => !desiredIndex.has(id)).length,
-        sex: normalizeSex(pal.sex), owned: true, individualId: pal.id || `owned-${index}`,
-        cost: 0, stepCount: 0, ownedSources: 1,
-        plannedJoinCount: 0,
-        signature: `${pal.speciesId}|${normalizeSex(pal.sex)}|${passiveIds.slice().sort().join(",")}|${pal.id || index}`,
-      };
-    }).sort(compareStates);
+    const probability = window.PassiveProbability; const startedAt = performance.now();
+    const finish = (result) => ({ ...result, durationMs: performance.now() - startedAt });
+    if (!probability) return finish({ error: "Le module de probabilités n’est pas disponible.", truncated: false, timeout: false, expanded: 0 });
+    const roster = input.roster || []; const desired = [...new Set(input.desiredPassives || [])].slice(0, 4);
+    const speciesIds = [...new Set((input.speciesIds || roster.map((pal) => pal.speciesId)).concat(input.targetId))];
+    const speciesIndex = new Map(speciesIds.map((id, index) => [String(id).toLowerCase(), index]));
+    const target = speciesIndex.get(String(input.targetId).toLowerCase());
+    if (target === undefined) return finish({ error: "Le Pal cible est absent des données d’élevage.", truncated: false, timeout: false, expanded: 0 });
+    if (!roster.length) return finish({ error: "Aucun Pal compatible n’a été trouvé dans cette sauvegarde.", truncated: false, timeout: false, expanded: 0 });
+    const desiredIndex = new Map(desired.map((id, index) => [id, index])); const masks = 1 << desired.length; const fullMask = masks - 1;
+    const maskOf = (ids) => [...new Set(ids || [])].reduce((mask, id) => desiredIndex.has(id) ? mask | (1 << desiredIndex.get(id)) : mask, 0);
+    const owned = roster.map((pal, index) => { const passives = [...new Set(pal.passives || [])]; return { species: speciesIndex.get(String(pal.speciesId).toLowerCase()), mask: maskOf(passives), extras: passives.filter((id) => !desiredIndex.has(id)).length, passives, sex: normalizeSex(pal.sex), id: pal.id || `owned-${index}` }; }).filter((pal) => pal.species !== undefined && pal.sex !== "Unknown");
+    const available = new Set(owned.flatMap((pal) => pal.passives));
+    if (desired.some((id) => !available.has(id))) return finish({ error: "Un ou plusieurs passifs choisis sont absents de cette sauvegarde.", truncated: false, timeout: false, expanded: 0 });
+    const existing = owned.filter((pal) => pal.species === target && pal.mask === fullMask).sort((a, b) => a.extras - b.extras || String(a.id).localeCompare(String(b.id)))[0];
+    const ownedNode = (pal) => ({ speciesId: speciesIds[pal.species], mask: pal.mask, maxUnknownExtras: pal.extras, exactPassives: pal.passives, sex: pal.sex, owned: true, individualId: pal.id, cost: 0, stepCount: 0, depth: 0, plannedJoinCount: 0 });
+    if (existing) return finish({ summary: "Déjà présent dans votre sauvegarde", root: ownedNode(existing), expectedBatches: 0, expanded: 0, generated: 0, joinsConsidered: 0, truncated: false, timeout: false });
 
-    const existing = owned.filter((pal) => pal.speciesId.toLowerCase() === targetKey && (pal.mask & fullMask) === fullMask)
-      .sort((a, b) => a.maxUnknownExtras - b.maxUnknownExtras || compareStates(a, b))[0];
-    if (existing) return { summary: "Déjà présent dans votre sauvegarde", root: existing, expectedBatches: 0, expanded: 0, durationMs: performance.now() - startedAt };
-    if (!owned.length) return { error: "Aucun Pal compatible n’a été trouvé dans cette sauvegarde." };
-    const available = new Set(owned.flatMap((pal) => pal.exactPassives));
-    const missing = desiredPassives.filter((id) => !available.has(id));
-    if (missing.length) return { error: "Un ou plusieurs passifs choisis sont absents de cette sauvegarde." };
-
-    const representativeOwned = [];
-    const byEquivalentRole = new Map();
-    for (const pal of owned) {
-      const key = `${pal.speciesId.toLowerCase()}|${pal.sex}|${pal.mask}`;
-      const group = byEquivalentRole.get(key) || [];
-      const passiveSet = new Set(pal.exactPassives);
-      if (group.some((kept) => kept.exactPassives.every((id) => passiveSet.has(id)))) continue;
-      const survivors = group.filter((kept) => !pal.exactPassives.every((id) => new Set(kept.exactPassives).has(id)));
-      survivors.push(pal); byEquivalentRole.set(key, survivors);
-    }
-    byEquivalentRole.forEach((group) => representativeOwned.push(...group));
-    representativeOwned.sort(compareStates);
-
-    const keyOf = (pal) => `${pal.speciesId.toLowerCase()}|${pal.mask}|${pal.maxUnknownExtras}|${pal.sex}`;
-    const bestExact = new Map();
-    const pareto = new Map();
-    const queue = new Queue();
-    const settled = [];
-    const settledBySpecies = new Map();
-    const settledByMaskAndSex = new Map();
-    const targetPartners = new Map();
-    const partnerActionCache = new Map();
-    let bestAnswer = null;
-    let bestBranchedAnswer = null;
-    let expanded = 0;
-    const joinStats = { considered: 0, noMaskGain: 0, stale: 0, invalid: 0, generated: 0 };
-
-    const speciesIds = (input.speciesIds || [...new Set(owned.map((pal) => pal.speciesId))]).slice().sort();
-    const sexes = ["Female", "Male"];
-    for (let first = 0; first < speciesIds.length; first += 1) {
-      for (let second = first; second < speciesIds.length; second += 1) {
-        let reachesTarget = false;
-        for (const firstSex of sexes) for (const secondSex of sexes) {
-          if (firstSex !== secondSex && childFor(speciesIds[first], speciesIds[second], firstSex, secondSex)?.toLowerCase() === targetKey) reachesTarget = true;
-        }
-        if (!reachesTarget) continue;
-        const add = (from, to) => { const set = targetPartners.get(from.toLowerCase()) || new Set(); set.add(to.toLowerCase()); targetPartners.set(from.toLowerCase(), set); };
-        add(speciesIds[first], speciesIds[second]); add(speciesIds[second], speciesIds[first]);
-      }
-    }
-
-    function accept(candidate) {
-      if (!Number.isFinite(candidate.cost) || candidate.cost >= (bestAnswer?.cost ?? Infinity) - EPSILON) return false;
-      const exactKey = keyOf(candidate);
-      const previous = bestExact.get(exactKey);
-      if (previous && compareStates(previous, candidate) <= 0) return false;
-      const frontKey = `${candidate.speciesId.toLowerCase()}|${candidate.mask}|${candidate.sex}`;
-      const front = pareto.get(frontKey) || [];
-      if (front.some((item) => item.cost <= candidate.cost + EPSILON && item.maxUnknownExtras <= candidate.maxUnknownExtras)) return false;
-      const removed = front.filter((item) => candidate.cost <= item.cost + EPSILON && candidate.maxUnknownExtras <= item.maxUnknownExtras);
-      removed.forEach((item) => { if (bestExact.get(keyOf(item)) === item) bestExact.delete(keyOf(item)); });
-      const survivors = front.filter((item) => !removed.includes(item));
-      survivors.push(candidate); pareto.set(frontKey, survivors); bestExact.set(exactKey, candidate); queue.push(candidate); return true;
-    }
-
-    function validPair(a, b) {
-      if (a.owned && b.owned && a.individualId === b.individualId) return false;
-      return !(a.sex !== "Unknown" && b.sex !== "Unknown" && a.sex === b.sex);
-    }
-
-    function plannedPartnerActions(planned) {
-      const cacheKey = `${planned.speciesId.toLowerCase()}|${planned.sex}`;
-      if (partnerActionCache.has(cacheKey)) return partnerActionCache.get(cacheKey);
-      const best = new Map();
-      for (const partner of representativeOwned) {
-        if (!validPair(planned, partner)) continue;
-        const child = childFor(planned.speciesId, partner.speciesId, planned.sex, partner.sex);
-        if (!child) continue;
-        const key = `${child.toLowerCase()}|${partner.mask}|${partner.sex}`;
-        const previous = best.get(key);
-        if (!previous || partner.maxUnknownExtras < previous.maxUnknownExtras
-          || (partner.maxUnknownExtras === previous.maxUnknownExtras && compareStates(partner, previous) < 0)) best.set(key, partner);
-      }
-      const actions = [...best.values()].sort(compareStates);
-      partnerActionCache.set(cacheKey, actions);
-      return actions;
-    }
-
-    function poolSize(a, b, nextMask) {
-      if (a.owned && b.owned) return new Set(a.exactPassives.concat(b.exactPassives)).size;
-      const outside = (pal) => pal.owned
-        ? pal.exactPassives.filter((id) => {
-          const index = desiredIndex.get(id); return index === undefined || (nextMask & (1 << index)) === 0;
-        }).length
-        : pal.maxUnknownExtras;
-      return Math.min(8, bits(nextMask) + outside(a) + outside(b));
-    }
-
-    // Une route structurelle déjà connue peut servir uniquement de borne haute
-    // initiale. Elle est entièrement réévaluée avec les probabilités du nouveau
-    // moteur et n’influence ni sa queue ni ses règles de dominance.
-    function scoreInitialRoute(node, final = false) {
-      if (!node) return null;
-      if (!node.parents) {
-        const source = owned.find((pal) => pal.individualId === node.individualId)
-          || owned.find((pal) => pal.speciesId.toLowerCase() === String(node.speciesId).toLowerCase() && pal.mask === node.mask);
-        return source || null;
-      }
-      const first = scoreInitialRoute(node.parents[0]);
-      const second = scoreInitialRoute(node.parents[1]);
-      if (!first || !second || !validPair(first, second)) return null;
-      if (childFor(first.speciesId, second.speciesId, first.sex, second.sex)?.toLowerCase() !== String(node.speciesId).toLowerCase()) return null;
-      const mask = first.mask | second.mask;
-      const extras = final ? 4 - desiredPassives.length : 0;
-      const recommendation = probability.recommend(poolSize(first, second, mask), bits(mask), extras);
-      if (!recommendation) return null;
-      return {
-        speciesId: node.speciesId, mask, maxUnknownExtras: extras, sex: normalizeSex(node.sex), owned: false,
-        parents: [first, second], recommendedCake: recommendation.cake,
-        cost: first.cost + second.cost + 1 / recommendation.probability,
-        stepCount: first.stepCount + second.stepCount + 1,
-        ownedSources: first.ownedSources + second.ownedSources,
-        plannedJoinCount: first.plannedJoinCount + second.plannedJoinCount + Number(!first.owned && !second.owned),
-        signature: `warm|${first.signature}>${second.signature}|${node.speciesId}|${extras}`,
-      };
-    }
-
-    if (input.initialRoute) {
-      const warm = scoreInitialRoute(input.initialRoute, true);
-      if (warm && warm.speciesId.toLowerCase() === targetKey && (warm.mask & fullMask) === fullMask) bestAnswer = warm;
-    }
-
-    function createChildren(a, b, finalOnly = false, plannedJoin = false) {
-      if (!validPair(a, b)) { if (plannedJoin) joinStats.invalid += 1; return; }
-      const childSpecies = childFor(a.speciesId, b.speciesId, a.sex, b.sex);
-      if (!childSpecies) { if (plannedJoin) joinStats.invalid += 1; return; }
-      const nextMask = a.mask | b.mask;
-      const isTarget = childSpecies.toLowerCase() === targetKey && (nextMask & fullMask) === fullMask;
-      if (finalOnly && !isTarget) return;
-      const desiredCount = bits(nextMask);
-      const unionSize = poolSize(a, b, nextMask);
-      const maxAllowed = isTarget ? 4 - desiredPassives.length : 4 - desiredCount;
-      const extrasVariants = isTarget ? [maxAllowed] : Array.from({ length: maxAllowed + 1 }, (_, index) => index);
-      for (const extras of extrasVariants) {
-        const recommendation = probability.recommend(unionSize, desiredCount, extras);
-        if (!recommendation) continue;
-        const cost = a.cost + b.cost + 1 / recommendation.probability;
-        const child = {
-          speciesId: childSpecies, mask: nextMask, maxUnknownExtras: extras,
-          sex: "Unknown", owned: false, parents: [a, b], recommendedCake: recommendation.cake,
-          cost, stepCount: a.stepCount + b.stepCount + 1,
-          ownedSources: a.ownedSources + b.ownedSources,
-          plannedJoinCount: a.plannedJoinCount + b.plannedJoinCount + Number(!a.owned && !b.owned),
-          signature: `${childSpecies}|${nextMask}|${extras}|${a.signature}>${b.signature}|${recommendation.cake}`,
-        };
-        if (isTarget) {
-          if (child.plannedJoinCount > 0 && (!bestBranchedAnswer || compareStates(child, bestBranchedAnswer) < 0)) bestBranchedAnswer = child;
-          if (!bestAnswer || compareStates(child, bestAnswer) < 0) bestAnswer = child;
-        } else {
-          for (const sex of ["Female", "Male"]) {
-            if (accept({ ...child, sex, signature: `${child.signature}|${sex}` }) && plannedJoin) joinStats.generated += 1;
-          }
-        }
-      }
-    }
-
-    // Tous les couples réels constituent des arêtes de coût initial nul + un batch.
-    for (let first = 0; first < representativeOwned.length; first += 1) {
-      for (let second = first + 1; second < representativeOwned.length; second += 1) createChildren(representativeOwned[first], representativeOwned[second]);
-    }
-
-    const maxExpanded = input.maxExpanded || 80000;
-    const maxDurationMs = input.maxDurationMs || 4500;
-    while (queue.size && expanded < maxExpanded && performance.now() - startedAt < maxDurationMs) {
-      const current = queue.pop();
-      if (!current || bestExact.get(keyOf(current)) !== current || current.cost >= (bestAnswer?.cost ?? Infinity) - EPSILON) continue;
-      expanded += 1; settled.push(current);
-      const speciesGroup = settledBySpecies.get(current.speciesId.toLowerCase()) || [];
-      speciesGroup.push(current); settledBySpecies.set(current.speciesId.toLowerCase(), speciesGroup);
-      for (const partner of plannedPartnerActions(current)) createChildren(current, partner);
-
-      if (input.allowPlannedIntermediates !== false) {
-        // Jointures multi-branches ciblées, indexées par masque et sexe. Les états
-        // sont déjà des représentants Pareto coût/propreté ; les entrées devenues
-        // dominées sont ignorées avant d'évaluer le croisement.
-        const oppositeSex = current.sex === "Female" ? "Male" : "Female";
-        for (let partnerMask = 0; partnerMask <= fullMask; partnerMask += 1) {
-          const nextMask = current.mask | partnerMask;
-          // Une jointure doit améliorer au moins l’une des deux branches. Une
-          // amélioration unilatérale reste utile pour changer d’espèce sur le
-          // chemin vers la cible, notamment avec un partenaire structurel vide.
-          if (nextMask === current.mask && nextMask === partnerMask) { joinStats.noMaskGain += 1; continue; }
-          const partners = settledByMaskAndSex.get(`${partnerMask}|${oppositeSex}`) || [];
-          for (const partner of partners) {
-            joinStats.considered += 1;
-            if (bestExact.get(keyOf(partner)) !== partner) { joinStats.stale += 1; continue; }
-            createChildren(current, partner, false, true);
-          }
-        }
-      } else {
-        // Mode de comparaison reproduisant la restriction historique du nouveau solveur.
-        for (const partnerSpecies of targetPartners.get(current.speciesId.toLowerCase()) || []) {
-          for (const partner of settledBySpecies.get(partnerSpecies) || []) {
-            if (partner === current || (current.mask | partner.mask) !== fullMask) continue;
-            createChildren(current, partner, true);
-          }
-        }
-      }
-
-      const maskSexGroup = settledByMaskAndSex.get(`${current.mask}|${current.sex}`) || [];
-      maskSexGroup.push(current); settledByMaskAndSex.set(`${current.mask}|${current.sex}`, maskSexGroup);
-    }
-
-    if (!bestAnswer) return { error: "Aucune route probabiliste valide trouvée avec cette sauvegarde.", expanded, joinStats, durationMs: performance.now() - startedAt };
-    return {
-      summary: `${bestAnswer.stepCount} étape${bestAnswer.stepCount > 1 ? "s" : ""} d’élevage`,
-      root: bestAnswer, expectedBatches: bestAnswer.cost, expanded,
-      joinStats,
-      bestBranched: bestBranchedAnswer ? {
-        expectedBatches: bestBranchedAnswer.cost,
-        stepCount: bestBranchedAnswer.stepCount,
-        plannedJoinCount: bestBranchedAnswer.plannedJoinCount,
-      } : null,
-      durationMs: performance.now() - startedAt,
-      truncated: queue.size > 0 && (expanded >= maxExpanded || performance.now() - startedAt >= maxDurationMs),
-    };
+    const representatives = []; const seen = new Set();
+    owned.sort((a, b) => a.extras - b.extras || String(a.id).localeCompare(String(b.id)));
+    for (const pal of owned) { const key = `${pal.species}|${pal.sex}|${pal.mask}|${Math.min(4, pal.extras)}|${pal.passives.slice().sort().join(",")}`; if (!seen.has(key)) { seen.add(key); representatives.push(pal); } }
+    const stateCount = speciesIds.length * masks * 5 * 2;
+    const encode = (species, mask, extras, sex) => ((((species * masks) + mask) * 5 + extras) * 2) + sex;
+    const decode = (state) => { const sex = state % 2; let value = (state - sex) / 2; const extras = value % 5; value = (value - extras) / 5; const mask = value % masks; return { species: (value - mask) / masks, mask, extras, sex }; };
+    const costs = new Float64Array(stateCount); costs.fill(Infinity); const priorities = new Float64Array(stateCount); priorities.fill(Infinity); const steps = new Uint16Array(stateCount); steps.fill(0xffff); const depth = new Uint16Array(stateCount); depth.fill(0xffff);
+    const parentA = new Int32Array(stateCount); parentA.fill(-2147483648); const parentB = new Int32Array(stateCount); parentB.fill(-2147483648); const cake = new Uint8Array(stateCount); const settled = new Uint8Array(stateCount);
+    const queue = new Queue(stateCount, costs, priorities, steps, depth); const buckets = Array.from({ length: masks * 2 }, () => []); const noPassives = desired.length === 0;
+    let expanded = 0; let generated = 0; let joinsConsidered = 0; let answer = -1; let bestTarget = -1;
+    const childCache = new Int16Array(speciesIds.length * speciesIds.length * 2); childCache.fill(-2);
+    function childFor(a, b, sex) { const offset = (a * speciesIds.length + b) * 2 + sex; if (childCache[offset] !== -2) return childCache[offset]; const firstSex = sex ? "Male" : "Female"; const result = input.childFor(speciesIds[a], speciesIds[b], firstSex, sex ? "Female" : "Male"); childCache[offset] = result == null ? -1 : (speciesIndex.get(String(result).toLowerCase()) ?? -1); return childCache[offset]; }
+    function dominates(species, mask, extras, sex, cost, count, levels) { for (let clean = 0; clean <= extras; clean += 1) { const state = encode(species, mask, clean, sex); if (costs[state] < cost - EPSILON || (Math.abs(costs[state] - cost) <= EPSILON && steps[state] <= count && depth[state] <= levels)) return true; } return false; }
+    function relax(species, mask, extras, sex, cost, count, levels, first, second, cakeCode) { extras = Math.min(4, extras); const state = encode(species, mask, extras, sex); const difference = cost - costs[state]; const better = difference < -EPSILON || (Math.abs(difference) <= EPSILON && (count < steps[state] || (count === steps[state] && levels < depth[state]))); if (settled[state] || !better || dominates(species, mask, extras, sex, cost, count, levels)) return; costs[state] = cost; priorities[state] = noPassives ? cost : cost - bits(mask) * 64; steps[state] = count; depth[state] = levels; parentA[state] = first; parentB[state] = second; cake[state] = cakeCode; queue.update(state); generated += 1; if (species === target && mask === fullMask && (bestTarget < 0 || cost < costs[bestTarget] - EPSILON || (Math.abs(cost - costs[bestTarget]) <= EPSILON && (count < steps[bestTarget] || (count === steps[bestTarget] && levels < depth[bestTarget]))))) bestTarget = state; }
+    function refData(ref) { if (ref < 0) { const pal = representatives[-ref - 1]; return { species: pal.species, mask: pal.mask, extras: pal.extras, sex: pal.sex === "Male" ? 1 : 0, cost: 0, steps: 0, depth: 0, passives: pal.passives }; } return { ...decode(ref), cost: costs[ref], steps: steps[ref], depth: depth[ref], passives: null }; }
+    function breed(firstRef, secondRef, join = false) { const first = refData(firstRef); const second = refData(secondRef); if (first.sex === second.sex || (firstRef < 0 && firstRef === secondRef)) return; if (join) joinsConsidered += 1; const child = childFor(first.species, second.species, first.sex); if (child < 0) return; const nextMask = first.mask | second.mask; const count = first.steps + second.steps + 1; const levels = Math.max(first.depth, second.depth) + 1; if (noPassives) { for (let sex = 0; sex < 2; sex += 1) relax(child, 0, 0, sex, count, count, levels, firstRef, secondRef, 0); return; } const union = first.passives && second.passives ? new Set(first.passives.concat(second.passives)).size : Math.min(8, bits(nextMask) + first.extras + second.extras); const wanted = bits(nextMask); const final = child === target && nextMask === fullMask; const maxExtras = 4 - wanted; const variants = final ? [maxExtras] : Array.from({ length: maxExtras + 1 }, (_, index) => index); for (const extras of variants) { const recommendation = probability.recommend(union, wanted, extras); if (!recommendation?.probability) continue; const cost = first.cost + second.cost + 1 / recommendation.probability; const cakeCode = Math.max(1, CAKES.indexOf(recommendation.cake)); for (let sex = 0; sex < 2; sex += 1) relax(child, nextMask, extras, sex, cost, count, levels, firstRef, secondRef, cakeCode); } }
+    for (let a = 0; a < representatives.length; a += 1) for (let b = a + 1; b < representatives.length; b += 1) breed(-a - 1, -b - 1);
+    const actionCache = new Map();
+    function actions(species, sex) { const key = species * 2 + sex; if (actionCache.has(key)) return actionCache.get(key); const best = new Map(); for (let index = 0; index < representatives.length; index += 1) { const pal = representatives[index]; if ((pal.sex === "Male" ? 1 : 0) === sex) continue; const child = childFor(species, pal.species, sex); if (child < 0) continue; const actionKey = `${child}|${pal.mask}|${Math.min(4, pal.extras)}`; if (!best.has(actionKey)) best.set(actionKey, -index - 1); } const result = [...best.values()]; actionCache.set(key, result); return result; }
+    const maxDurationMs = Number.isFinite(input.maxDurationMs) ? input.maxDurationMs : 5000; const maxExpanded = Number.isFinite(input.maxExpanded) ? input.maxExpanded : stateCount; let timeout = false; let limitReached = false;
+    while (queue.size) { if (performance.now() - startedAt >= maxDurationMs) { timeout = true; break; } if (expanded >= maxExpanded) { limitReached = true; break; } const current = queue.pop(); if (current < 0 || settled[current]) continue; settled[current] = 1; expanded += 1; const state = decode(current); if (state.species === target && state.mask === fullMask) { answer = current; break; } for (const partner of actions(state.species, state.sex)) breed(current, partner); const opposite = state.sex ^ 1; for (let partnerMask = 0; partnerMask < masks; partnerMask += 1) { const union = state.mask | partnerMask; if (!noPassives && union !== fullMask && (union === state.mask || union === partnerMask)) continue; for (const partner of buckets[partnerMask * 2 + opposite]) breed(current, partner, true); } buckets[state.mask * 2 + state.sex].push(current); }
+    const truncated = timeout || limitReached;
+    if (answer < 0 && bestTarget >= 0) answer = bestTarget;
+    if (answer < 0) return finish(truncated ? { error: "Recherche interrompue avant d’avoir pu déterminer une route.", truncated: true, timeout, limitReached, expanded, generated, joinsConsidered } : { error: "Aucune route probabiliste valide trouvée avec cette sauvegarde.", truncated: false, timeout: false, limitReached: false, expanded, generated, joinsConsidered });
+    function buildNode(ref) { if (ref < 0) return ownedNode(representatives[-ref - 1]); const state = decode(ref); const first = buildNode(parentA[ref]); const second = buildNode(parentB[ref]); return { speciesId: speciesIds[state.species], mask: state.mask, maxUnknownExtras: state.extras, sex: state.sex ? "Male" : "Female", owned: false, parents: [first, second], recommendedCake: CAKES[cake[ref]] || undefined, cost: costs[ref], stepCount: steps[ref], depth: depth[ref], plannedJoinCount: first.plannedJoinCount + second.plannedJoinCount + Number(!first.owned && !second.owned), signature: `${speciesIds[state.species]}|${state.mask}|${state.extras}|${state.sex}|${first.individualId || first.signature}>${second.individualId || second.signature}` }; }
+    return finish({ summary: `${steps[answer]} étape${steps[answer] > 1 ? "s" : ""} d’élevage`, root: buildNode(answer), expectedBatches: noPassives ? undefined : costs[answer], expanded, generated, joinsConsidered, truncated, timeout, limitReached, depth: depth[answer] });
   }
-
   window.ProbabilisticBreedingSolver = { solve, bits, compareStates };
 })();
