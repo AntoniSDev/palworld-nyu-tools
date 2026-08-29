@@ -33,6 +33,7 @@
   let calculating = false;
   let treeResult = null;
   let modalPointerDownOnBackdrop = null;
+  let passiveSearchShouldFocus = false;
 
   const MIN_SCALE = .10;
   const MAX_SCALE = 2.50;
@@ -104,11 +105,12 @@
     return `<i class="save-passive-rank save-passive-rank--${passiveRank(passive.rank)}" aria-hidden="true"></i>`;
   }
 
-  function passiveChip(id, removable = false) {
+  function passiveChip(id, interactive = false) {
     const passive = passiveInfo(id);
-    return `<span class="save-passive ${passiveClass(passive.rank)}" data-passive-id="${escapeHtml(id)}" data-passive-tooltip="${escapeHtml(id)}" tabindex="0">
-      ${passiveRankIcon(passive)}<span>${escapeHtml(passive.name)}</span>${removable ? `<button type="button" data-remove-passive="${escapeHtml(id)}" aria-label="Retirer ${escapeHtml(passive.name)}">×</button>` : ""}
-    </span>`;
+    const tag = interactive ? "button" : "span";
+    return `<${tag}${interactive ? ` type="button" data-open-passives aria-label="Modifier les passifs désirés"` : ""} class="save-passive ${passiveClass(passive.rank)}" data-passive-id="${escapeHtml(id)}" data-passive-tooltip="${escapeHtml(id)}" tabindex="0">
+      <span>${escapeHtml(passive.name)}</span>${passiveRankIcon(passive)}
+    </${tag}>`;
   }
 
   function sexSymbol(sex) {
@@ -235,6 +237,11 @@
     </section>`;
   }
 
+  function toggledPassives(current, id) {
+    if (current.includes(id)) return current.filter((entry) => entry !== id);
+    return current.length < 4 ? [...current, id] : current;
+  }
+
   function selectionSummary() {
     return `${targetPicker()}${passivesPanel()}`;
   }
@@ -283,14 +290,15 @@
     ];
     return `<div class="save-modal-backdrop" data-close-passive-modal><section class="save-modal save-passive-modal" role="dialog" aria-modal="true" aria-labelledby="passive-modal-title">
       <header><div><span class="eyebrow">Objectif d’élevage</span><h2 id="passive-modal-title">Compétences passives</h2></div><button type="button" data-close-passive-modal aria-label="Fermer">×</button></header>
-      <div class="save-passive-modal__tools"><label class="save-passive-modal__search"><small>Rechercher par nom ou effet</small><span class="pal-search__field"><input type="search" data-passive-search placeholder="Vitesse, attaque, satiété…" aria-label="Rechercher par nom ou effet" value="${escapeHtml(passiveQuery)}" autofocus /><span aria-hidden="true">⌕</span></span></label><span>${state.selectedPassives.length}/4</span><button type="button" data-clear-passives>Tout effacer</button></div>
+      <div class="save-passive-modal__tools"><label class="save-passive-modal__search"><small>Rechercher par nom ou effet</small><span class="pal-search__field"><input type="search" data-passive-search placeholder="Vitesse, attaque, satiété…" aria-label="Rechercher par nom ou effet" value="${escapeHtml(passiveQuery)}" /><span aria-hidden="true">⌕</span></span></label><span class="save-passive-modal__count">${state.selectedPassives.length}/4</span><button type="button" class="save-passive-modal__clear" data-clear-passives>Tout effacer</button></div>
       <div class="save-passive-list">${groups.map((group) => {
         const groupRows = rows.filter((passive) => group.match(passive.rank));
         if (!groupRows.length) return "";
         return `<section class="save-passive-tier"><header><strong>${group.label}</strong><span>${groupRows.length}</span></header><div>${groupRows.map((passive) => {
           const selected = state.selectedPassives.includes(passive.id);
           const owned = allAvailable.has(passive.id);
-          return `<button type="button" data-toggle-passive="${escapeHtml(passive.id)}" data-passive-tooltip="${escapeHtml(passive.id)}" class="${passiveClass(passive.rank)}${selected ? " is-selected" : ""}${owned ? "" : " is-unowned"}" ${owned ? "" : `disabled aria-disabled="true"`}>${passiveRankIcon(passive)}<strong>${escapeHtml(passive.name)}</strong><span aria-hidden="true">${selected ? "✓" : "+"}</span></button>`;
+          const blocked = !owned || (state.selectedPassives.length >= 4 && !selected);
+          return `<button type="button" data-toggle-passive="${escapeHtml(passive.id)}" data-passive-tooltip="${escapeHtml(passive.id)}" aria-pressed="${selected}" class="${passiveClass(passive.rank)}${selected ? " is-selected" : ""}${owned ? "" : " is-unowned"}${blocked && owned ? " is-limit-blocked" : ""}" ${blocked ? `disabled aria-disabled="true"` : ""}><strong>${escapeHtml(passive.name)}</strong>${passiveRankIcon(passive)}<span class="save-passive-tier__selection" aria-hidden="true">${selected ? "✓" : "+"}</span></button>`;
         }).join("")}</div></section>`;
       }).join("")}</div>
       <footer><span>${rows.length} compétence${rows.length > 1 ? "s" : ""}</span><button type="button" class="save-primary" data-close-passive-modal>Terminer</button></footer>
@@ -309,7 +317,7 @@
         <aside class="breeding-panel save-breeding-panel">
           ${selectionSummary()}
         </aside>
-        <section class="breeding-canvas" data-save-viewport aria-label="Arbre généalogique interactif"><div class="breeding-canvas__tip">Molette : zoom · Cliquer-glisser : déplacer</div><div class="breeding-canvas__summary">${escapeHtml(resultSummary(treeResult))}</div><div class="breeding-canvas__controls" aria-label="Contrôles du terrain"><button type="button" data-canvas-zoom-out aria-label="Dézoomer">−</button><button type="button" data-canvas-zoom-in aria-label="Zoomer">+</button><button type="button" data-canvas-fit>Fit</button><output data-canvas-scale>100 %</output></div>${graphMarkup}</section>
+        <section class="breeding-canvas" data-save-viewport aria-label="Arbre généalogique interactif"><div class="breeding-canvas__tip">Molette : zoom · Cliquer-glisser : déplacer</div><div class="breeding-canvas__summary">${escapeHtml(resultSummary(treeResult))}</div><div class="breeding-canvas__controls" aria-label="Contrôles du terrain"><button type="button" data-canvas-zoom-out aria-label="Dézoomer">−</button><button type="button" data-canvas-zoom-in aria-label="Zoomer">+</button><button type="button" data-canvas-fit title="Recentrer l’arbre">Recentrer</button><output data-canvas-scale>100 %</output></div>${graphMarkup}</section>
       </div>` : ""}
       ${modalTemplates()}
     </section>`;
@@ -505,7 +513,9 @@
     content.innerHTML = template();
     bindCanvas(fit);
     const search = content.querySelector("[data-passive-search]");
-    if (passiveModalOpen && search) { search.focus(); search.setSelectionRange(search.value.length, search.value.length); }
+    if (passiveModalOpen && passiveSearchShouldFocus && search) {
+      search.focus(); search.setSelectionRange(search.value.length, search.value.length); passiveSearchShouldFocus = false;
+    }
   }
 
   let canvas = { x: 0, y: 0, scale: 1 };
@@ -533,7 +543,11 @@
     if (!viewport || !world || !tree) return;
     const scaleOutput = viewport.querySelector("[data-canvas-scale]");
     const apply = () => {
-      world.style.transform = `translate3d(${canvas.x}px, ${canvas.y}px, 0) scale(${canvas.scale})`;
+      const pixelRatio = window.devicePixelRatio || 1;
+      const renderX = Math.round(canvas.x * pixelRatio) / pixelRatio;
+      const renderY = Math.round(canvas.y * pixelRatio) / pixelRatio;
+      world.style.transform = `translate3d(${renderX}px, ${renderY}px, 0)`;
+      tree.style.zoom = canvas.scale;
       if (scaleOutput) scaleOutput.value = `${Math.round(canvas.scale * 100)} %`;
     };
     const fitBreedingCanvas = () => { canvas = fittedCamera(viewport.clientWidth, viewport.clientHeight, tree.offsetWidth, tree.offsetHeight); apply(); };
@@ -650,15 +664,14 @@
       targetQuery = "";
       saveState(); scheduleSolve(true); return;
     }
-    if (event.target.closest("[data-open-passives]")) { passiveModalOpen = true; passiveQuery = ""; render(false); return; }
-    const remove = event.target.closest("[data-remove-passive]"); if (remove) { state.selectedPassives = state.selectedPassives.filter((id) => id !== remove.dataset.removePassive); saveState(); scheduleSolve(); return; }
+    if (event.target.closest("[data-open-passives]")) { passiveModalOpen = true; passiveQuery = ""; passiveSearchShouldFocus = true; render(false); return; }
     const toggle = event.target.closest("[data-toggle-passive]");
     if (toggle && !toggle.disabled) {
       const id = toggle.dataset.togglePassive;
-      state.selectedPassives = state.selectedPassives.includes(id) ? state.selectedPassives.filter((entry) => entry !== id) : state.selectedPassives.length < 4 ? [...state.selectedPassives, id] : state.selectedPassives;
-      saveState(); scheduleSolve(); return;
+      state.selectedPassives = toggledPassives(state.selectedPassives, id);
+      saveState(); render(false); scheduleSolve(); return;
     }
-    if (event.target.closest("[data-clear-passives]")) { state.selectedPassives = []; saveState(); scheduleSolve(); return; }
+    if (event.target.closest("[data-clear-passives]")) { state.selectedPassives = []; saveState(); render(false); scheduleSolve(); return; }
     if (event.target.closest("button[data-close-passive-modal]") || (event.target.matches("[data-close-passive-modal]") && shouldCloseFromBackdrop(event.target))) { passiveModalOpen = false; modalPointerDownOnBackdrop = null; render(false); return; }
     const worldChoice = event.target.closest("[data-world-index]"); if (worldChoice) { selectedWorldIndex = Number(worldChoice.dataset.worldIndex); render(false); return; }
     if (event.target.closest("[data-import-world]")) { const world = pendingWorlds[selectedWorldIndex]; if (world) void parseWorld(world); return; }
@@ -668,7 +681,7 @@
 
   function handleInput(event) {
     if (event.target.matches("[data-target-search]")) { targetQuery = event.target.value; const results = content.querySelector("[data-target-results]"); if (results) results.innerHTML = targetResults(); }
-    if (event.target.matches("[data-passive-search]")) { passiveQuery = event.target.value; render(false); }
+    if (event.target.matches("[data-passive-search]")) { passiveQuery = event.target.value; passiveSearchShouldFocus = true; render(false); }
   }
 
   function handlePointerDown(event) {
@@ -767,6 +780,7 @@
       passiveModal,
       passivesPanel,
       passiveClass,
+      toggledPassives,
       isSpeciesKnown,
       cameraAroundPoint,
       fittedCamera,

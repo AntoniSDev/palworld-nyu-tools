@@ -46,6 +46,13 @@ const saveCumoirSource = fs.readFileSync(new URL("../js/save-cumoir.js", import.
 if (!/\.save-tree-node__new\s*\{[^}]*position:\s*absolute;[^}]*top:\s*7px;[^}]*left:\s*50%;[^}]*transform:\s*translateX\(-50%\)/s.test(styles)) {
   throw new Error("The Nouveau badge is not positioned at the centered top of the Pal card.");
 }
+const sharedPassiveRule = styles.match(/\.save-passive\s*\{([^}]*)\}/s)?.[1] || "";
+const sharedPassiveTextRule = styles.match(/\.save-passive > span\s*\{([^}]*)\}/s)?.[1] || "";
+if (!sharedPassiveRule.includes("height: 29px") || !sharedPassiveRule.includes("grid-template-columns: minmax(0, 1fr) 20px")
+  || !sharedPassiveRule.includes("border: 1px solid") || !sharedPassiveRule.includes("border-left-width: 3px")
+  || !sharedPassiveTextRule.includes("white-space: nowrap") || !sharedPassiveTextRule.includes("text-overflow: ellipsis")) {
+  throw new Error("The shared compact passive skin is missing its fixed row, full border, left accent or ellipsis.");
+}
 const emptyTemplate = context.SaveCumoir.template();
 if (emptyTemplate.includes("Source des Pals") || emptyTemplate.includes("Transmission des passifs")) throw new Error("Empty save UI still exposes removed Cumoir blocks.");
 if (!(emptyTemplate.indexOf("SaveGames") < emptyTemplate.indexOf("Importer une sauvegarde"))) throw new Error("Import instructions are not ordered correctly.");
@@ -96,7 +103,8 @@ if (!passiveModal.includes("Rechercher par nom ou effet")
   throw new Error("Passive search guidance or icon is missing from the modal.");
 }
 const unavailablePassive = context.PALWORLD_PASSIVES.find((passive) => !available?.includes?.(passive.id));
-if (!unavailablePassive || !passiveModal.includes(`data-toggle-passive="${unavailablePassive.id}"`) || !passiveModal.includes(`data-toggle-passive="${unavailablePassive.id}" data-passive-tooltip="${unavailablePassive.id}" class="${api.passiveClass(unavailablePassive.rank)} is-unowned" disabled aria-disabled="true"`)) {
+const unavailableMarkup = unavailablePassive ? passiveModal.match(new RegExp(`<button[^>]*data-toggle-passive="${unavailablePassive.id}"[^>]*>`))?.[0] || "" : "";
+if (!unavailablePassive || !unavailableMarkup.includes(`${api.passiveClass(unavailablePassive.rank)} is-unowned`) || !unavailableMarkup.includes("disabled") || !unavailableMarkup.includes('aria-disabled="true"')) {
   throw new Error("Unavailable passives are not kept visible and disabled.");
 }
 if (!api.searchPassives(unavailablePassive.name).some((passive) => passive.id === unavailablePassive.id)) {
@@ -107,9 +115,27 @@ for (let count = 0; count <= 4; count += 1) {
   api.setTarget(target, objectives.slice(0, count));
   const panel = api.passivesPanel();
   const addButtons = (panel.match(/data-open-passives/g) || []).length;
-  if (addButtons !== Number(count < 4)) throw new Error(`Passive slot layout failed at ${count} selected passives.`);
-  if (count && !panel.includes(`data-remove-passive="${objectives[0]}"`)) throw new Error(`Passive chips are missing at ${count} selected passives.`);
+  if (addButtons !== count + Number(count < 4)) throw new Error(`Passive slot layout failed at ${count} selected passives.`);
+  if (panel.includes("data-remove-passive") || panel.includes(">×</button>")) throw new Error("Sidebar passive chips still expose individual remove buttons.");
+  if (count && !panel.includes(`data-passive-id="${objectives[0]}"`)) throw new Error(`Passive chips are missing at ${count} selected passives.`);
 }
+api.setTarget(target, objectives.slice(0, 4));
+const fullModal = api.passiveModal();
+for (const id of objectives.slice(0, 4)) {
+  const selectedMarkup = fullModal.match(new RegExp(`<button[^>]*data-toggle-passive="${id}"[^>]*>`))?.[0] || "";
+  if (!selectedMarkup.includes("is-selected") || selectedMarkup.includes("disabled")) throw new Error("A selected passive becomes unavailable at 4/4.");
+}
+const ownedUnselected = available.find((id) => !objectives.slice(0, 4).includes(id));
+if (ownedUnselected) {
+  const blockedMarkup = fullModal.match(new RegExp(`<button[^>]*data-toggle-passive="${ownedUnselected}"[^>]*>`))?.[0] || "";
+  if (!blockedMarkup.includes("is-limit-blocked") || !blockedMarkup.includes("disabled")) throw new Error("An unselected owned passive remains clickable at 4/4.");
+}
+const unchangedAtLimit = api.toggledPassives(objectives.slice(0, 4), ownedUnselected || "another-passive");
+if (unchangedAtLimit.length !== 4 || unchangedAtLimit.some((id, index) => id !== objectives[index])) throw new Error("A fifth passive changes a full selection.");
+const deselectedAtLimit = api.toggledPassives(objectives.slice(0, 4), objectives[1]);
+if (deselectedAtLimit.length !== 3 || deselectedAtLimit.includes(objectives[1])) throw new Error("A selected passive cannot be removed at 4/4.");
+if (api.toggledPassives(deselectedAtLimit, ownedUnselected || objectives[1]).length !== 4) throw new Error("Passives do not become selectable again after freeing a slot.");
+if (!fullModal.includes('save-passive-modal__count">4/4') || !fullModal.includes("save-passive-modal__clear")) throw new Error("The modal counter or clear action lacks its dedicated visual state.");
 const backdrop = { matches: (selector) => selector === ".save-modal-backdrop" };
 const input = { matches: () => false };
 api.handlePointerDown({ target: input });
@@ -123,11 +149,11 @@ const fitted = api.fittedCamera(1600, 900, 20000, 8000);
 if (fitted.scale !== .1) throw new Error("Fit does not handle a very large tree at the 10% minimum zoom.");
 const panned = api.pannedCamera({ x: 0, y: 0, scale: 1 }, { x: 200, y: 150 }, { x: -1800, y: 2350 });
 if (panned.x !== -2000 || panned.y !== 2200) throw new Error("Camera pan is not 1:1 or is clamped.");
-if (!activeTemplate.includes("data-canvas-zoom-out") || !activeTemplate.includes("data-canvas-zoom-in") || !activeTemplate.includes("data-canvas-fit") || !activeTemplate.includes("data-canvas-scale")) {
+if (!activeTemplate.includes("data-canvas-zoom-out") || !activeTemplate.includes("data-canvas-zoom-in") || !activeTemplate.includes("data-canvas-fit") || !activeTemplate.includes("data-canvas-scale") || !activeTemplate.includes("Recentrer")) {
   throw new Error("Canvas controls are missing.");
 }
-if (!saveCumoirSource.includes("translate3d(${canvas.x}px, ${canvas.y}px, 0) scale(${canvas.scale})") || /style\.zoom|world\.style\.left|world\.style\.top/.test(saveCumoirSource)) {
-  throw new Error("The canvas still mixes old and new camera systems.");
+if (!saveCumoirSource.includes("world.style.transform = `translate3d(${renderX}px, ${renderY}px, 0)`") || !saveCumoirSource.includes("tree.style.zoom = canvas.scale") || /world\.style\.zoom|world\.style\.left|world\.style\.top|scale\(\$\{canvas\.scale\}\)/.test(saveCumoirSource)) {
+  throw new Error("The canvas does not separate crisp native zoom from virtual-camera translation.");
 }
 if (!passiveModal.includes('data-close-passive-modal aria-label="Fermer"') || !passiveModal.includes('data-close-passive-modal>Terminer')) throw new Error("Explicit modal close controls are missing.");
 if (activeTemplate.includes("Gâteau") || activeTemplate.includes("Special Cake")) throw new Error("Cake guidance leaked into the carrier Cumoir.");
