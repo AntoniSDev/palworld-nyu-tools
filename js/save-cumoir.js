@@ -399,6 +399,7 @@
       }
     });
     const cakeMarkers = [];
+    const ownedSpecies = new Set(roster.map((individual) => String(individual.speciesId).toLowerCase()));
     const paths = layout.families.map(({ parents, child }) => {
       const [left, right] = parents.map((key) => nodeByKey.get(key));
       const target = nodeByKey.get(child);
@@ -420,7 +421,7 @@
       const eggAsset = `assets/eggs/t_itemicon_material_palegg${eggSuffix ? `_${eggSuffix}` : ""}.webp`;
       return `<article class="breeding-node save-tree-node${final ? " save-tree-node--final" : ""}" style="left:${x}px;top:${y}px">
         ${node.owned ? "" : `<span class="save-egg" data-egg-tooltip="${escapeHtml(eggName)}" tabindex="0"><img src="${eggAsset}" alt="${escapeHtml(eggName)}" /></span>`}
-        ${node.owned ? "" : `<span class="save-tree-node__new">Nouveau</span>`}
+        ${ownedSpecies.has(pal.id.toLowerCase()) ? "" : `<span class="save-tree-node__new">Nouveau</span>`}
         <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span><strong>${escapeHtml(pal.name)}</strong>${requiredSex ? `<b class="breeding-node__sex breeding-node__sex--${requiredSex.toLowerCase()}" aria-label="${requiredSex === "Male" ? "Mâle requis" : "Femelle requise"}">${sexSymbol(requiredSex)}</b>` : ""}</span></span>
         ${useful.length ? `<span class="save-tree-node__passives">${useful.map((id) => passiveChip(id)).join("")}</span>` : ""}
       </article>`;

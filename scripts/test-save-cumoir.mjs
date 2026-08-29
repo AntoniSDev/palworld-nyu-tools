@@ -58,6 +58,15 @@ const targetAutocomplete = {
   crossoverSlimes: (api.targetResults("Gelée").match(/data-save-target=/g) || []).length >= 6,
 };
 if (!Object.values(targetAutocomplete).every(Boolean)) throw new Error("Target autocomplete constraints failed.");
+const ownedSpeciesId = normalized[0]?.speciesId;
+const absentSpeciesId = context.BREEDING_DATA.pals.find(([id]) => !normalized.some((pal) => pal.speciesId.toLowerCase() === id.toLowerCase()))?.[0];
+if (!ownedSpeciesId || !absentSpeciesId) throw new Error("Owned/unowned species fixtures are unavailable.");
+if (api.renderGraph({ root: { speciesId: ownedSpeciesId, mask: 0, owned: false } }).includes('save-tree-node__new">Nouveau')) {
+  throw new Error("A planned individual of an owned species is incorrectly marked Nouveau.");
+}
+if (!api.renderGraph({ root: { speciesId: absentSpeciesId, mask: 0, owned: false } }).includes('save-tree-node__new">Nouveau')) {
+  throw new Error("An unowned species is missing the Nouveau badge.");
+}
 const movementSearch = api.searchPassives("vi");
 if (!movementSearch.length || !movementSearch.some((passive) => !passive.name.toLowerCase().includes("vi") && passive.effect.toLowerCase().includes("vi"))) {
   throw new Error("Passive search does not include effect-only matches.");
