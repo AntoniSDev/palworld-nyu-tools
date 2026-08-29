@@ -55,6 +55,10 @@ const targetAutocomplete = {
   crossoverSlimes: (api.targetResults("Gelée").match(/data-save-target=/g) || []).length >= 6,
 };
 if (!Object.values(targetAutocomplete).every(Boolean)) throw new Error("Target autocomplete constraints failed.");
+const movementSearch = api.searchPassives("vi");
+if (!movementSearch.length || !movementSearch.some((passive) => !passive.name.toLowerCase().includes("vi") && passive.effect.toLowerCase().includes("vi"))) {
+  throw new Error("Passive search does not include effect-only matches.");
+}
 const plannedDepth = (node) => node?.parents ? 1 + Math.max(...node.parents.map(plannedDepth)) : 0;
 
 const target = context.BREEDING_DATA.pals.find(([id]) => id === "Anubis")?.[0];
@@ -125,6 +129,7 @@ console.log(JSON.stringify({
   fourPassives: normalized.filter((pal) => pal.passives.length === 4).length,
   objectives,
   targetAutocomplete,
+  passiveDescriptionSearch: movementSearch.length,
   solveChecks,
   directChild: directResult,
   eggTooltips: {

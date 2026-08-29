@@ -266,9 +266,15 @@
     </section></div>`;
   }
 
+  function searchPassives(searchValue = passiveQuery) {
+    const search = normalize(searchValue);
+    return passives.filter((passive) => !search
+      || normalize(passive.name).includes(search)
+      || normalize(passiveEffectText(passive.effect)).includes(search));
+  }
+
   function passiveModal() {
-    const search = normalize(passiveQuery);
-    const rows = passives.filter((passive) => !search || normalize(passive.name).includes(search));
+    const rows = searchPassives();
     const groups = [
       { label: "Arbre-Monde", match: (rank) => rank >= 5 },
       { label: "Légendaires", match: (rank) => rank === 4 },
@@ -279,7 +285,7 @@
     ];
     return `<div class="save-modal-backdrop" data-close-passive-modal><section class="save-modal save-passive-modal" role="dialog" aria-modal="true" aria-labelledby="passive-modal-title">
       <header><div><span class="eyebrow">Objectif d’élevage</span><h2 id="passive-modal-title">Compétences passives</h2></div><button type="button" data-close-passive-modal aria-label="Fermer">×</button></header>
-      <div class="save-passive-modal__tools"><input type="search" data-passive-search placeholder="Rechercher un passif…" value="${escapeHtml(passiveQuery)}" autofocus /><span>${state.selectedPassives.length}/4</span><button type="button" data-clear-passives>Tout effacer</button></div>
+      <div class="save-passive-modal__tools"><input type="search" data-passive-search placeholder="Rechercher" aria-label="Rechercher" value="${escapeHtml(passiveQuery)}" autofocus /><span>${state.selectedPassives.length}/4</span><button type="button" data-clear-passives>Tout effacer</button></div>
       <div class="save-passive-list">${groups.map((group) => {
         const groupRows = rows.filter((passive) => group.match(passive.rank));
         if (!groupRows.length) return "";
@@ -879,6 +885,7 @@
       rosterCard,
       rosterList,
       targetResults,
+      searchPassives,
     },
   };
 })();
