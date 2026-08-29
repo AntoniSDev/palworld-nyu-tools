@@ -225,8 +225,7 @@
       .filter((pal) => normalize(pal.name).includes(search))
       .sort((a, b) => Number(!normalize(a.name).startsWith(search)) - Number(!normalize(b.name).startsWith(search))
         || normalize(a.name).indexOf(search) - normalize(b.name).indexOf(search)
-        || a.order - b.order)
-      .slice(0, 8);
+        || a.order - b.order);
     return targets.length ? targets.map((pal) => `<button type="button" data-save-target="${escapeHtml(pal.id)}"><img src="${escapeHtml(pal.portrait)}" alt="" loading="lazy" /><span>${escapeHtml(pal.name)}</span></button>`).join("") : `<p>Aucun Pal trouvé.</p>`;
   }
 

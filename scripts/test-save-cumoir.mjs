@@ -49,7 +49,7 @@ if (activeTemplate.includes("data-save-roster") || activeTemplate.includes("data
 const targetAutocomplete = {
   empty: api.targetResults("") === "",
   oneCharacter: api.targetResults("a") === "",
-  maximumEight: (api.targetResults("an").match(/data-save-target=/g) || []).length <= 8,
+  unlimited: (api.targetResults("an").match(/data-save-target=/g) || []).length > 8,
   missing: api.targetResults("zzzzzz").includes("Aucun Pal trouvé"),
 };
 if (!Object.values(targetAutocomplete).every(Boolean)) throw new Error("Target autocomplete constraints failed.");
