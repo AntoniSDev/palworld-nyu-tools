@@ -310,7 +310,11 @@
   }
 
   function selectionSummary() {
-    return `${targetPicker()}${passivesPanel()}${historyPanel()}`;
+    return `<section class="save-goal-card">${targetPicker()}${passivesPanel()}</section>${historyPanel()}`;
+  }
+
+  function historyPinIcon() {
+    return `<svg class="history-pin-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.48 122.88" aria-hidden="true" focusable="false"><path fill="currentColor" fill-rule="evenodd" d="M121.21,36.53,85.92,1.23c-3-3-7.77.1-9.2,2.74-.24.45.19.86-.2,3.92A46.27,46.27,0,0,1,73.8,19.21L58.11,34.91c-6.27,6.26-15.23,3.48-22.87-.32-1.62-.8-3.69-2.57-5.48-.78l-6.64,6.64a2.49,2.49,0,0,0,0,3.53L78.9,99.76a2.5,2.5,0,0,0,3.53,0l6.64-6.64c1.77-1.77-.49-4.06-1.41-6-3.4-7-6.45-16.41-.78-22.08l16.39-16.39a84.14,84.14,0,0,1,11.35-2.57c3.09-.49,3.47-.11,3.91-.4,2.71-1.74,5.7-6.15,2.68-9.17Z"/><polygon fill="currentColor" fill-rule="evenodd" points="53.48 82.11 40.77 69.4 0 120.96 1.92 122.88 53.48 82.11"/></svg>`;
   }
 
   function historyPanel() {
@@ -319,7 +323,7 @@
       const pal = palInfo(entry.target); if (!pal) return "";
       return `<article class="save-history__entry${entry.id === activeHistoryId ? " is-active" : ""}" data-history-tooltip="${escapeHtml(entry.id)}">
         <button type="button" class="save-history__load" data-load-history="${escapeHtml(entry.id)}"><img src="${escapeHtml(pal.portrait)}" alt="" /><span>${escapeHtml(pal.name)}</span></button>
-        <button type="button" class="save-history__pin${entry.pinned ? " is-pinned" : ""}" data-pin-history="${escapeHtml(entry.id)}" aria-label="${entry.pinned ? "Désépingler" : "Épingler"} ${escapeHtml(pal.name)}" aria-pressed="${entry.pinned}">◆</button>
+        <button type="button" class="save-history__pin${entry.pinned ? " is-pinned" : ""}" data-pin-history="${escapeHtml(entry.id)}" aria-label="${entry.pinned ? "Désépingler ce plan" : "Épingler ce plan"}" title="${entry.pinned ? "Désépingler ce plan" : "Épingler ce plan"}" aria-pressed="${entry.pinned}">${historyPinIcon()}</button>
         <button type="button" class="save-history__delete" data-delete-history="${escapeHtml(entry.id)}" aria-label="Supprimer ${escapeHtml(pal.name)} de l’historique">×</button>
       </article>`;
     }).join("")}</div></section>`;
@@ -426,7 +430,7 @@
   }
 
   function emptyGraphTemplate(message) {
-    return `<div class="breeding-canvas__empty"><img src="assets/ui/gerard-empty.webp" alt="" /><p>${escapeHtml(message)}</p></div>`;
+    return `<div class="breeding-canvas__empty"><span class="breeding-canvas__mascot"><img src="assets/ui/gerard-empty.webp" alt="" /></span><p>${escapeHtml(message)}</p></div>`;
   }
 
   function resultSummary(result) {
@@ -453,9 +457,9 @@
     const families = [];
     let leafCursor = 0;
     let keyCursor = 0;
-    const nodeWidth = 244;
+    const nodeWidth = 272;
     const nodeHeight = 164;
-    const horizontalStep = 264;
+    const horizontalStep = 296;
     const verticalStep = 224;
     function visit(node, depth = 0) {
       const key = `node-${keyCursor++}`;
@@ -490,7 +494,9 @@
       const parentY = left.y;
       const childY = target.y + layout.nodeHeight;
       const joinY = childY + (parentY - childY) * .48;
-      return `<path class="save-family-link" d="M ${leftX} ${parentY} V ${joinY} H ${rightX} V ${parentY} M ${childX} ${joinY} V ${childY}" /><circle class="save-family-junction" cx="${childX}" cy="${joinY}" r="4" />`;
+      const path = `M ${leftX} ${parentY} V ${joinY} H ${rightX} V ${parentY} M ${childX} ${joinY} V ${childY}`;
+      const upwardPath = `M ${leftX} ${parentY} V ${joinY} M ${rightX} ${parentY} V ${joinY} M ${childX} ${joinY} V ${childY}`;
+      return `<path class="save-family-link" d="${path}" /><path class="save-family-link-flow" d="${upwardPath}" /><circle class="save-family-junction" cx="${childX}" cy="${joinY}" r="5" />`;
     }).join("");
     const nodes = layout.nodes.map(({ node, x, y }) => {
       const pal = palInfo(node.speciesId); if (!pal) return "";
@@ -503,7 +509,7 @@
       return `<article class="breeding-node save-tree-node${final ? " save-tree-node--final" : ""}" style="left:${x}px;top:${y}px">
         ${node.owned ? "" : `<span class="save-egg"><img src="${eggAsset}" alt="${escapeHtml(eggName)}" /></span>`}
         ${isNewSpecies ? `<span class="save-tree-node__new">Nouveau</span>` : ""}
-        <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span><strong>${escapeHtml(pal.name)}</strong>${requiredSex ? `<b class="breeding-node__sex breeding-node__sex--${requiredSex.toLowerCase()}" aria-label="${requiredSex === "Male" ? "Mâle requis" : "Femelle requise"}">${sexIcon(requiredSex)}</b>` : ""}</span></span>
+        <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span class="save-tree-node__name"><strong>${escapeHtml(pal.name)}</strong>${requiredSex ? `<b class="breeding-node__sex breeding-node__sex--${requiredSex.toLowerCase()}" aria-label="${requiredSex === "Male" ? "Mâle requis" : "Femelle requise"}">${sexIcon(requiredSex)}</b>` : ""}</span></span>
         ${useful.length ? `<span class="save-tree-node__passives">${useful.map((id) => passiveChip(id)).join("")}</span>` : ""}
       </article>`;
     }).join("");
@@ -807,10 +813,17 @@
     tooltip.hidden = false;
     const rect = target.getBoundingClientRect();
     const tooltipRect = tooltip.getBoundingClientRect();
-    const left = Math.min(window.innerWidth - tooltipRect.width - 10, Math.max(10, rect.left + rect.width / 2 - tooltipRect.width / 2));
-    const above = rect.top - tooltipRect.height - 9;
-    tooltip.style.left = `${left}px`;
-    tooltip.style.top = `${above >= 8 ? above : rect.bottom + 9}px`;
+    if (historyEntry) {
+      const right = rect.right + 10;
+      const left = right + tooltipRect.width <= window.innerWidth - 10 ? right : Math.max(10, rect.left - tooltipRect.width - 10);
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${Math.min(window.innerHeight - tooltipRect.height - 10, Math.max(10, rect.top + rect.height / 2 - tooltipRect.height / 2))}px`;
+    } else {
+      const left = Math.min(window.innerWidth - tooltipRect.width - 10, Math.max(10, rect.left + rect.width / 2 - tooltipRect.width / 2));
+      const above = rect.top - tooltipRect.height - 9;
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${above >= 8 ? above : rect.bottom + 9}px`;
+    }
   }
 
   function hideTooltip() {
@@ -895,6 +908,7 @@
       normalizeHistoryEntries,
       upsertHistoryEntries,
       historyPanel,
+      historyPinIcon,
     },
   };
 })();

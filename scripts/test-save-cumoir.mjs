@@ -43,6 +43,11 @@ if (unknownSpecies.length) throw new Error(`Imported species missing from breedi
 const api = context.SaveCumoir.__test;
 const styles = fs.readFileSync(new URL("../css/styles.css", import.meta.url), "utf8");
 const saveCumoirSource = fs.readFileSync(new URL("../js/save-cumoir.js", import.meta.url), "utf8");
+if (styles.includes('font-family: "Fredoka"') || !styles.includes('font-family: "Sora"')
+  || !fs.existsSync(new URL("../assets/fonts/sora-500.ttf", import.meta.url))
+  || !fs.existsSync(new URL("../assets/fonts/sora-600.ttf", import.meta.url))) {
+  throw new Error("Sora is not fully self-hosted or Fredoka remains in active CSS.");
+}
 if (!/\.save-tree-node__new\s*\{[^}]*position:\s*absolute;[^}]*top:\s*7px;[^}]*left:\s*50%;[^}]*transform:\s*translateX\(-50%\)/s.test(styles)) {
   throw new Error("The Nouveau badge is not positioned at the centered top of the Pal card.");
 }
@@ -66,6 +71,10 @@ if (activeTemplate.includes("Ancien calcul") || activeTemplate.includes("Nouveau
 }
 if (activeTemplate.includes("Transmission des passifs") || activeTemplate.includes("Estimations communautaires")) {
   throw new Error("The retired probability panel is still rendered.");
+}
+if (!activeTemplate.includes("save-goal-card") || !activeTemplate.includes("save-history")) throw new Error("Goal and history are not separate cards.");
+if (!api.historyPinIcon().includes('viewBox="0 0 122.48 122.88"') || !api.historyPinIcon().includes("53.48 82.11 40.77 69.4")) {
+  throw new Error("The exact history pin SVG is missing.");
 }
 const targetAutocomplete = {
   empty: api.targetResults("") === "",
@@ -94,6 +103,12 @@ if (api.renderGraph({ status: "found", root: { speciesId: ownedSpeciesId, mask: 
 if (!api.renderGraph({ root: { speciesId: absentSpeciesId, mask: 0, owned: false } }).includes('save-tree-node__new">Nouveau')) {
   throw new Error("An unowned species is missing the Nouveau badge.");
 }
+const linkedGraph = api.renderGraph({ status: "found", root: { speciesId: ownedSpeciesId, mask: 0, parents: [
+  { speciesId: ownedSpeciesId, mask: 0, owned: true }, { speciesId: ownedSpeciesId, mask: 0, owned: true },
+] } });
+if (!linkedGraph.includes("save-family-link-flow") || !linkedGraph.includes("save-family-junction")) throw new Error("Animated transmission connectors are missing.");
+if (!styles.includes("stroke-dashoffset: -182") || !styles.includes("prefers-reduced-motion")) throw new Error("Upward connector flow or reduced-motion fallback is missing.");
+if (!styles.includes("border: 3px solid transparent") || !styles.includes("linear-gradient(#12343b, #12343b) padding-box")) throw new Error("The single matte final-card border is missing.");
 if (api.renderGraph({ status: "already-owned", root: { speciesId: ownedSpeciesId, mask: 0, sex: "Female", owned: true, individualId: "fixture" } }).includes('save-tree-node__new">Nouveau')) {
   throw new Error("An owned individual is incorrectly marked Nouveau.");
 }

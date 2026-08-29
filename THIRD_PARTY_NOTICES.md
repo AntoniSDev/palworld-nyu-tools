@@ -28,6 +28,11 @@ from that project’s extracted Palworld asset set.
 Palworld names, data and imagery belong to Pocketpair, Inc. This community
 project is not affiliated with or endorsed by Pocketpair.
 
+## Sora font
+
+The Sora typeface is distributed by Google Fonts under the SIL Open Font
+License 1.1. The license text is included at `assets/fonts/OFL-Sora.txt`.
+
 ## Palworld Wiki interface icons
 
 The embedded rank-2 and negative passive-skill indicators are the 24 × 24
