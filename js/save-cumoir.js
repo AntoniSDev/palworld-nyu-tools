@@ -27,7 +27,7 @@
   let worldModalOpen = false;
   let selectedWorldIndex = 0;
   let solveTimer = 0;
-  let probabilisticWorker = null;
+  let carrierWorker = null;
   let solveRequestId = 0;
   let calculating = false;
   let treeResult = null;
@@ -145,14 +145,6 @@
     }).finally(() => db.close());
   }
 
-  function inheritanceNote() {
-    return `<aside class="breeding-inheritance" aria-label="Estimations communautaires de transmission des passifs" title="Estimations communautaires pour le tirage initial d’héritage, non publiées officiellement par Pocketpair.">
-      <div><p class="eyebrow">Transmission des passifs</p><span>Estimations communautaires</span></div>
-      <dl><div><dt>1 passif</dt><dd>≈ 40 %</dd></div><div><dt>2 passifs</dt><dd>≈ 30 %</dd></div><div><dt>3 passifs</dt><dd>≈ 20 %</dd></div><div><dt>4 passifs</dt><dd>≈ 10 %</dd></div></dl>
-      <p>Des passifs aléatoires peuvent aussi apparaître.</p>
-    </aside>`;
-  }
-
   function currentRoster() {
     const selected = new Set(state.selectedPassives);
     return roster.slice().sort((a, b) => {
@@ -267,9 +259,9 @@
 
   function searchPassives(searchValue = passiveQuery) {
     const search = normalize(searchValue);
-    return passives.filter((passive) => !search
+    return passives.filter((passive) => allAvailable.has(passive.id) && (!search
       || normalize(passive.name).includes(search)
-      || normalize(passiveEffectText(passive.effect)).includes(search));
+      || normalize(passiveEffectText(passive.effect)).includes(search)));
   }
 
   function passiveModal() {
@@ -289,9 +281,8 @@
         const groupRows = rows.filter((passive) => group.match(passive.rank));
         if (!groupRows.length) return "";
         return `<section class="save-passive-tier"><header><strong>${group.label}</strong><span>${groupRows.length}</span></header><div>${groupRows.map((passive) => {
-          const available = allAvailable.has(passive.id);
           const selected = state.selectedPassives.includes(passive.id);
-          return `<button type="button" data-toggle-passive="${escapeHtml(passive.id)}" data-passive-tooltip="${escapeHtml(passive.id)}" class="${passiveClass(passive.rank)}${selected ? " is-selected" : ""}" ${available ? "" : "disabled"}>${passiveRankIcon(passive)}<strong>${escapeHtml(passive.name)}</strong><span aria-hidden="true">${selected ? "✓" : available ? "+" : "—"}</span></button>`;
+          return `<button type="button" data-toggle-passive="${escapeHtml(passive.id)}" data-passive-tooltip="${escapeHtml(passive.id)}" class="${passiveClass(passive.rank)}${selected ? " is-selected" : ""}">${passiveRankIcon(passive)}<strong>${escapeHtml(passive.name)}</strong><span aria-hidden="true">${selected ? "✓" : "+"}</span></button>`;
         }).join("")}</div></section>`;
       }).join("")}</div>
       <footer><span>${rows.length} compétence${rows.length > 1 ? "s" : ""}</span><button type="button" class="save-primary" data-close-passive-modal>Terminer</button></footer>
@@ -302,7 +293,7 @@
     const graphMarkup = calculating ? calculationStateTemplate() : graphTemplate(treeResult);
     return `<section class="breeding-page breeding-page--save" aria-label="Cumoir avec sauvegarde">
       <header class="breeding-page__header"><p class="eyebrow">Planificateur d’élevage</p><p>Le Cumoir travaille avec les Pals réellement présents dans votre sauvegarde.</p></header>
-      ${activeWorld ? `<div class="breeding-top-tools breeding-top-tools--save"><section class="save-source-panel" aria-label="Sauvegarde active">${worldStatus()}</section>${inheritanceNote()}</div>` : ""}
+      ${activeWorld ? `<section class="save-source-panel" aria-label="Sauvegarde active">${worldStatus()}</section>` : ""}
       ${activeWorld ? "" : importEmpty()}
       ${parsing ? `<div class="save-progress"><span></span>${escapeHtml(progress || "Lecture de la sauvegarde…")}</div>` : ""}
       ${error ? `<div class="save-error">${escapeHtml(error)}</div>` : ""}
@@ -310,7 +301,7 @@
         <aside class="breeding-panel save-breeding-panel">
           ${selectionSummary()}
         </aside>
-        <section class="breeding-canvas" data-save-viewport aria-label="Arbre généalogique interactif"><div class="breeding-canvas__tip">Molette : zoom · Cliquer-glisser : déplacer</div><div class="breeding-canvas__summary">${escapeHtml(treeResult?.summary || "Arbre généalogique")}</div>${graphMarkup}</section>
+        <section class="breeding-canvas" data-save-viewport aria-label="Arbre généalogique interactif"><div class="breeding-canvas__tip">Molette : zoom · Cliquer-glisser : déplacer</div><div class="breeding-canvas__summary">${escapeHtml(resultSummary(treeResult))}</div>${treeResult?.status === "found" && state.selectedPassives.length ? `<div class="save-route-note">Route prévue avec Gâteau spécial pour favoriser la transmission des passifs.</div>` : ""}${graphMarkup}</section>
       </div>` : ""}
       ${modalTemplates()}
     </section>`;
@@ -343,6 +334,25 @@
     return `<div class="breeding-canvas__empty"><img src="assets/ui/gerard-empty.webp" alt="" /><p>${escapeHtml(message)}</p></div>`;
   }
 
+  function resultSummary(result) {
+    if (!result) return "Arbre généalogique";
+    if (result.status === "already-owned") return "Déjà présent dans votre sauvegarde";
+    if (result.status === "found") return `${result.breedingCount} étape${result.breedingCount > 1 ? "s" : ""} d’élevage`;
+    return "Arbre généalogique";
+  }
+
+  function resultError(result) {
+    if (!result) return "Choisissez un Pal cible pour calculer une route.";
+    if (result.error) return result.error;
+    if (result.status === "missing-passive") {
+      const names = (result.missingPassiveIds || []).map((id) => passiveInfo(id).name).join(", ");
+      return `Le passif ${names || "demandé"} n’est présent sur aucun Pal de cette sauvegarde.`;
+    }
+    if (result.status === "interrupted") return "La recherche a été interrompue avant de pouvoir prouver une route.";
+    if (result.status === "no-route") return "Aucune route d’élevage valide n’existe avec les Pals de cette sauvegarde.";
+    return "Choisissez un Pal cible pour calculer une route.";
+  }
+
   function treeToGraph(root) {
     const nodes = [];
     const families = [];
@@ -373,32 +383,9 @@
   }
 
   function graphTemplate(result) {
-    if (!result?.root) return emptyGraphTemplate(result?.error || "Choisissez un Pal cible pour calculer une route.");
+    if (!result?.root) return emptyGraphTemplate(resultError(result));
     const layout = treeToGraph(result.root);
     const nodeByKey = new Map(layout.nodes.map((entry) => [entry.key, entry]));
-    const requiredSexByKey = new Map();
-    layout.families.forEach(({ parents, child }) => {
-      const [left, right] = parents.map((key) => nodeByKey.get(key));
-      const target = nodeByKey.get(child);
-      const leftPal = palInfo(left?.node.speciesId);
-      const rightPal = palInfo(right?.node.speciesId);
-      const childPal = palInfo(target?.node.speciesId);
-      if (!leftPal || !rightPal || !childPal) return;
-      for (const combo of breedingRaw.genderCombos || []) {
-        if (combo[4] !== childPal.order) continue;
-        if (combo[0] === leftPal.order && combo[2] === rightPal.order) {
-          requiredSexByKey.set(parents[0], combo[1] === "M" ? "Male" : "Female");
-          requiredSexByKey.set(parents[1], combo[3] === "M" ? "Male" : "Female");
-          break;
-        }
-        if (combo[0] === rightPal.order && combo[2] === leftPal.order) {
-          requiredSexByKey.set(parents[0], combo[3] === "M" ? "Male" : "Female");
-          requiredSexByKey.set(parents[1], combo[1] === "M" ? "Male" : "Female");
-          break;
-        }
-      }
-    });
-    const ownedSpecies = new Set(roster.map((individual) => String(individual.speciesId).toLowerCase()));
     const paths = layout.families.map(({ parents, child }) => {
       const [left, right] = parents.map((key) => nodeByKey.get(key));
       const target = nodeByKey.get(child);
@@ -410,16 +397,16 @@
       const joinY = childY + (parentY - childY) * .48;
       return `<path class="save-family-link" d="M ${leftX} ${parentY} V ${joinY} H ${rightX} V ${parentY} M ${childX} ${joinY} V ${childY}" /><circle class="save-family-junction" cx="${childX}" cy="${joinY}" r="4" />`;
     }).join("");
-    const nodes = layout.nodes.map(({ key, node, x, y }) => {
+    const nodes = layout.nodes.map(({ node, x, y }) => {
       const pal = palInfo(node.speciesId); if (!pal) return "";
       const final = node === result.root;
-      const requiredSex = requiredSexByKey.get(key);
+      const requiredSex = final ? null : node.sex;
       const useful = state.selectedPassives.filter((id) => (node.mask & (1 << state.selectedPassives.indexOf(id))) !== 0);
       const [eggSuffix, eggName] = eggKind(node.speciesId);
       const eggAsset = `assets/eggs/t_itemicon_material_palegg${eggSuffix ? `_${eggSuffix}` : ""}.webp`;
       return `<article class="breeding-node save-tree-node${final ? " save-tree-node--final" : ""}" style="left:${x}px;top:${y}px">
         ${node.owned ? "" : `<span class="save-egg" data-egg-tooltip="${escapeHtml(eggName)}" tabindex="0"><img src="${eggAsset}" alt="${escapeHtml(eggName)}" /></span>`}
-        ${ownedSpecies.has(pal.id.toLowerCase()) ? "" : `<span class="save-tree-node__new">Nouveau</span>`}
+        ${node.owned ? "" : `<span class="save-tree-node__new">Nouveau</span>`}
         <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span><strong>${escapeHtml(pal.name)}</strong>${requiredSex ? `<b class="breeding-node__sex breeding-node__sex--${requiredSex.toLowerCase()}" aria-label="${requiredSex === "Male" ? "Mâle requis" : "Femelle requise"}">${sexSymbol(requiredSex)}</b>` : ""}</span></span>
         ${useful.length ? `<span class="save-tree-node__passives">${useful.map((id) => passiveChip(id)).join("")}</span>` : ""}
       </article>`;
@@ -459,25 +446,25 @@
   function scheduleSolve(immediate = false) {
     clearTimeout(solveTimer);
     const run = () => {
-      if (!activeWorld) { probabilisticWorker?.terminate(); probabilisticWorker = null; treeResult = null; render(true); return; }
-      if (!state.target) { probabilisticWorker?.terminate(); probabilisticWorker = null; treeResult = null; calculating = false; render(true); return; }
+      if (!activeWorld) { carrierWorker?.terminate(); carrierWorker = null; treeResult = null; render(true); return; }
+      if (!state.target) { carrierWorker?.terminate(); carrierWorker = null; treeResult = null; calculating = false; render(true); return; }
       calculating = true;
       render(true);
-      probabilisticWorker?.terminate();
+      carrierWorker?.terminate();
       const requestId = ++solveRequestId;
-      probabilisticWorker = new Worker("js/probabilistic-solver.worker.js?v=0.9.3");
-      probabilisticWorker.onmessage = ({ data }) => {
+      carrierWorker = new Worker("js/carrier-solver.worker.js?v=0.9.1");
+      carrierWorker.onmessage = ({ data }) => {
         if (data.requestId !== requestId) return;
         treeResult = data.type === "solved" ? data.result : { error: "Le calcul n’a pas pu être terminé." };
-        calculating = false; probabilisticWorker.terminate(); probabilisticWorker = null; render(true);
+        calculating = false; carrierWorker.terminate(); carrierWorker = null; render(true);
       };
-      probabilisticWorker.onerror = (workerError) => {
+      carrierWorker.onerror = (workerError) => {
         console.error("Échec du solveur :", workerError.message);
         if (requestId !== solveRequestId) return;
         treeResult = { error: "Le calcul n’a pas pu être terminé." };
-        calculating = false; probabilisticWorker?.terminate(); probabilisticWorker = null; render(true);
+        calculating = false; carrierWorker?.terminate(); carrierWorker = null; render(true);
       };
-      probabilisticWorker.postMessage({
+      carrierWorker.postMessage({
         type: "solve", requestId,
         input: {
           roster, targetId: state.target, desiredPassives: state.selectedPassives,
@@ -716,8 +703,8 @@
         state.target = target;
         state.selectedPassives = selectedPassives;
       },
-      solveProbabilistic(options = {}) {
-        return window.ProbabilisticBreedingSolver.solve({ roster, targetId: state.target, desiredPassives: state.selectedPassives, childFor, speciesIds: species.map((pal) => pal.id), ...options });
+      solveCarrier(options = {}) {
+        return window.CarrierBreedingSolver.solve({ roster, targetId: state.target, desiredPassives: state.selectedPassives, childFor, speciesIds: species.map((pal) => pal.id), ...options });
       },
       renderGraph: graphTemplate,
       eggKind,

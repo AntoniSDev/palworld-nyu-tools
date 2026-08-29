@@ -2196,30 +2196,12 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
   align-items: stretch;
   margin-bottom: 16px;
 }
-.breeding-top-tools--save { display: grid; grid-template-columns: minmax(390px, 440px) minmax(0, 1fr); gap: 16px; align-items: stretch; margin-bottom: 16px; }
 .breeding-manual-tools > .breeding-source { width: 100%; margin: 0; }
 .breeding-top-tools .breeding-source { min-height: 74px; padding: 12px; }
 .breeding-top-tools .breeding-source > div { gap: 7px; }
 .breeding-top-tools .breeding-source button { height: 36px; font-size: .76rem; }
 .breeding-manual-tools + .breeding-layout .breeding-panel,
 .breeding-manual-tools + .breeding-layout .breeding-canvas { height: calc(100vh - 240px); }
-.breeding-inheritance {
-  display: grid;
-  min-width: 0;
-  padding: 9px 12px;
-  border: 1px solid rgba(103, 214, 216, .2);
-  border-radius: 9px;
-  background: linear-gradient(120deg, rgba(7, 48, 58, .62), rgba(22, 32, 55, .58));
-}
-.breeding-inheritance > div:first-child { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.breeding-inheritance .eyebrow { margin: 0; color: #f3d79b; font-size: .7rem; }
-.breeding-inheritance > div:first-child span { color: #789ba1; font-size: .78rem; font-weight: 700; }
-.breeding-inheritance dl { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 6px 0 4px; }
-.breeding-inheritance dl div { display: flex; min-width: 0; min-height: 44px; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; border-radius: 5px; background: rgba(3, 21, 29, .52); }
-.breeding-inheritance dt { color: #9bb8bb; font-size: .86rem; }
-.breeding-inheritance dd { margin: 0; color: #7cebe6; font-size: .96rem; font-weight: 800; white-space: nowrap; }
-.breeding-inheritance > p { margin: 2px 0 0; color: #789ba1; font-size: .86rem; line-height: 1.4; }
-
 .save-source-panel {
   display: grid;
   width: 100%;
@@ -2230,7 +2212,9 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
   border: 1px solid rgba(103, 214, 216, .24);
   border-radius: 11px;
   background: linear-gradient(120deg, rgba(7, 48, 58, .74), rgba(22, 32, 55, .7));
+  margin-bottom: 16px;
 }
+.save-route-note { position: absolute; z-index: 3; top: 40px; left: 50%; width: max-content; max-width: calc(100% - 32px); color: #83aaa9; font-size: .7rem; text-align: center; pointer-events: none; transform: translateX(-50%); }
 .save-source-panel > .breeding-source {
   width: auto;
   max-width: none;
@@ -2300,10 +2284,6 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
   .site-nav button { min-height: 50px; font-size: .82rem; }
   .breeding-manual-tools { grid-template-columns: 1fr; }
   .save-source-panel { width: auto; grid-template-columns: 1fr; }
-}
-
-@media (max-width: 560px) {
-  .breeding-inheritance dl { grid-template-columns: 1fr 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2387,7 +2367,7 @@ body::before { opacity: .32; background: radial-gradient(ellipse at 55% 72%, rgb
 
 @media (max-width: 900px) {
   .site-nav button { min-height: 50px; font-size: .9rem; }
-  .breeding-manual-tools, .breeding-top-tools--save { grid-template-columns: 1fr; }
+  .breeding-manual-tools { grid-template-columns: 1fr; }
   .breeding-page:not(.breeding-page--save) .breeding-layout,
   .breeding-layout--save { grid-template-columns: 1fr; }
 }

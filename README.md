@@ -38,3 +38,20 @@ Petite application statique en français regroupant des outils pratiques pour Pa
 Le contenu de ce dossier peut être publié directement avec GitHub Pages, sans compilation ni serveur.
 
 Les données de cette version correspondent à Palworld 1.0.3.
+
+## Planificateur du Cumoir
+
+Le Cumoir construit ses routes uniquement depuis les individus de la sauvegarde
+chargée localement. Les passifs choisis sont encodés dans un bitmask de quatre
+bits au maximum. Le moteur manipule ensuite des carriers compacts définis par
+leur espèce, leur sexe et ce masque de passifs.
+
+Chaque croisement valide fusionne les passifs recherchés de ses deux parents.
+Une recherche exacte conserve le meilleur plan connu pour chaque carrier et
+minimise d’abord le nombre total d’étapes d’élevage, puis la profondeur de
+l’arbre. Les dépendances mémorisées permettent de reconstruire les feuilles
+réellement possédées et les intermédiaires à produire.
+
+Le calcul s’exécute dans un Web Worker. La sauvegarde et son roster ne sont
+jamais envoyés à un serveur. Cette expérience de planification pratique suit
+les usages des outils communautaires modernes, sans reprendre leur code.

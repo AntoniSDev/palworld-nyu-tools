@@ -1,10 +1,6 @@
-/* Palworld Nyu Tools — exécution hors thread du solveur probabiliste. GPL-3.0. */
+/* Palworld Nyu Tools — worker du planificateur exact de carriers. GPL-3.0. */
 self.window = self;
-importScripts(
-  "breeding-data.js?v=0.9",
-  "passive-probability.js?v=0.9.2",
-  "probabilistic-breeding-solver.js?v=0.9.4",
-);
+importScripts("breeding-data.js?v=0.9", "carrier-breeding-solver.js?v=0.9.1");
 
 const raw = self.BREEDING_DATA;
 const pals = raw.pals.map(([id, name, portrait, order]) => ({ id, name, portrait, order }));
@@ -24,13 +20,15 @@ function childFor(aId, bId, sexA = null, sexB = null) {
     let expectedA; let expectedB; let childIndex;
     if (combo[0] === a.order && combo[2] === b.order) {
       expectedA = combo[1] === "M" ? "Male" : "Female";
-      expectedB = combo[3] === "M" ? "Male" : "Female"; childIndex = combo[4];
+      expectedB = combo[3] === "M" ? "Male" : "Female";
+      childIndex = combo[4];
     } else if (combo[0] === b.order && combo[2] === a.order) {
       expectedA = combo[3] === "M" ? "Male" : "Female";
-      expectedB = combo[1] === "M" ? "Male" : "Female"; childIndex = combo[4];
+      expectedB = combo[1] === "M" ? "Male" : "Female";
+      childIndex = combo[4];
     } else continue;
     hasGenderRule = true;
-    if ((!sexA || sexA === "Unknown" || sexA === expectedA) && (!sexB || sexB === "Unknown" || sexB === expectedB)) return pals[childIndex]?.id || null;
+    if (sexA === expectedA && sexB === expectedB) return pals[childIndex]?.id || null;
   }
   if (hasGenderRule && sexA && sexB) return null;
   const childIndex = raw.children[pairIndex(a.order, b.order)];
@@ -40,7 +38,7 @@ function childFor(aId, bId, sexA = null, sexB = null) {
 self.onmessage = ({ data }) => {
   if (data?.type !== "solve") return;
   try {
-    const result = self.ProbabilisticBreedingSolver.solve({
+    const result = self.CarrierBreedingSolver.solve({
       ...data.input, childFor, speciesIds: pals.map((pal) => pal.id),
     });
     self.postMessage({ type: "solved", requestId: data.requestId, result });

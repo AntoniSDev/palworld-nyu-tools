@@ -36,15 +36,15 @@ Palworld interface icons distributed by
 under CC BY-SA 4.0. They complement the same local icon family already used by
 the passive-skills page.
 
-## Breeding probability references
+## Breeding planner references
 
-Palbreed / Palpath was consulted as a public conceptual, behavioural and
-algorithmic reference. Its current public repository,
+Palbreed / Palpath was consulted as a public conceptual and behavioural
+reference for practical breeding routes. Its current public repository,
 [`EthanMarkham/palbreed`](https://github.com/EthanMarkham/palbreed), is
 unlicensed (`UNLICENSED`): no Palbreed source code was copied, adapted or
 integrated. The Nyu Tools implementation is independent.
 
-The public documentation and tests from
-[`tylercamp/palcalc`](https://github.com/tylercamp/palcalc), licensed under
-MIT, were consulted separately. Neither project is a runtime dependency and
-no source package is vendored.
+The public documentation from
+[`tylercamp/palcalc`](https://github.com/tylercamp/palcalc), licensed under MIT,
+was consulted separately for breeding-data context. Neither project is a
+runtime dependency and no source package is vendored.
