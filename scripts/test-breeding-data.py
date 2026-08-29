@@ -68,10 +68,10 @@ def shortest_route(start: str, target: str):
     return list(reversed(route))
 
 
-assert data["meta"]["palCount"] == len(pals) == 287
-assert data["meta"]["outcomeCount"] == 41329
+assert data["meta"]["palCount"] == len(pals) == 298
+assert data["meta"]["outcomeCount"] == 44552
 assert len(by_id) == len(pals)
-assert len(children) == 287 * 288 // 2
+assert len(children) == 298 * 299 // 2
 assert children.count(-1) == 1
 assert len(gender_combos) == 2
 assert outcomes("SheepBall", "SheepBall")[0][0] == "SheepBall"
@@ -82,6 +82,8 @@ assert outcomes("BirdDragon", "IceFox")[0][0] == "BirdDragon_Ice"
 assert outcomes("CatMage", "FoxMage", "Female", "Male")[0][0] == "CatMage_Fire"
 assert outcomes("CatMage", "FoxMage", "Male", "Female")[0][0] == "FoxMage_Dark"
 assert outcomes("CatMage", "FoxMage", "Female", "Female") == []
+assert outcomes("YakushimaMonster001", "YakushimaBoss001")[0][0] == "YakushimaBoss001"
+assert outcomes("YakushimaBoss001", "YakushimaBoss001")[0][0] == "YakushimaBoss001"
 assert shortest_route("SheepBall", "SheepBall") == []
 
 route_cases = []

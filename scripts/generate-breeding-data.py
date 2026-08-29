@@ -2,9 +2,8 @@
 """Build the compact, browser-ready Palworld 1.0 breeding dataset.
 
 Inputs are the extracted pals.json / combos.json files from
-ICSharperNow/palworld-breeding-calculator and this project's generated French
-condensation roster. Only the 287 released, non-crossover Pals shared by both
-sources are published.
+ICSharperNow/palworld-breeding-calculator, the audited PalCalc outcome snapshot
+and this project's generated French condensation roster.
 """
 
 from __future__ import annotations
@@ -17,6 +16,19 @@ from pathlib import Path
 
 
 SOURCE_REVISION = "2d622d64140fc90b1ac913c139d91dfd150d15dd"
+CROSSOVER_NAMES = {
+    "YakushimaMonster003": "Cave Bat",
+    "YakushimaMonster003_Purple": "Illuminant Bat",
+    "YakushimaMonster001_Rainbow": "Rainbow Slime",
+    "YakushimaMonster001_Blue": "Blue Slime",
+    "YakushimaMonster001_Pink": "Illuminant Slime",
+    "YakushimaMonster001_Red": "Red Slime",
+    "YakushimaMonster001": "Green Slime",
+    "YakushimaMonster001_Purple": "Purple Slime",
+    "YakushimaMonster002": "Enchanted Sword",
+    "YakushimaBoss001": "Eye of Cthulhu",
+    "YakushimaBoss001_Small": "Demon Eye",
+}
 
 
 def read_condensation_roster(path: Path) -> list[dict]:
@@ -38,16 +50,18 @@ def main() -> None:
     source_pals = json.loads(args.pals.read_text(encoding="utf-8"))
     source_combos = json.loads(args.combos.read_text(encoding="utf-8"))
     outcome_snapshot = json.loads(args.outcomes.read_text(encoding="utf-8"))
-    local_by_code = {
-        pal["code"]: pal
-        for pal in read_condensation_roster(args.condensation)
-        if not pal.get("crossover", False)
-    }
+    local_roster = read_condensation_roster(args.condensation)
+    local_by_code = {pal["code"]: pal for pal in local_roster}
 
     included = [pal for pal in source_pals if pal["id"] in local_by_code]
+    included.extend(
+        {"id": pal["code"], "name": CROSSOVER_NAMES[pal["code"]]}
+        for pal in local_roster
+        if pal.get("crossover", False) and pal["code"] in CROSSOVER_NAMES
+    )
     included_ids = {pal["id"] for pal in included}
-    if len(included) != 287:
-        raise SystemExit(f"Expected 287 released Pals, found {len(included)}")
+    if len(included) != 298 or len(included_ids) != len(included):
+        raise SystemExit(f"Expected 298 released Pals, found {len(included)}")
 
     pals = []
     id_to_index = {}
@@ -100,7 +114,7 @@ def main() -> None:
         else:
             children[pair_index(a_index, b_index)] = child_index
 
-    if included_records != 41329 or children.count(-1) != 1 or len(gender_combos) != 2:
+    if included_records != 44552 or children.count(-1) != 1 or len(gender_combos) != 2:
         raise SystemExit(
             f"Unexpected outcome coverage: {included_records} records, "
             f"{children.count(-1)} gender-only pair, {len(gender_combos)} gender rules"
@@ -113,7 +127,7 @@ def main() -> None:
             "palCount": len(pals),
             "outcomeCount": included_records,
             "specialRuleCount": len(source_combos),
-            "source": "Palweave Palworld 1.0 audited outcomes, mapped with ICSharperNow game tables",
+            "source": "Palweave Palworld 1.0 audited outcomes, mapped with ICSharperNow game tables and Terraria crossover roster",
             "sourceRevision": SOURCE_REVISION,
             "outcomeSha256": "9f558802ed3fa14b52c352d18a05cd40b295e636ccca249376293e80dc1643c4",
         },

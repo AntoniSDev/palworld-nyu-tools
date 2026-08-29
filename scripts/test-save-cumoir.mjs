@@ -51,6 +51,8 @@ const targetAutocomplete = {
   oneCharacter: api.targetResults("a") === "",
   unlimited: (api.targetResults("an").match(/data-save-target=/g) || []).length > 8,
   missing: api.targetResults("zzzzzz").includes("Aucun Pal trouvé"),
+  crossoverEye: api.targetResults("Cthulhu").includes("Œil de Cthulhu"),
+  crossoverSlimes: (api.targetResults("Gelée").match(/data-save-target=/g) || []).length >= 6,
 };
 if (!Object.values(targetAutocomplete).every(Boolean)) throw new Error("Target autocomplete constraints failed.");
 const plannedDepth = (node) => node?.parents ? 1 + Math.max(...node.parents.map(plannedDepth)) : 0;
