@@ -2086,15 +2086,13 @@ body[data-view="breeding"] footer { margin-top: 18px; }
 .save-tree-node__passives .save-passive-rank { width: 15px; height: 15px; flex-basis: 15px; }
 .save-family-link { stroke-linecap: round; stroke-linejoin: round; }
 .save-family-junction { fill: #83ddd8; stroke: rgba(4, 27, 35, .9); stroke-width: 2; vector-effect: non-scaling-stroke; }
-.save-cake-marker { position: absolute; z-index: 3; display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid rgba(131, 221, 216, .68); border-radius: 50%; background: rgba(4, 20, 27, .94); box-shadow: 0 4px 12px rgba(0, 0, 0, .46), 0 0 10px rgba(81, 210, 203, .18); cursor: help; transform: translate(-50%, -50%); }
-.save-cake-marker img { width: 29px; height: 29px; object-fit: contain; }
 .save-passive-tooltip { position: fixed; z-index: 1300; display: grid; width: min(280px, calc(100vw - 20px)); gap: 4px; padding: 9px 11px; border: 1px solid rgba(104, 220, 216, .38); border-radius: 7px; background: rgba(3, 20, 28, .97); box-shadow: 0 12px 30px rgba(0, 5, 10, .42); color: #d9eeee; pointer-events: none; }
 .save-passive-tooltip[hidden] { display: none; }
 .save-passive-tooltip strong { color: #f1ffff; font-size: .7rem; }
 .save-passive-tooltip span { color: #9ab8bb; font-size: .62rem; line-height: 1.4; }
 .save-egg { position: absolute; z-index: 2; top: -13px; right: -10px; display: grid; width: 37px; height: 37px; place-items: center; border: 1px solid rgba(229, 201, 133, .5); border-radius: 50%; background: rgba(4, 20, 27, .9); box-shadow: 0 4px 10px rgba(0, 0, 0, .42); }
 .save-egg img { width: 34px; height: 34px; object-fit: contain; }
-.save-tree-node__new { display: inline-flex; justify-self: center; padding: 2px 6px; border: 1px solid rgba(106, 255, 223, .7); border-radius: 999px; background: rgba(7, 83, 73, .94); box-shadow: 0 0 10px rgba(78, 245, 213, .3); color: #aaffed; font-size: .48rem; font-weight: 900; letter-spacing: .06em; line-height: 1.1; text-transform: uppercase; }
+.save-tree-node__new { position: absolute; z-index: 3; top: 7px; left: 50%; display: inline-flex; padding: 2px 6px; border: 1px solid rgba(106, 255, 223, .7); border-radius: 999px; background: rgba(7, 83, 73, .94); box-shadow: 0 0 10px rgba(78, 245, 213, .3); color: #aaffed; font-size: .48rem; font-weight: 900; letter-spacing: .06em; line-height: 1.1; text-transform: uppercase; transform: translateX(-50%); }
 .save-calculating { position: absolute; inset: 0; display: grid; place-content: center; place-items: center; gap: 10px; color: #bce8e5; }
 .save-calculating span { width: 24px; height: 24px; border: 2px solid rgba(108, 224, 222, .2); border-top-color: #6de1dd; border-radius: 50%; animation: save-spin .7s linear infinite; }
 .save-calculating strong { font-size: 1rem; font-weight: 700; }

@@ -398,7 +398,6 @@
         }
       }
     });
-    const cakeMarkers = [];
     const ownedSpecies = new Set(roster.map((individual) => String(individual.speciesId).toLowerCase()));
     const paths = layout.families.map(({ parents, child }) => {
       const [left, right] = parents.map((key) => nodeByKey.get(key));
@@ -409,7 +408,6 @@
       const parentY = left.y;
       const childY = target.y + layout.nodeHeight;
       const joinY = childY + (parentY - childY) * .48;
-      if (target.node.recommendedCake) cakeMarkers.push({ x: childX, y: joinY, cake: target.node.recommendedCake });
       return `<path class="save-family-link" d="M ${leftX} ${parentY} V ${joinY} H ${rightX} V ${parentY} M ${childX} ${joinY} V ${childY}" /><circle class="save-family-junction" cx="${childX}" cy="${joinY}" r="4" />`;
     }).join("");
     const nodes = layout.nodes.map(({ key, node, x, y }) => {
@@ -421,16 +419,12 @@
       const eggAsset = `assets/eggs/t_itemicon_material_palegg${eggSuffix ? `_${eggSuffix}` : ""}.webp`;
       return `<article class="breeding-node save-tree-node${final ? " save-tree-node--final" : ""}" style="left:${x}px;top:${y}px">
         ${node.owned ? "" : `<span class="save-egg" data-egg-tooltip="${escapeHtml(eggName)}" tabindex="0"><img src="${eggAsset}" alt="${escapeHtml(eggName)}" /></span>`}
-        <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span>${ownedSpecies.has(pal.id.toLowerCase()) ? "" : `<span class="save-tree-node__new">Nouveau</span>`}<strong>${escapeHtml(pal.name)}</strong>${requiredSex ? `<b class="breeding-node__sex breeding-node__sex--${requiredSex.toLowerCase()}" aria-label="${requiredSex === "Male" ? "Mâle requis" : "Femelle requise"}">${sexSymbol(requiredSex)}</b>` : ""}</span></span>
+        ${ownedSpecies.has(pal.id.toLowerCase()) ? "" : `<span class="save-tree-node__new">Nouveau</span>`}
+        <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span><strong>${escapeHtml(pal.name)}</strong>${requiredSex ? `<b class="breeding-node__sex breeding-node__sex--${requiredSex.toLowerCase()}" aria-label="${requiredSex === "Male" ? "Mâle requis" : "Femelle requise"}">${sexSymbol(requiredSex)}</b>` : ""}</span></span>
         ${useful.length ? `<span class="save-tree-node__passives">${useful.map((id) => passiveChip(id)).join("")}</span>` : ""}
       </article>`;
     }).join("");
-    const cakes = cakeMarkers.map(({ x, y, cake }) => {
-      const names = { standard: "Gâteau", vegetable: "Gâteau aux légumes", special: "Gâteau spécial" };
-      const assets = { standard: "cake", vegetable: "vegetable-cake", special: "special-cake" };
-      return `<span class="save-cake-marker" style="left:${x}px;top:${y}px" data-cake-tooltip="${escapeHtml(names[cake] || cake)}" tabindex="0"><img src="assets/items/${assets[cake] || "cake"}.png" alt="" /></span>`;
-    }).join("");
-    return `<div class="breeding-canvas__world" data-save-world><div class="breeding-tree" data-save-tree style="width:${layout.width}px;height:${layout.height}px"><svg class="breeding-tree__links" width="${layout.width}" height="${layout.height}" viewBox="0 0 ${layout.width} ${layout.height}">${paths}</svg>${cakes}${nodes}</div></div>`;
+    return `<div class="breeding-canvas__world" data-save-world><div class="breeding-tree" data-save-tree style="width:${layout.width}px;height:${layout.height}px"><svg class="breeding-tree__links" width="${layout.width}" height="${layout.height}" viewBox="0 0 ${layout.width} ${layout.height}">${paths}</svg>${nodes}</div></div>`;
   }
 
   function pairIndex(a, b) {
@@ -648,7 +642,6 @@
 
   function showTooltip(target) {
     const passive = target.dataset.passiveTooltip ? passiveInfo(target.dataset.passiveTooltip) : null;
-    const cake = target.dataset.cakeTooltip;
     let tooltip = document.querySelector(".save-passive-tooltip");
     if (!tooltip) {
       tooltip = document.createElement("div");
@@ -656,9 +649,7 @@
       tooltip.setAttribute("role", "tooltip");
       document.body.append(tooltip);
     }
-    tooltip.innerHTML = cake
-      ? `<strong>Gâteau conseillé : ${escapeHtml(cake)}</strong><span>Recommandation pour optimiser ce croisement.</span>`
-      : passive
+    tooltip.innerHTML = passive
       ? `<strong>${escapeHtml(passive.name)}</strong><span>${escapeHtml(passiveEffectText(passive.effect))}</span>`
       : `<strong>${escapeHtml(target.dataset.eggTooltip)}</strong><span>À obtenir par reproduction.</span>`;
     tooltip.hidden = false;
@@ -694,10 +685,10 @@
   document.addEventListener("click", handleClick);
   document.addEventListener("input", handleInput);
   document.addEventListener("change", handleChange);
-  document.addEventListener("pointerover", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-egg-tooltip], [data-cake-tooltip]"); if (target) showTooltip(target); });
-  document.addEventListener("pointerout", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-egg-tooltip], [data-cake-tooltip]"); if (target && !target.contains(event.relatedTarget)) hideTooltip(); });
-  document.addEventListener("focusin", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-egg-tooltip], [data-cake-tooltip]"); if (target) showTooltip(target); });
-  document.addEventListener("focusout", (event) => { if (event.target.closest("[data-passive-tooltip], [data-egg-tooltip], [data-cake-tooltip]")) hideTooltip(); });
+  document.addEventListener("pointerover", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-egg-tooltip]"); if (target) showTooltip(target); });
+  document.addEventListener("pointerout", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-egg-tooltip]"); if (target && !target.contains(event.relatedTarget)) hideTooltip(); });
+  document.addEventListener("focusin", (event) => { const target = event.target.closest("[data-passive-tooltip], [data-egg-tooltip]"); if (target) showTooltip(target); });
+  document.addEventListener("focusout", (event) => { if (event.target.closest("[data-passive-tooltip], [data-egg-tooltip]")) hideTooltip(); });
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
     if (passiveModalOpen) { passiveModalOpen = false; render(false); }

@@ -36,14 +36,15 @@ Palworld interface icons distributed by
 under CC BY-SA 4.0. They complement the same local icon family already used by
 the passive-skills page.
 
-The Cake, Vegetable Cake and Special Cake icons used by the probabilistic
-breeding tree are likewise embedded locally from
-[`palworld.wiki.gg`](https://palworld.wiki.gg/wiki/Cakes) under CC BY-SA 4.0.
-
 ## Breeding probability references
 
-The passive-inheritance mathematics and search design were independently
-implemented after comparison with the public documentation and tests from
-[`EthanMarkham/palbreed`](https://github.com/EthanMarkham/palbreed) (MIT) and
-[`tylercamp/palcalc`](https://github.com/tylercamp/palcalc) (MIT). Neither
-project is a runtime dependency and no source package is vendored.
+Palbreed / Palpath was consulted as a public conceptual, behavioural and
+algorithmic reference. Its current public repository,
+[`EthanMarkham/palbreed`](https://github.com/EthanMarkham/palbreed), is
+unlicensed (`UNLICENSED`): no Palbreed source code was copied, adapted or
+integrated. The Nyu Tools implementation is independent.
+
+The public documentation and tests from
+[`tylercamp/palcalc`](https://github.com/tylercamp/palcalc), licensed under
+MIT, were consulted separately. Neither project is a runtime dependency and
+no source package is vendored.

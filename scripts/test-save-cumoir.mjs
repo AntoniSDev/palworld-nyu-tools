@@ -38,6 +38,10 @@ const normalized = parsed.pals.map((pal) => ({
   passives: Array.isArray(pal.passives) ? pal.passives.slice(0, 4) : [],
 }));
 const api = context.SaveCumoir.__test;
+const styles = fs.readFileSync(new URL("../css/styles.css", import.meta.url), "utf8");
+if (!/\.save-tree-node__new\s*\{[^}]*position:\s*absolute;[^}]*top:\s*7px;[^}]*left:\s*50%;[^}]*transform:\s*translateX\(-50%\)/s.test(styles)) {
+  throw new Error("The Nouveau badge is not positioned at the centered top of the Pal card.");
+}
 const emptyTemplate = context.SaveCumoir.template();
 if (emptyTemplate.includes("Source des Pals") || emptyTemplate.includes("Transmission des passifs")) throw new Error("Empty save UI still exposes removed Cumoir blocks.");
 if (!(emptyTemplate.indexOf("SaveGames") < emptyTemplate.indexOf("Importer une sauvegarde"))) throw new Error("Import instructions are not ordered correctly.");
@@ -96,7 +100,7 @@ if (objectives.length) {
   if (!probabilistic.root && !probabilistic.error) throw new Error("Probabilistic solver returned neither a plan nor an explicit error.");
   if (probabilistic.root) {
     const graph = api.renderGraph(probabilistic);
-    if (!graph.includes("data-cake-tooltip=\"") || !graph.includes("assets/items/")) throw new Error("Cake recommendation is missing from the shared tree renderer.");
+    if (graph.includes("data-cake-tooltip") || graph.includes("assets/items/") || graph.includes("recommendedCake")) throw new Error("Cake recommendations remain in the tree renderer.");
     if (!graph.includes('save-tree-node__new">Nouveau')) throw new Error("Planned intermediates are missing the Nouveau badge.");
     if (graph.includes("expectedBatches") || graph.includes("probability")) throw new Error("Internal probability data leaked into the UI.");
   }

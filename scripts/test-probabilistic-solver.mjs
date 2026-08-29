@@ -13,10 +13,8 @@ const p = context.PassiveProbability;
 for (const [pool, desired, extras, expected] of [
   [1, 1, 0, .4], [2, 2, 0, .24], [3, 3, 0, .12], [4, 4, 0, .1],
   [2, 1, 0, .08], [4, 2, 0, .02], [4, 2, 1, .075],
-]) assert.ok(Math.abs(p.standard(pool, desired, extras) - expected) < 1e-12, `${pool}/${desired}/${extras}`);
-assert.ok(Math.abs(p.vegetable(.4) - .64) < 1e-12);
-assert.equal(p.special(4, 4, 0), 1);
-assert.ok(Math.abs(p.special(8, 4, 0) - 1 / 70) < 1e-12);
+]) assert.ok(Math.abs(p.inheritance(pool, desired, extras) - expected) < 1e-12, `${pool}/${desired}/${extras}`);
+assert.deepEqual(Object.keys(p).sort(), ["choose", "inheritance"], "single probability model");
 
 const childFor = (a, b, sexA, sexB) => {
   if (a === b && sexA !== "Unknown" && sexB !== "Unknown" && sexA === sexB) return null;
@@ -33,7 +31,7 @@ const solve = (desiredPassives) => context.ProbabilisticBreedingSolver.solve({ r
 for (let count = 1; count <= 2; count += 1) {
   const result = solve(["P1", "P2"].slice(0, count));
   assert.ok(result.root, `route ${count} passive(s)`);
-  assert.ok(["vegetable", "special", "standard"].includes(result.root.recommendedCake));
+  assert.equal("recommendedCake" in result.root, false, "route does not expose a cake recommendation");
 }
 const first = solve(["P1", "P2"]);
 const second = solve(["P1", "P2"]);
@@ -123,4 +121,4 @@ const largeResult = context.ProbabilisticBreedingSolver.solve({
 assert.ok(largeResult.root || largeResult.truncated, "large roster returns a route or an explicit interruption");
 assert.ok(performance.now() - largeStartedAt < 3500, "large roster remains bounded");
 
-console.log(JSON.stringify({ probabilityFixtures: 10, deterministic: true, cleanSource: true, branches: true, deepBranches: true, specialSex: true, sampleMs: first.durationMs, largeRosterMs: largeResult.durationMs, largeRosterExpanded: largeResult.expanded }));
+console.log(JSON.stringify({ probabilityFixtures: 7, deterministic: true, cleanSource: true, branches: true, deepBranches: true, specialSex: true, sampleMs: first.durationMs, largeRosterMs: largeResult.durationMs, largeRosterExpanded: largeResult.expanded }));

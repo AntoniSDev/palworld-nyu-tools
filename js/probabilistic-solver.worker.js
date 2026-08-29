@@ -2,8 +2,8 @@
 self.window = self;
 importScripts(
   "breeding-data.js?v=0.9",
-  "passive-probability.js?v=0.9.1",
-  "probabilistic-breeding-solver.js?v=0.9.3",
+  "passive-probability.js?v=0.9.2",
+  "probabilistic-breeding-solver.js?v=0.9.4",
 );
 
 const raw = self.BREEDING_DATA;
