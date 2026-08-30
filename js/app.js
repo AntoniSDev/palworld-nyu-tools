@@ -143,7 +143,6 @@ const specialPartnerActivities = [
 const partnerActivities = [...jobs, ...specialPartnerActivities];
 const picker = document.querySelector("#job-picker");
 const content = document.querySelector("#content");
-const brand = document.querySelector(".brand");
 const singleButton = document.querySelector("#single-view");
 const workButton = document.querySelector("#work-view");
 const combatButton = document.querySelector("#combat-view");
@@ -153,6 +152,13 @@ const memoButton = document.querySelector("#memo-view");
 const intro = document.querySelector(".intro");
 const pageEyebrow = document.querySelector("#page-eyebrow");
 const pageCopy = document.querySelector("#page-copy");
+const primaryNavLinks = [breedingButton, singleButton, workButton, combatButton, condensationButton, memoButton];
+const jobTooltip = document.createElement("div");
+jobTooltip.id = "work-job-tooltip";
+jobTooltip.className = "work-job-tooltip";
+jobTooltip.setAttribute("role", "tooltip");
+jobTooltip.hidden = true;
+document.body.append(jobTooltip);
 const formatter = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2 });
 
 let selectedId = jobs[0].id;
@@ -165,7 +171,16 @@ let partnerSkillsPromise = null;
 let selectedCondensationPalId = null;
 let condensationStars = 0;
 let condensationQuery = "";
-let currentView = "breeding";
+const viewRoutes = new Map([
+  ["#cumoir", "breeding"],
+  ["#capacites", "jobs"],
+  ["#optimisation", "work"],
+  ["#combat", "combat"],
+  ["#condensation", "condensation"],
+  ["#memo", "memo"],
+]);
+const viewFromHash = (hash) => viewRoutes.get(hash) || "breeding";
+let currentView = viewFromHash(window.location.hash);
 let viewTransitionTimer;
 let draggedMemoId = null;
 let memoDragPlaceholder = null;
@@ -299,12 +314,14 @@ function renderPicker() {
         <button
           type="button"
           data-job="${job.id}"
+          data-job-tooltip="${escapeHtml(job.name)}"
           class="${selectedId === job.id && currentView === "jobs" ? "selected" : ""}"
           aria-pressed="${selectedId === job.id && currentView === "jobs"}"
+          aria-label="${escapeHtml(job.name)}"
+          aria-describedby="work-job-tooltip"
           style="--job-color:${job.color}"
         >
           <img src="${job.icon}" alt="" />
-          <span>${job.shortName}</span>
         </button>`,
     )
     .join("");
@@ -356,7 +373,8 @@ function workActivityPickerTemplate(mode) {
       ${isPartner && index === jobs.length ? '<span class="work-activity-picker__separator" aria-hidden="true"></span>' : ""}
       <button type="button" data-work-activity="${activity.id}" class="${selectedId === activity.id ? "selected" : ""}"
         aria-pressed="${selectedId === activity.id}" aria-label="${escapeHtml(activity.name)}"
-        title="${escapeHtml(activity.name)}" style="--job-color:${activity.color}">
+        aria-describedby="work-job-tooltip" data-job-tooltip="${escapeHtml(activity.name)}"
+        style="--job-color:${activity.color}">
         <img src="${activity.icon}" alt="" />
       </button>`).join("")}
   </nav>`;
@@ -372,14 +390,14 @@ function passiveResultsTemplate() {
     ? [...workOptimization.passiveProfiles.standard, ...workOptimization.passiveProfiles.farming]
     : workOptimization.passiveProfiles[profile];
   const context = profile === "transport"
-    ? "La Vitesse de travail n’améliore pas le Transport : privilégiez la vitesse de déplacement et l’autonomie."
+    ? "Vitesse de déplacement · activité nocturne · MEN / satiété"
     : profile === "farming"
-      ? "L’Exploitation bénéficie de ses passifs dédiés et des bonus de Vitesse de travail."
-      : "Vitesse de travail, autonomie et activité nocturne.";
+      ? "Vitesse de travail · capacité d’Exploitation · activité nocturne · MEN / satiété"
+      : "Vitesse de travail · activité nocturne · MEN / satiété";
   return `<div class="passive-results">
     <header class="passive-results__header" style="--job-color:${job.color}">
       <span class="work-card__icon"><img src="${job.icon}" alt="" /></span>
-      <div><p>Compétences passives utiles pour</p><h2>${escapeHtml(job.name)}</h2><span>${context}</span></div>
+      <div><h2>${escapeHtml(job.name)}</h2><span>${context}</span></div>
     </header>
     <div class="passive-list">${passiveListTemplate(skillIds)}</div>
   </div>`;
@@ -420,22 +438,24 @@ function workPartnerCardTemplate(reference) {
       <h3>${escapeHtml(skill.name)}</h3>
       ${reference.description ? `<p class="work-partner-description">${escapeHtml(skill.description)}</p>` : ""}
       ${partnerProgressTemplate(effect)}
+      ${reference.note ? `<p class="work-partner-note">${escapeHtml(reference.note)}</p>` : ""}
+      ${reference.nonCumulative ? '<p class="work-partner-note">Effet non cumulable.</p>' : ""}
     </div>
   </article>`;
 }
 
 function partnerResultsTemplate() {
   if (!selectedWorkPartnerActivityId) {
-    return `<div class="work-empty"><strong>Choisissez une activité</strong><span>Sélectionnez une icône pour afficher les compétences partenaire utiles.</span></div>`;
+    return `<div class="work-empty"><strong>Choisissez une activité</strong><span>Sélectionnez une icône pour afficher les compétences partenaires utiles.</span></div>`;
   }
   const activity = partnerActivities.find((entry) => entry.id === selectedWorkPartnerActivityId);
-  if (partnerSkillsError) return '<div class="work-empty work-empty--error"><strong>Données indisponibles</strong><span>Les compétences partenaire n’ont pas pu être chargées.</span></div>';
+  if (partnerSkillsError) return '<div class="work-empty work-empty--error"><strong>Données indisponibles</strong><span>Les compétences partenaires n’ont pas pu être chargées.</span><button type="button" data-work-partner-retry>Réessayer</button></div>';
   if (!partnerSkillsData) return '<div class="work-empty"><strong>Chargement des données…</strong></div>';
   const references = workOptimization.partnerActivities[activity.id] || [];
   return `<div class="partner-results" style="--job-color:${activity.color}">
     <header class="partner-results__header">
       <span class="work-card__icon"><img src="${activity.icon}" alt="" /></span>
-      <div><p>Compétences partenaire utiles pour</p><h2>${escapeHtml(activity.name)}</h2></div>
+      <div><h2>${escapeHtml(activity.name)}</h2></div>
     </header>
     <div class="partner-list">${references.map(workPartnerCardTemplate).join("")}</div>
   </div>`;
@@ -443,13 +463,20 @@ function partnerResultsTemplate() {
 
 function ensurePartnerSkills() {
   if (partnerSkillsData || partnerSkillsError || partnerSkillsPromise) return;
-  partnerSkillsPromise = fetch("data/partner-skills-fr.json")
+  const partnerSkillsUrl = new URL("data/partner-skills-fr.json", document.baseURI).href;
+  partnerSkillsPromise = fetch(partnerSkillsUrl)
     .then((response) => {
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
       return response.json();
     })
     .then((data) => { partnerSkillsData = data; })
-    .catch(() => { partnerSkillsError = true; })
+    .catch((error) => {
+      partnerSkillsError = true;
+      console.error("[Optimisation] Échec du chargement des compétences partenaires.", {
+        url: partnerSkillsUrl,
+        error,
+      });
+    })
     .finally(() => {
       partnerSkillsPromise = null;
       if (currentView === "work" && workMode === "partners") render();
@@ -461,10 +488,10 @@ function workPageTemplate() {
   return `<section class="work-optimization-page">
     <header class="work-optimization-header">
       <p class="eyebrow">Optimisation du travail</p>
-      <p>Trouvez les compétences utiles pour optimiser les Pals de votre base.</p>
+      <p>Trouvez les compétences adaptées pour optimiser le travail des Pals de votre base.</p>
       <nav class="work-mode-tabs" aria-label="Type de compétence">
         <button type="button" data-work-mode="passives" class="${partnerMode ? "" : "active"}" aria-pressed="${!partnerMode}">Compétences passives</button>
-        <button type="button" data-work-mode="partners" class="${partnerMode ? "active" : ""}" aria-pressed="${partnerMode}">Compétences partenaire</button>
+        <button type="button" data-work-mode="partners" class="${partnerMode ? "active" : ""}" aria-pressed="${partnerMode}">Compétences partenaires</button>
       </nav>
     </header>
     ${workActivityPickerTemplate(workMode)}
@@ -1067,7 +1094,7 @@ function updateIntro() {
   );
 
   pageEyebrow.textContent = "Guide rapide de la base";
-  pageCopy.textContent = "Compare l’efficacité de chaque niveau d’aptitude, de 1 à 10.";
+  pageCopy.textContent = "Compare l’efficacité de chaque niveau de capacité de travail, de 1 à 10.";
 }
 
 function switchView(nextView) {
@@ -1088,6 +1115,44 @@ function switchView(nextView) {
     content.classList.add("view-entering");
     window.setTimeout(() => content.classList.remove("view-entering"), 230);
   }, 115);
+}
+
+function syncViewFromHash() {
+  const nextView = viewFromHash(window.location.hash);
+  if (nextView === "condensation" && currentView !== "condensation") {
+    selectedCondensationPalId = null;
+    condensationStars = 0;
+    condensationQuery = "";
+  }
+  if (nextView === "breeding" && currentView !== "breeding") breedingQuery = "";
+  switchView(nextView);
+  window.scrollTo(0, 0);
+}
+
+function positionJobTooltip(button) {
+  const bounds = button.getBoundingClientRect();
+  const margin = 12;
+  const tooltipBounds = jobTooltip.getBoundingClientRect();
+  const left = Math.min(
+    window.innerWidth - tooltipBounds.width / 2 - 10,
+    Math.max(tooltipBounds.width / 2 + 10, bounds.left + bounds.width / 2),
+  );
+  const preferredTop = bounds.top - tooltipBounds.height - margin;
+  jobTooltip.style.left = `${left}px`;
+  jobTooltip.style.top = `${preferredTop >= 10 ? preferredTop : bounds.bottom + margin}px`;
+}
+
+function showJobTooltip(button) {
+  if (!button?.dataset.jobTooltip) return;
+  jobTooltip.textContent = button.dataset.jobTooltip;
+  jobTooltip.hidden = false;
+  jobTooltip.dataset.owner = button.dataset.job || button.dataset.workActivity || "";
+  positionJobTooltip(button);
+}
+
+function hideJobTooltip() {
+  jobTooltip.hidden = true;
+  jobTooltip.removeAttribute("data-owner");
 }
 
 function animateMemoReflow(mutateLayout) {
@@ -1117,12 +1182,20 @@ function render() {
   document.body.dataset.view = currentView;
   renderPicker();
   updateIntro();
-  singleButton.classList.toggle("active", currentView === "jobs");
-  workButton.classList.toggle("active", currentView === "work");
-  combatButton.classList.toggle("active", currentView === "combat");
-  condensationButton.classList.toggle("active", currentView === "condensation");
-  breedingButton.classList.toggle("active", currentView === "breeding");
-  memoButton.classList.toggle("active", currentView === "memo");
+  const activeLink = {
+    jobs: singleButton,
+    work: workButton,
+    combat: combatButton,
+    condensation: condensationButton,
+    breeding: breedingButton,
+    memo: memoButton,
+  }[currentView];
+  primaryNavLinks.forEach((link) => {
+    const active = link === activeLink;
+    link.classList.toggle("active", active);
+    if (active) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
+  });
   picker.classList.toggle("hidden", currentView !== "jobs");
 
   if (currentView === "condensation") {
@@ -1168,6 +1241,15 @@ picker.addEventListener("click", (event) => {
 });
 
 content.addEventListener("click", (event) => {
+  if (event.target.closest("[data-work-partner-retry]")) {
+    partnerSkillsError = false;
+    partnerSkillsData = null;
+    partnerSkillsPromise = null;
+    render();
+    ensurePartnerSkills();
+    return;
+  }
+
   const breedingRoleButton = event.target.closest("[data-breeding-second-role]");
   if (breedingRoleButton) {
     breedingState.secondRole = breedingRoleButton.dataset.breedingSecondRole;
@@ -1387,35 +1469,31 @@ function finishMemoDrag(event) {
 document.addEventListener("pointerup", finishMemoDrag);
 document.addEventListener("pointercancel", finishMemoDrag);
 
-brand.addEventListener("click", (event) => {
-  event.preventDefault();
-  switchView("breeding");
-  window.scrollTo(0, 0);
+document.addEventListener("pointerover", (event) => {
+  const button = event.target.closest("[data-job-tooltip]");
+  if (button && !button.contains(event.relatedTarget)) showJobTooltip(button);
 });
 
-singleButton.addEventListener("click", () => {
-  switchView("jobs");
+document.addEventListener("pointerout", (event) => {
+  const button = event.target.closest("[data-job-tooltip]");
+  if (button && !button.contains(event.relatedTarget)) hideJobTooltip();
 });
 
-workButton.addEventListener("click", () => switchView("work"));
-combatButton.addEventListener("click", () => switchView("combat"));
-
-condensationButton.addEventListener("click", () => {
-  if (currentView !== "condensation") {
-    selectedCondensationPalId = null;
-    condensationStars = 0;
-    condensationQuery = "";
-  }
-  switchView("condensation");
+document.addEventListener("focusin", (event) => {
+  const button = event.target.closest("[data-job-tooltip]");
+  if (button) showJobTooltip(button);
 });
 
-breedingButton.addEventListener("click", () => {
-  breedingQuery = "";
-  switchView("breeding");
+document.addEventListener("focusout", (event) => {
+  if (event.target.closest("[data-job-tooltip]")) hideJobTooltip();
 });
 
-memoButton.addEventListener("click", () => {
-  switchView("memo");
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") hideJobTooltip();
 });
 
-window.addEventListener("DOMContentLoaded", render, { once: true });
+window.addEventListener("hashchange", syncViewFromHash);
+window.addEventListener("DOMContentLoaded", () => {
+  currentView = viewFromHash(window.location.hash);
+  render();
+}, { once: true });

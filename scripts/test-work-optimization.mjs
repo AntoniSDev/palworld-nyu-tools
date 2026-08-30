@@ -15,6 +15,7 @@ const pals = loadWindowScript("js/condensation-data.js").CONDENSATION_PALS;
 const partnerSource = JSON.parse(fs.readFileSync("data/partner-skills-fr.json", "utf8")).skills;
 const indexHtml = fs.readFileSync("index.html", "utf8");
 const appSource = fs.readFileSync("js/app.js", "utf8");
+const pagesConfig = fs.readFileSync("_config.yml", "utf8");
 const passiveById = new Map(passives.map((passive) => [passive.id, passive]));
 const palByCode = new Map(pals.map((pal) => [pal.code, pal]));
 const jobIds = Object.keys(config.passiveJobProfiles);
@@ -33,10 +34,19 @@ assert(config.passiveProfiles.standard.includes("PAL_conceited"), "Vaniteux doit
 assert(!config.passiveProfiles.transport.some((id) => id.startsWith("CraftSpeed")), "Transport ne doit pas inclure Work Speed.");
 assert(config.passiveProfiles.farming.includes("WorkSuitabilityAddRank_MonsterFarm_2"));
 assert(config.passiveProfiles.farming.includes("WorkSuitabilityAddRank_MonsterFarm_1"));
-assert.match(indexHtml, /breeding-view[\s\S]*single-view[\s\S]*work-view[\s\S]*combat-view[\s\S]*condensation-view[\s\S]*memo-view/);
+assert(!pagesConfig.includes("data/partner-skills-fr.json"), "Le JSON partenaire doit être publié par GitHub Pages.");
+const primaryRoutes = ["#cumoir", "#capacites", "#optimisation", "#combat", "#condensation", "#memo"];
+const primaryLinks = [...indexHtml.matchAll(/<a id="(?:breeding|single|work|combat|condensation|memo)-view"[^>]+href="([^"]+)"/g)];
+assert.equal(primaryLinks.length, 6, "La navigation principale doit contenir six liens.");
+assert.deepEqual(primaryLinks.map((match) => match[1]), primaryRoutes);
+assert.match(indexHtml, /<a class="brand" href="#cumoir"/);
 assert(!indexHtml.includes("skills-menu"), "L’ancien menu Compétences doit être supprimé.");
-assert.match(appSource, /let currentView = "breeding"/);
-assert.match(appSource, /switchView\("breeding"\);\s*window\.scrollTo\(0, 0\)/);
+assert.match(appSource, /const viewFromHash = \(hash\) => viewRoutes\.get\(hash\) \|\| "breeding"/);
+for (const route of primaryRoutes) assert(appSource.includes(`["${route}",`), `Route absente : ${route}`);
+assert(!appSource.includes("brand.addEventListener"), "Le logo doit conserver son comportement natif de lien.");
+assert(!appSource.includes('title="${escapeHtml(activity.name)}"'), "Les icônes ne doivent plus dépendre du title natif.");
+assert.match(appSource, /data-job-tooltip=/);
+assert.match(appSource, /aria-label=/);
 
 const partnerCodes = Object.values(config.partnerActivities).flat().map((entry) => entry.pal);
 assert(!partnerCodes.includes("NegativeKoala"), "Depresso doit rester exclu.");
@@ -46,6 +56,7 @@ for (const entries of Object.values(config.partnerActivities)) {
     assert(skill, `Compétence partenaire inconnue : ${entry.pal}`);
     assert(palByCode.has(entry.pal), `Pal ou portrait canonique inconnu : ${entry.pal}`);
     assert(skill.effects.some((effect) => effect.label === entry.effect), `Effet absent pour ${entry.pal} : ${entry.effect}`);
+    if (entry.note) assert(!/\d/.test(entry.note), `La note UX de ${entry.pal} ne doit pas dupliquer de valeur numérique.`);
   }
 }
 
