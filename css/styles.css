@@ -2086,7 +2086,7 @@ button.save-passive:hover { filter: brightness(1.12); }
 .save-passive-tooltip { position: fixed; z-index: 1300; display: grid; width: min(280px, calc(100vw - 20px)); gap: 4px; padding: 9px 11px; border: 1px solid rgba(104, 220, 216, .38); border-radius: 7px; background: rgba(3, 20, 28, .97); box-shadow: 0 12px 30px rgba(0, 5, 10, .42); color: #d9eeee; pointer-events: none; }
 .save-passive-tooltip[hidden] { display: none; }
 .save-passive-tooltip strong { color: #f1ffff; font-size: .7rem; }
-.save-passive-tooltip span { color: #9ab8bb; font-size: .62rem; line-height: 1.4; }
+.save-passive-tooltip > span:not(.save-history-tooltip__chips) { color: #9ab8bb; font-size: .62rem; line-height: 1.4; }
 .save-egg { position: absolute; z-index: 2; top: -13px; right: -10px; display: grid; width: 37px; height: 37px; place-items: center; border: 1px solid rgba(229, 201, 133, .5); border-radius: 50%; background: rgba(4, 20, 27, .9); box-shadow: 0 4px 10px rgba(0, 0, 0, .42); }
 .save-egg img { width: 34px; height: 34px; object-fit: contain; }
 .save-tree-node__new { position: absolute; z-index: 3; top: 7px; left: 50%; display: inline-flex; padding: 2px 6px; border: 1px solid rgba(106, 255, 223, .7); border-radius: 999px; background: rgba(7, 83, 73, .94); box-shadow: 0 0 10px rgba(78, 245, 213, .3); color: #aaffed; font-size: .48rem; font-weight: 900; letter-spacing: .06em; line-height: 1.1; text-transform: uppercase; transform: translateX(-50%); }
@@ -2269,10 +2269,10 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 .save-egg img { width: 41px; height: 41px; }
 
 .save-tree-node {
-  width: 316px;
-  min-height: 236px;
+  width: 350px;
+  min-height: 158px;
   grid-template-rows: 70px auto;
-  border: 2px solid #527d87;
+  border: 2px solid #65919a;
   border-radius: 10px;
   background: #091e27;
   box-shadow: 0 14px 28px rgba(0, 6, 11, .52);
@@ -2296,13 +2296,14 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 .save-tree-node .breeding-node__portrait { width: 66px; height: 66px; }
 .save-tree-node__name { display: flex !important; min-width: 0; align-items: center; gap: 5px; }
 .save-tree-node__name strong { min-width: 0; overflow: hidden; font-family: "Sora", sans-serif; font-size: .88rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-.save-tree-node__passives { grid-template-columns: minmax(0, 1fr); gap: 7px; }
-.save-tree-node__passives .save-passive { height: 29px; padding: 3px 6px 3px 8px; font-size: .7rem; }
+.save-tree-node__passives { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
 
-.save-family-link { stroke: #5f919b; stroke-width: 3; }
-.save-family-link-flow { stroke: #a0fff7; stroke-width: 3.6; stroke-dasharray: 26 104; stroke-dashoffset: 0; opacity: .98; animation: family-flow-up 3.4s linear infinite; }
-.save-family-junction { fill: #091e27; stroke: #83e2dd; stroke-width: 3; }
-@keyframes family-flow-up { to { stroke-dashoffset: -130; } }
+.save-family-link { stroke: #65919a; stroke-width: 3; }
+.save-family-link-flow { stroke: #affff8; stroke-width: 4; stroke-dasharray: .27 .73; stroke-dashoffset: 0; opacity: .98; animation: family-flow-up 3.8s linear infinite; }
+.save-family-link-flow--alternate { animation-delay: -1.9s; }
+.save-family-junction { fill: #0d3038; stroke: #94ebe4; stroke-width: 3; animation: family-junction-pulse 3.8s ease-in-out infinite; }
+@keyframes family-flow-up { to { stroke-dashoffset: -1; } }
+@keyframes family-junction-pulse { 0%, 42%, 100% { fill: #0d3038; } 55% { fill: #72d9d2; } }
 
 .save-breeding-panel { gap: 16px; padding: 0; overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .save-goal-card, .save-history { padding: 14px; border: 1px solid rgba(98, 190, 196, .24); border-radius: 10px; background: #0a2a34; box-shadow: 0 12px 26px rgba(0, 8, 14, .2); }
@@ -2321,7 +2322,7 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 .save-history__pin:hover, .save-history__pin.is-pinned { color: #e3bd68; background: rgba(110, 82, 38, .35) !important; }
 .save-history__delete.breeding-parent-remove { position: static; width: 24px; height: 24px; justify-self: center; font-size: 1rem; }
 .save-history-tooltip { width: min(420px, calc(100vw - 20px)); }
-.save-history-tooltip__chips { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; color: #a9c2c4 !important; }
+.save-history-tooltip__chips { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
 .save-history-tooltip__chips .save-passive { height: 29px; font-size: .7rem; }
 
 .save-passive-modal__count, .save-passive-modal__clear { align-self: end; margin-bottom: 8px; }
@@ -2345,7 +2346,7 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .save-tree-node--final, .save-family-link-flow { animation: none; }
+  .save-tree-node--final, .save-family-link-flow, .save-family-junction { animation: none; }
   .save-family-link-flow { display: none; }
 }
 

@@ -457,28 +457,31 @@
     const families = [];
     let leafCursor = 0;
     let keyCursor = 0;
-    const nodeWidth = 316;
-    const nodeHeight = 244;
-    const horizontalStep = 330;
-    const verticalStep = 270;
+    const nodeWidth = 350;
+    const horizontalStep = 366;
+    const verticalStep = 250;
+    const nodeHeight = (node) => {
+      const usefulCount = state.selectedPassives.filter((id, index) => (node.mask & (1 << index)) !== 0).length;
+      return usefulCount > 2 ? 165 : 158;
+    };
     function visit(node, depth = 0) {
       const key = `node-${keyCursor++}`;
       if (!node.parents) {
-        nodes.push({ key, node, x: leafCursor++ * horizontalStep, depth });
+        nodes.push({ key, node, x: leafCursor++ * horizontalStep, depth, height: nodeHeight(node) });
         return key;
       }
       const a = visit(node.parents[0], depth + 1);
       const b = visit(node.parents[1], depth + 1);
       const left = nodes.find((entry) => entry.key === a);
       const right = nodes.find((entry) => entry.key === b);
-      nodes.push({ key, node, x: (left.x + right.x) / 2, depth });
+      nodes.push({ key, node, x: (left.x + right.x) / 2, depth, height: nodeHeight(node) });
       families.push({ parents: [a, b], child: key });
       return key;
     }
     visit(root);
     const maxDepth = Math.max(...nodes.map((node) => node.depth), 0);
     nodes.forEach((node) => { node.y = node.depth * verticalStep + 42; node.x += 64; });
-    return { nodes, families, nodeWidth, nodeHeight, width: Math.max(560, leafCursor * horizontalStep + 128), height: maxDepth * verticalStep + nodeHeight + 84 };
+    return { nodes, families, nodeWidth, width: Math.max(560, leafCursor * horizontalStep + 128), height: Math.max(...nodes.map((node) => node.y + node.height), 158) + 84 };
   }
 
   function graphTemplate(result) {
@@ -492,11 +495,12 @@
       const rightX = right.x + layout.nodeWidth / 2;
       const childX = target.x + layout.nodeWidth / 2;
       const parentY = left.y;
-      const childY = target.y + layout.nodeHeight;
+      const childY = target.y + target.height;
       const joinY = childY + (parentY - childY) * .48;
       const path = `M ${leftX} ${parentY} V ${joinY} H ${rightX} V ${parentY} M ${childX} ${joinY} V ${childY}`;
-      const upwardPath = `M ${leftX} ${parentY} V ${joinY} M ${rightX} ${parentY} V ${joinY} M ${childX} ${joinY} V ${childY}`;
-      return `<path class="save-family-link" d="${path}" /><path class="save-family-link-flow" d="${upwardPath}" /><circle class="save-family-junction" cx="${childX}" cy="${joinY}" r="5" />`;
+      const leftFlow = `M ${leftX} ${parentY} V ${joinY} H ${childX} V ${childY}`;
+      const rightFlow = `M ${rightX} ${parentY} V ${joinY} H ${childX} V ${childY}`;
+      return `<path class="save-family-link" d="${path}" /><path class="save-family-link-flow" pathLength="1" d="${leftFlow}" /><path class="save-family-link-flow save-family-link-flow--alternate" pathLength="1" d="${rightFlow}" /><circle class="save-family-junction" cx="${childX}" cy="${joinY}" r="5" />`;
     }).join("");
     const nodes = layout.nodes.map(({ node, x, y }) => {
       const pal = palInfo(node.speciesId); if (!pal) return "";

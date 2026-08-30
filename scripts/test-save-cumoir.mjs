@@ -106,8 +106,17 @@ if (!api.renderGraph({ root: { speciesId: absentSpeciesId, mask: 0, owned: false
 const linkedGraph = api.renderGraph({ status: "found", root: { speciesId: ownedSpeciesId, mask: 0, parents: [
   { speciesId: ownedSpeciesId, mask: 0, owned: true }, { speciesId: ownedSpeciesId, mask: 0, owned: true },
 ] } });
-if (!linkedGraph.includes("save-family-link-flow") || !linkedGraph.includes("save-family-junction")) throw new Error("Animated transmission connectors are missing.");
-if (!styles.includes("stroke-dashoffset: -130") || !styles.includes("prefers-reduced-motion")) throw new Error("Upward connector flow or reduced-motion fallback is missing.");
+if ((linkedGraph.match(/save-family-link-flow/g) || []).length !== 3 || !linkedGraph.includes("save-family-junction")
+  || !/save-family-link-flow[^>]*pathLength="1"[^>]*d="M [^"]+ V [^"]+ H [^"]+ V [^"]+"/.test(linkedGraph)) {
+  throw new Error("Continuous parent-to-child transmission paths are missing.");
+}
+if (!styles.includes("stroke-dashoffset: -1") || !styles.includes("stroke-dasharray: .27 .73") || !styles.includes("prefers-reduced-motion")) {
+  throw new Error("Upward connector flow or reduced-motion fallback is missing.");
+}
+if (!styles.includes(".save-tree-node__passives { grid-template-columns: repeat(2, minmax(0, 1fr))")
+  || styles.includes(".save-history-tooltip__chips { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; color:")) {
+  throw new Error("Tree or history passives no longer reuse the shared two-column visual component.");
+}
 if (!styles.includes("border: 3px solid transparent") || !styles.includes("linear-gradient(#12343b, #12343b) padding-box")) throw new Error("The single matte final-card border is missing.");
 if (api.renderGraph({ status: "already-owned", root: { speciesId: ownedSpeciesId, mask: 0, sex: "Female", owned: true, individualId: "fixture" } }).includes('save-tree-node__new">Nouveau')) {
   throw new Error("An owned individual is incorrectly marked Nouveau.");
