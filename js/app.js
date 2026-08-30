@@ -466,7 +466,7 @@ function workPartnerCardTemplate(reference) {
       <div class="partner-skill-card__effects">
         ${resolvedEffects.map(({ effect, metadata }) => partnerEffectTemplate(effect, metadata)).join("")}
       </div>
-      <div class="partner-skill-card__notes">${notes.map((note) => `<p>${note}</p>`).join("")}</div>
+      ${notes.length ? `<div class="partner-skill-card__notes">${notes.map((note) => `<p>${note}</p>`).join("")}</div>` : ""}
     </div>
   </article>`;
 }

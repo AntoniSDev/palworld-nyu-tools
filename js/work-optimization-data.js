@@ -32,14 +32,24 @@ window.WORK_OPTIMIZATION = {
       },
       {
         pal: "JellyfishFairy",
-        effects: [{ label: "Vitesse de travail", description: "Dans la base, augmente la vitesse de travail des Pals." }],
+        effects: [{
+          label: "Vitesse d’arrosage de Jelliette",
+          sourceLabel: "Vitesse de travail",
+          description: "Lorsque Jelliette et Jellroy sont dans la base, augmente la vitesse d’arrosage de Jelliette.",
+        }],
         note: "Nécessite Jelliette et Jellroy ensemble dans la base.",
+        nonCumulative: true,
         highlights: ["Jelliette", "Jellroy"],
       },
       {
         pal: "JellyfishGhost",
-        effects: [{ label: "Vitesse de travail", description: "Dans la base, augmente la vitesse de travail des Pals." }],
+        effects: [{
+          label: "Vitesse d’arrosage de Jellroy",
+          sourceLabel: "Vitesse de travail",
+          description: "Lorsque Jelliette et Jellroy sont dans la base, augmente la vitesse d’arrosage de Jellroy.",
+        }],
         note: "Nécessite Jelliette et Jellroy ensemble dans la base.",
+        nonCumulative: true,
         highlights: ["Jelliette", "Jellroy"],
       },
     ],
@@ -139,7 +149,15 @@ window.WORK_OPTIMIZATION = {
       },
     ],
     breeding: [
-      { pal: "Plesiosaur", effects: [{ label: "Vitesse de reproduction à la base", description: "Dans la base, accélère la reproduction des Pals affectés à un Élevage." }], nonCumulative: true },
+      {
+        pal: "Plesiosaur",
+        effects: [{
+          label: "Vitesse de production des œufs",
+          sourceLabel: "Vitesse de reproduction à la base",
+          description: "Dans la base, augmente la vitesse de production des œufs des Pals affectés à un Élevage.",
+        }],
+        nonCumulative: true,
+      },
       { pal: "ThunderFluffyBird", effects: [{ label: "Vitesse d’éclosion des œufs", description: "Dans la base, accélère l’éclosion des œufs." }], nonCumulative: true },
     ],
   },

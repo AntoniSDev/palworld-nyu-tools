@@ -73,6 +73,34 @@ assert.deepEqual(
   [["+20%", "+24%", "+28%", "+32%", "+40%"], ["+30%", "+36%", "+42%", "+48%", "+60%"]],
   "Les deux progressions de Sekhmet doivent rester conformes aux données validées.",
 );
+const wateringPartners = config.partnerActivities.watering;
+for (const [code, palName] of [["JellyfishFairy", "Jelliette"], ["JellyfishGhost", "Jellroy"]]) {
+  const reference = wateringPartners.find((entry) => entry.pal === code);
+  const effect = reference.effects[0];
+  assert.equal(effect.label, `Vitesse d’arrosage de ${palName}`);
+  assert.equal(effect.sourceLabel, "Vitesse de travail");
+  assert(effect.description.includes(palName), `${palName} doit être présenté comme bénéficiaire personnel.`);
+  assert(effect.description.includes("Jelliette et Jellroy"), `La condition du duo doit être indiquée pour ${palName}.`);
+  assert(reference.note.includes("Jelliette et Jellroy"));
+  assert.equal(reference.nonCumulative, true);
+  assert.deepEqual(
+    Array.from(partnerSource[code].effects.find((entry) => entry.label === effect.sourceLabel).values),
+    ["+50%", "+60%", "+70%", "+90%", "+120%"],
+  );
+}
+const prunelia = config.partnerActivities.gathering.find((entry) => entry.pal === "BlueberryFairy");
+assert.equal(prunelia.nonCumulative, undefined, "Prunelia doit rester cumulable.");
+assert.deepEqual(
+  Array.from(partnerSource.BlueberryFairy.effects.find((entry) => entry.label === prunelia.effects[0].label).values),
+  ["+18%", "+22%", "+26%", "+30%", "+35%"],
+);
+const braloha = config.partnerActivities.breeding.find((entry) => entry.pal === "Plesiosaur");
+assert.equal(braloha.effects[0].label, "Vitesse de production des œufs");
+assert.equal(braloha.effects[0].sourceLabel, "Vitesse de reproduction à la base");
+assert.deepEqual(
+  Array.from(partnerSource.Plesiosaur.effects.find((entry) => entry.label === braloha.effects[0].sourceLabel).values),
+  ["+20%", "+26%", "+32%", "+38%", "+50%"],
+);
 const wumpo = config.partnerActivities.transport.find((entry) => entry.pal === "Yeti");
 assert.deepEqual(
   Array.from(partnerSource.Yeti.effects.find((effect) => effect.label === wumpo.effects[0].label).values),
@@ -80,5 +108,6 @@ assert.deepEqual(
 );
 assert.match(appSource, /\(reference\.effects \|\| \[\]\)\.map/, "Le rendu partenaire doit accepter plusieurs effets.");
 assert.match(appSource, /if \(magnitude\) formatted = formatted\.replace/, "Les réductions doivent afficher une grandeur positive.");
+assert.match(appSource, /notes\.length \? `<div class="partner-skill-card__notes">/, "Un bloc notes ne doit être rendu que lorsqu’une note existe.");
 
 console.log("Work optimization data: OK");
