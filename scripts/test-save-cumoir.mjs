@@ -148,7 +148,8 @@ if (!styles.includes("animation: family-flow-in 6.2s linear infinite")
 if (!styles.includes(".breeding-page--save .breeding-canvas { align-self: stretch; height: auto; min-height: calc(100vh - 148px); border-bottom: 0;")
   || !styles.includes(".save-passive-tooltip { gap: 8px; padding: 15px 17px; }")
   || !styles.includes(".save-passive-tooltip strong { font-size: .96rem; font-weight: 700; line-height: 1.4; }")
-  || !styles.includes(".save-passive-tooltip span { font-size: .88rem; line-height: 1.6; }")) {
+  || !styles.includes(".save-passive-tooltip span { font-size: .88rem; line-height: 1.6; }")
+  || /\.save-passive-tooltip > span:not\([^)]*\)\s*\{[^}]*font-size:/s.test(styles)) {
   throw new Error("Open-bottom canvas or shared tooltip readability adjustments are missing.");
 }
 if (!styles.includes("@keyframes family-flow-in { 0% { stroke-dashoffset: 0; opacity: .98; } 42% { stroke-dashoffset: -1; opacity: .98; } 42.01%, 100%")
