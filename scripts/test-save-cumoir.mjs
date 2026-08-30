@@ -73,10 +73,12 @@ if (!saveCumoirSource.includes('placeholder="Rechercher un Pal…" aria-label="R
   || !styles.includes(".save-target-search input::-webkit-search-cancel-button { cursor: pointer; }")) {
   throw new Error("The target search label or native clear-button pointer is incorrect.");
 }
-if (!styles.includes(".save-passive-goal { gap: 8px; margin-top: 17px; }")
-  || !styles.includes(".save-source-panel > header { display: flex; min-height: 34px; align-items: center; margin-bottom: 12px; padding: 0;")
+if (!styles.includes(".save-target-picker { position: relative; display: grid; gap: 8px; }")
+  || !styles.includes(".save-passive-goal { gap: 17px; margin-top: 17px; }")
+  || !styles.includes(".save-source-panel > header { display: flex; min-height: 48px; align-items: center; margin-top: -14px;")
   || !styles.includes(".save-passive-goal > div:first-child { min-height: 20px; }")
-  || !styles.includes(".save-history > header { display: flex; min-height: 26px; align-items: center;")) {
+  || !styles.includes(".save-transmission-panel > .eyebrow { margin-bottom: 5px; }")
+  || !styles.includes(".save-history { display: grid; min-height: 0; gap: 15px;")) {
   throw new Error("The unified sidebar heading rhythm is missing.");
 }
 if (!activeTemplate.includes("Transmission des passifs") || !activeTemplate.includes("1 à 4 au descendant")
