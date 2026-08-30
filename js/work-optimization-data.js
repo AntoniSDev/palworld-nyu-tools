@@ -19,40 +19,128 @@ window.WORK_OPTIMIZATION = {
     medicine: "standard", cooling: "standard", transport: "transport", farming: "farming",
   },
   partnerActivities: {
-    kindling: [{ pal: "CatMage_Fire", effect: "Capacité de travail — Allumage de feu", nonCumulative: true }],
+    kindling: [{
+      pal: "CatMage_Fire",
+      effects: [{ label: "Capacité de travail — Allumage de feu", description: "Dans la base, augmente le niveau de la capacité de travail Allumage de feu des autres Pals." }],
+      nonCumulative: true,
+    }],
     watering: [
-      { pal: "ClioneTwins", effect: "Capacité de travail — Arrosage", nonCumulative: true },
-      { pal: "JellyfishFairy", effect: "Vitesse de travail", note: "Nécessite Jelliette et Jellroy ensemble dans la base." },
-      { pal: "JellyfishGhost", effect: "Vitesse de travail", note: "Nécessite Jelliette et Jellroy ensemble dans la base." },
+      {
+        pal: "ClioneTwins",
+        effects: [{ label: "Capacité de travail — Arrosage", description: "Dans la base, augmente le niveau de la capacité de travail Arrosage des autres Pals." }],
+        nonCumulative: true,
+      },
+      {
+        pal: "JellyfishFairy",
+        effects: [{ label: "Vitesse de travail", description: "Dans la base, augmente la vitesse de travail des Pals." }],
+        note: "Nécessite Jelliette et Jellroy ensemble dans la base.",
+        highlights: ["Jelliette", "Jellroy"],
+      },
+      {
+        pal: "JellyfishGhost",
+        effects: [{ label: "Vitesse de travail", description: "Dans la base, augmente la vitesse de travail des Pals." }],
+        note: "Nécessite Jelliette et Jellroy ensemble dans la base.",
+        highlights: ["Jelliette", "Jellroy"],
+      },
     ],
     planting: [
-      { pal: "FlowerDoll", effect: "Capacité de travail — Semence", nonCumulative: true },
-      { pal: "LeafPrincess", effect: "Vitesse de croissance des cultures" },
+      {
+        pal: "FlowerDoll",
+        effects: [{ label: "Capacité de travail — Semence", description: "Dans la base, augmente le niveau de la capacité de travail Semence des autres Pals." }],
+        nonCumulative: true,
+      },
+      { pal: "LeafPrincess", effects: [{ label: "Vitesse de croissance des cultures", description: "Dans la base, accélère la croissance des cultures." }] },
     ],
-    electricity: [{ pal: "ElecPomeranian", effect: "Capacité de travail — Génération d’énergie", nonCumulative: true }],
+    electricity: [{
+      pal: "ElecPomeranian",
+      effects: [{ label: "Capacité de travail — Génération d’énergie", description: "Dans la base, augmente le niveau de la capacité de travail Génération d’énergie des autres Pals." }],
+      nonCumulative: true,
+    }],
     handiwork: [
-      { pal: "PinkRabbit", effect: "Capacité de travail — Artisanat", nonCumulative: true },
-      { pal: "Sekhmet", effect: "Vitesse de travail", description: true },
-      { pal: "PinkRabbit_Grass", effect: "Vitesse de travail", note: "Bonus personnel sur établi et usine d’armes." },
+      {
+        pal: "PinkRabbit",
+        effects: [{ label: "Capacité de travail — Artisanat", description: "Dans la base, augmente le niveau de la capacité de travail Artisanat des autres Pals." }],
+        nonCumulative: true,
+      },
+      {
+        pal: "Sekhmet",
+        effects: [
+          { label: "Vitesse de travail des Anubis", description: "Dans la base, augmente la vitesse de travail des Anubis présents." },
+          { label: "Efficacité personnelle de Sekhmet", description: "Augmente l’efficacité de travail de Sekhmet sur un établi ou dans une usine." },
+        ],
+        nonCumulative: true,
+        highlights: ["Anubis", "Sekhmet"],
+      },
+      {
+        pal: "PinkRabbit_Grass",
+        effects: [{ label: "Vitesse de travail", description: "Augmente l’efficacité de travail de Ribbuny Botan sur un établi ou dans une usine d’armes." }],
+        highlights: ["Ribbuny Botan"],
+      },
     ],
     gathering: [
-      { pal: "CloverFairy", effect: "Capacité de travail — Collecte", nonCumulative: true },
-      { pal: "BlueberryFairy", effect: "Quantité récoltée", note: "Augmente la quantité de récoltes grâce aux prières de Prunelia dans la base." },
+      {
+        pal: "CloverFairy",
+        effects: [{ label: "Capacité de travail — Collecte", description: "Dans la base, augmente le niveau de la capacité de travail Collecte des autres Pals." }],
+        nonCumulative: true,
+      },
+      {
+        pal: "BlueberryFairy",
+        effects: [{ label: "Quantité récoltée", description: "Dans la base, les prières de Prunelia augmentent la quantité de récoltes." }],
+        highlights: ["Prunelia"],
+      },
     ],
-    lumbering: [{ pal: "Deer_Ground", effect: "Capacité de travail — Abattage", nonCumulative: true }],
-    mining: [{ pal: "CubeTurtle", effect: "Capacité de travail — Extraction", nonCumulative: true }],
-    medicine: [{ pal: "MushroomLady", effect: "Capacité de travail — Pharmacie", nonCumulative: true }],
-    cooling: [{ pal: "BlackPuppy_Ice", effect: "Capacité de travail — Réfrigération", nonCumulative: true }],
-    transport: [{ pal: "Yeti", effect: "Capacité de travail — Transport", nonCumulative: true }],
-    farming: [{ pal: "CuteButterfly", effect: "Capacité de travail — Exploitation", nonCumulative: true }],
+    lumbering: [{
+      pal: "Deer_Ground",
+      effects: [{ label: "Capacité de travail — Abattage", description: "Dans la base, augmente le niveau de la capacité de travail Abattage des autres Pals." }],
+      nonCumulative: true,
+    }],
+    mining: [{
+      pal: "CubeTurtle",
+      effects: [{ label: "Capacité de travail — Extraction", description: "Dans la base, augmente le niveau de la capacité de travail Extraction des autres Pals." }],
+      nonCumulative: true,
+    }],
+    medicine: [{
+      pal: "MushroomLady",
+      effects: [{ label: "Capacité de travail — Pharmacie", description: "Dans la base, augmente le niveau de la capacité de travail Pharmacie des autres Pals." }],
+      nonCumulative: true,
+    }],
+    cooling: [{
+      pal: "BlackPuppy_Ice",
+      effects: [{ label: "Capacité de travail — Réfrigération", description: "Dans la base, augmente le niveau de la capacité de travail Réfrigération des autres Pals." }],
+      nonCumulative: true,
+    }],
+    transport: [{
+      pal: "Yeti",
+      effects: [{ label: "Capacité de travail — Transport", description: "Dans la base, augmente le niveau de la capacité de travail Transport des autres Pals." }],
+      nonCumulative: true,
+    }],
+    farming: [{
+      pal: "CuteButterfly",
+      effects: [{ label: "Capacité de travail — Exploitation", description: "Dans la base, augmente le niveau de la capacité de travail Exploitation des autres Pals." }],
+      nonCumulative: true,
+    }],
     global: [
-      { pal: "MushroomDragon_Dark", effect: "Réduction de la perte de MEN" },
-      { pal: "SweetsSheep", effect: "Réduction de la faim" },
-      { pal: "SweetsSheep_Ground", effect: "Réduction de la faim" },
+      {
+        pal: "MushroomDragon_Dark",
+        effects: [{ label: "Réduction de la perte de MEN", description: "Dans la base, les mystérieuses spores de Shroomer Noct ralentissent la diminution des points MEN des Pals.", magnitude: true }],
+        highlights: ["Shroomer Noct"],
+      },
+      {
+        pal: "SweetsSheep",
+        effects: [{ label: "Ralentissement de la faim", sourceLabel: "Réduction de la faim", description: "Dans la base, Woolipop ralentit la diminution de la satiété des Pals.", magnitude: true }],
+        nonCumulative: true,
+        highlights: ["Woolipop"],
+      },
+      {
+        pal: "SweetsSheep_Ground",
+        effects: [{ label: "Ralentissement de la faim", sourceLabel: "Réduction de la faim", description: "Dans la base, Woolipop Terra ralentit la diminution de la satiété des Pals.", magnitude: true }],
+        nonCumulative: true,
+        highlights: ["Woolipop Terra"],
+      },
     ],
     breeding: [
-      { pal: "Plesiosaur", effect: "Vitesse de reproduction à la base" },
-      { pal: "ThunderFluffyBird", effect: "Vitesse d’éclosion des œufs" },
+      { pal: "Plesiosaur", effects: [{ label: "Vitesse de reproduction à la base", description: "Dans la base, accélère la reproduction des Pals affectés à un Élevage." }], nonCumulative: true },
+      { pal: "ThunderFluffyBird", effects: [{ label: "Vitesse d’éclosion des œufs", description: "Dans la base, accélère l’éclosion des œufs." }], nonCumulative: true },
     ],
   },
 };

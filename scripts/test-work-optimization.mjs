@@ -47,6 +47,7 @@ assert(!appSource.includes("brand.addEventListener"), "Le logo doit conserver so
 assert(!appSource.includes('title="${escapeHtml(activity.name)}"'), "Les icônes ne doivent plus dépendre du title natif.");
 assert.match(appSource, /data-job-tooltip=/);
 assert.match(appSource, /aria-label=/);
+assert.match(indexHtml, />Optimisation de la base<\/a>/, "Le libellé de navigation doit être explicite.");
 
 const partnerCodes = Object.values(config.partnerActivities).flat().map((entry) => entry.pal);
 assert(!partnerCodes.includes("NegativeKoala"), "Depresso doit rester exclu.");
@@ -55,9 +56,29 @@ for (const entries of Object.values(config.partnerActivities)) {
     const skill = partnerSource[entry.pal];
     assert(skill, `Compétence partenaire inconnue : ${entry.pal}`);
     assert(palByCode.has(entry.pal), `Pal ou portrait canonique inconnu : ${entry.pal}`);
-    assert(skill.effects.some((effect) => effect.label === entry.effect), `Effet absent pour ${entry.pal} : ${entry.effect}`);
+    assert(Array.isArray(entry.effects) && entry.effects.length > 0, `Effets structurés absents pour ${entry.pal}.`);
+    for (const effect of entry.effects) {
+      const sourceLabel = effect.sourceLabel || effect.label;
+      assert(skill.effects.some((sourceEffect) => sourceEffect.label === sourceLabel), `Effet absent pour ${entry.pal} : ${sourceLabel}`);
+      assert(!/\d/.test(effect.description), `La description de ${entry.pal} ne doit pas dupliquer les valeurs de progression.`);
+    }
     if (entry.note) assert(!/\d/.test(entry.note), `La note UX de ${entry.pal} ne doit pas dupliquer de valeur numérique.`);
   }
 }
+
+const sekhmet = config.partnerActivities.handiwork.find((entry) => entry.pal === "Sekhmet");
+assert.equal(sekhmet.effects.length, 2, "Sekhmet doit exposer ses deux effets de travail.");
+assert.deepEqual(
+  partnerSource.Sekhmet.effects.map((effect) => Array.from(effect.values)),
+  [["+20%", "+24%", "+28%", "+32%", "+40%"], ["+30%", "+36%", "+42%", "+48%", "+60%"]],
+  "Les deux progressions de Sekhmet doivent rester conformes aux données validées.",
+);
+const wumpo = config.partnerActivities.transport.find((entry) => entry.pal === "Yeti");
+assert.deepEqual(
+  Array.from(partnerSource.Yeti.effects.find((effect) => effect.label === wumpo.effects[0].label).values),
+  ["+1", "+1", "+1", "+1", "+1"],
+);
+assert.match(appSource, /\(reference\.effects \|\| \[\]\)\.map/, "Le rendu partenaire doit accepter plusieurs effets.");
+assert.match(appSource, /if \(magnitude\) formatted = formatted\.replace/, "Les réductions doivent afficher une grandeur positive.");
 
 console.log("Work optimization data: OK");

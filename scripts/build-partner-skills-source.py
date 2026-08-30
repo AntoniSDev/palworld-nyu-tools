@@ -110,6 +110,16 @@ TERRARIA_EFFECTS = {
     "YakushimaMonster002": [("Objets obtenus sur les Pals de Ténèbres", ["+40 %", "+50 %", "+60 %", "+70 %", "+80 %"])],
 }
 
+# Palworld DB ne structure qu'une des deux progressions de Sekhmet dans sa
+# table récapitulative. Les deux effets sont pourtant présents dans la
+# description canonique PalDB et suivent chacun leur propre courbe.
+STRUCTURED_EFFECT_OVERRIDES = {
+    "Sekhmet": [
+        ("Vitesse de travail des Anubis", ["+20%", "+24%", "+28%", "+32%", "+40%"]),
+        ("Efficacité personnelle de Sekhmet", ["+30%", "+36%", "+42%", "+48%", "+60%"]),
+    ],
+}
+
 
 def text_content(fragment: str) -> str:
     fragment = re.sub(r"<script\b.*?</script>", " ", fragment, flags=re.I | re.S)
@@ -218,6 +228,8 @@ def main() -> None:
     french = parse_french_skills(args.paldb_fr_html.read_text(encoding="utf-8"))
     scales = parse_scales(args.scales_html.read_text(encoding="utf-8"))
     for code, effects in TERRARIA_EFFECTS.items():
+        scales[code] = [{"label": label, "values": values} for label, values in effects]
+    for code, effects in STRUCTURED_EFFECT_OVERRIDES.items():
         scales[code] = [{"label": label, "values": values} for label, values in effects]
 
     output = {

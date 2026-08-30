@@ -3360,13 +3360,23 @@
       "description": "Dans la base, la vitesse de travail des Anubis présents augmente de (20~40) %. (Effet non cumulable) L'efficacité de travail de Sekhmet augmente de (30~60) % lorsqu'il travaille sur un établi ou dans une usine.",
       "effects": [
         {
-          "label": "Vitesse de travail",
+          "label": "Vitesse de travail des Anubis",
           "values": [
             "+20%",
             "+24%",
             "+28%",
             "+32%",
             "+40%"
+          ]
+        },
+        {
+          "label": "Efficacité personnelle de Sekhmet",
+          "values": [
+            "+30%",
+            "+36%",
+            "+42%",
+            "+48%",
+            "+60%"
           ]
         }
       ]

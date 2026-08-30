@@ -403,46 +403,74 @@ function passiveResultsTemplate() {
   </div>`;
 }
 
-function formatPartnerValue(value) {
-  return String(value || "")
-    .replace(/^\+-(\d)/, "-$1")
+function formatPartnerValue(value, magnitude = false) {
+  let formatted = String(value || "")
+    .replace(/^\+-(?=\d)/, "-")
     .replace(/\s*%$/, " %")
     .replace(/\s+/g, " ")
     .trim();
+  if (magnitude) formatted = formatted.replace(/^[+-](?=\d)/, "");
+  return formatted;
 }
 
-function partnerProgressTemplate(effect) {
-  const values = effect.values || [];
-  const formatted = values.map(formatPartnerValue);
+function highlightPartnerText(text, highlights = []) {
+  return highlights.reduce(
+    (html, term) => html.replaceAll(escapeHtml(term), `<strong class="partner-skill-card__keyword">${escapeHtml(term)}</strong>`),
+    escapeHtml(text),
+  );
+}
+
+function partnerEffectTemplate(effect, metadata) {
+  const formatted = (effect.values || []).map((value) => formatPartnerValue(value, metadata.magnitude));
   if (!formatted.length) return "";
+  const label = metadata.label || effect.label;
   if (new Set(formatted).size === 1) {
-    return `<p class="work-partner-effect"><span>${escapeHtml(effect.label)}</span><strong>${escapeHtml(formatted[0])}</strong></p>`;
+    return `<section class="partner-effect partner-effect--constant" aria-label="${escapeHtml(label)}">
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(formatted[0])}</strong>
+      <small>Valeur identique de 0★ à 4★</small>
+    </section>`;
   }
-  return `<div class="work-partner-progression">
-    <p class="work-partner-effect-title">${escapeHtml(effect.label)}</p>
-    <div class="work-partner-progress" aria-label="Progression selon la condensation">
+  return `<section class="partner-effect" aria-label="${escapeHtml(label)}">
+    <p class="partner-effect__label">${escapeHtml(label)}</p>
+    <div class="partner-effect__progress">
       ${formatted.map((value, star) => `<span><small>${star}★</small><strong>${escapeHtml(value)}</strong></span>`).join("")}
     </div>
-  </div>`;
+  </section>`;
 }
 
 function workPartnerCardTemplate(reference) {
   const skill = partnerSkillsData?.skills?.[reference.pal];
   const pal = condensationPals.find((entry) => entry.code === reference.pal);
-  const effect = skill?.effects?.find((entry) => entry.label === reference.effect);
-  if (!skill || !pal || !effect) return "";
-  return `<article class="partner-card work-partner-card">
-    <img class="partner-card__portrait" src="${pal.portrait}" alt="${escapeHtml(pal.name)}" />
-    <div class="partner-card__content">
-      <p class="partner-card__pal">${escapeHtml(pal.name)}</p>
-      <h3>${escapeHtml(skill.name)}</h3>
-      ${reference.description ? `<p class="work-partner-description">${escapeHtml(skill.description)}</p>` : ""}
-      ${partnerProgressTemplate(effect)}
-      ${reference.note ? `<p class="work-partner-note">${escapeHtml(reference.note)}</p>` : ""}
-      ${reference.nonCumulative ? '<p class="work-partner-note">Effet non cumulable.</p>' : ""}
+  const resolvedEffects = (reference.effects || []).map((metadata) => ({
+    metadata,
+    effect: skill?.effects?.find((entry) => entry.label === (metadata.sourceLabel || metadata.label)),
+  }));
+  if (!skill || !pal || resolvedEffects.some((entry) => !entry.effect)) return "";
+  const descriptions = resolvedEffects
+    .map(({ metadata }) => `<p>${highlightPartnerText(metadata.description, reference.highlights)}</p>`)
+    .join("");
+  const notes = [
+    reference.note ? highlightPartnerText(reference.note, reference.highlights) : "",
+    reference.nonCumulative ? "Effet non cumulable." : "",
+  ].filter(Boolean);
+
+  return `<article class="partner-skill-card">
+    <div class="partner-skill-card__portrait"><img src="${pal.portrait}" alt="" /></div>
+    <div class="partner-skill-card__body">
+      <header class="partner-skill-card__identity">
+        <p>${escapeHtml(pal.name)}</p>
+        <h3>${escapeHtml(skill.name)}</h3>
+      </header>
+      <div class="partner-skill-card__description">${descriptions}</div>
+      <div class="partner-skill-card__effects">
+        ${resolvedEffects.map(({ effect, metadata }) => partnerEffectTemplate(effect, metadata)).join("")}
+      </div>
+      <div class="partner-skill-card__notes">${notes.map((note) => `<p>${note}</p>`).join("")}</div>
     </div>
   </article>`;
 }
+
 
 function partnerResultsTemplate() {
   if (!selectedWorkPartnerActivityId) {
@@ -463,7 +491,7 @@ function partnerResultsTemplate() {
 
 function ensurePartnerSkills() {
   if (partnerSkillsData || partnerSkillsError || partnerSkillsPromise) return;
-  const partnerSkillsUrl = new URL("data/partner-skills-fr.json", document.baseURI).href;
+  const partnerSkillsUrl = new URL("data/partner-skills-fr.json?v=0.9.1", document.baseURI).href;
   partnerSkillsPromise = fetch(partnerSkillsUrl)
     .then((response) => {
       if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
