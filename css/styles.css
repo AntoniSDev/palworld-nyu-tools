@@ -2080,7 +2080,6 @@ button.save-passive:hover { filter: brightness(1.12); }
 .save-tree-node strong { width: auto; margin: 0; color: #efffff; font-size: .84rem; line-height: 1.2; overflow-wrap: anywhere; }
 .save-tree-node .breeding-node__sex { position: static; font-size: .78rem; }
 .save-tree-node__passives { display: grid; width: auto; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 4px; margin: 0; }
-.save-tree-node__passives .save-passive { font-size: .66rem; }
 .save-family-link, .save-family-link-flow { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 .save-family-junction { fill: #83ddd8; stroke: rgba(4, 27, 35, .9); stroke-width: 2; vector-effect: non-scaling-stroke; }
 .save-passive-tooltip { position: fixed; z-index: 1300; display: grid; width: min(280px, calc(100vw - 20px)); gap: 4px; padding: 9px 11px; border: 1px solid rgba(104, 220, 216, .38); border-radius: 7px; background: rgba(3, 20, 28, .97); box-shadow: 0 12px 30px rgba(0, 5, 10, .42); color: #d9eeee; pointer-events: none; }
