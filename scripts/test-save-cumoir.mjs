@@ -117,7 +117,7 @@ if ((linkedGraph.match(/class="save-family-link-flow /g) || []).length !== 3 || 
   || !/save-family-junction[^>]+><path class="save-family-link-flow save-family-link-flow--outgoing"/.test(linkedGraph)) {
   throw new Error("Synchronized incoming, junction and outgoing transmission phases are missing.");
 }
-if (!styles.includes("stroke-dashoffset: -1") || !styles.includes("stroke-dasharray: .27 .73") || !styles.includes("prefers-reduced-motion")) {
+if (!styles.includes("stroke-dashoffset: -1") || !styles.includes("stroke-dasharray: .27 1.73") || !styles.includes("prefers-reduced-motion")) {
   throw new Error("Upward connector flow or reduced-motion fallback is missing.");
 }
 if (!styles.includes(".breeding-tree__links .save-family-link-flow { stroke: #affff8; stroke-width: 4;")) {
@@ -146,9 +146,19 @@ if (!styles.includes("animation: family-flow-in 6.2s linear infinite")
   throw new Error("Connector and final-card animation hierarchy is incorrect.");
 }
 if (!styles.includes(".breeding-page--save .breeding-canvas { align-self: stretch; height: auto; min-height: calc(100vh - 148px); border-bottom: 0;")
-  || !styles.includes(".save-passive-tooltip strong { font-size: .86rem;")
-  || !styles.includes(".save-passive-tooltip span { font-size: .78rem; line-height: 1.55;")) {
+  || !styles.includes(".save-passive-tooltip { gap: 8px; padding: 15px 17px; }")
+  || !styles.includes(".save-passive-tooltip strong { font-size: .96rem; font-weight: 700; line-height: 1.4; }")
+  || !styles.includes(".save-passive-tooltip span { font-size: .88rem; line-height: 1.6; }")) {
   throw new Error("Open-bottom canvas or shared tooltip readability adjustments are missing.");
+}
+if (!styles.includes("@keyframes family-flow-in { 0% { stroke-dashoffset: 0; opacity: .98; } 42% { stroke-dashoffset: -1; opacity: .98; } 42.01%, 100%")
+  || !styles.includes("@keyframes family-flow-out { 0%, 41.99%")
+  || !styles.includes("42% { stroke-dashoffset: 0; opacity: .98; } 84%")
+  || !styles.includes("84.01%, 100%")
+  || !styles.includes("@keyframes family-junction-pulse { 0%, 30.7%")
+  || !styles.includes("42%, 46%")
+  || !styles.includes("54%, 100%")) {
+  throw new Error("Single-packet contact, absorption or outgoing timing is incorrect.");
 }
 if (api.renderGraph({ status: "already-owned", root: { speciesId: ownedSpeciesId, mask: 0, sex: "Female", owned: true, individualId: "fixture" } }).includes('save-tree-node__new">Nouveau')) {
   throw new Error("An owned individual is incorrectly marked Nouveau.");

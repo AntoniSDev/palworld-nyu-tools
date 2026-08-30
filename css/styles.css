@@ -2131,9 +2131,9 @@ body[data-view="breeding"] .site-nav button { font-size: .92rem; font-weight: 70
 .save-tree-node .breeding-node__sex { position: static; font-size: 1.25rem; font-weight: 900; line-height: 1; text-shadow: 0 0 5px currentColor; }
 .breeding-node__sex--male { color: #6dcfed; }
 .breeding-node__sex--female { color: #ed89b8; }
-.save-passive-tooltip { gap: 6px; padding: 12px 14px; }
-.save-passive-tooltip strong { font-size: .86rem; font-weight: 700; line-height: 1.35; }
-.save-passive-tooltip span { font-size: .78rem; line-height: 1.55; }
+.save-passive-tooltip { gap: 8px; padding: 15px 17px; }
+.save-passive-tooltip strong { font-size: .96rem; font-weight: 700; line-height: 1.4; }
+.save-passive-tooltip span { font-size: .88rem; line-height: 1.6; }
 .breeding-canvas__world { left: 0; top: 0; }
 .breeding-canvas__controls {
   position: absolute; z-index: 5; top: 42px; right: 12px; display: flex; align-items: center; gap: 4px; padding: 4px;
@@ -2321,13 +2321,13 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 .save-tree-node__passives { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
 
 .breeding-tree__links .save-family-link { stroke: #65919a; stroke-width: 3; }
-.breeding-tree__links .save-family-link-flow { stroke: #affff8; stroke-width: 4; stroke-dasharray: .27 .73; stroke-dashoffset: 0; opacity: 0; }
+.breeding-tree__links .save-family-link-flow { stroke: #affff8; stroke-width: 4; stroke-dasharray: .27 1.73; stroke-dashoffset: 0; opacity: 0; }
 .save-family-link-flow--incoming { animation: family-flow-in 6.2s linear infinite; }
 .save-family-link-flow--outgoing { animation: family-flow-out 6.2s linear infinite; }
 @keyframes family-flow-in { 0% { stroke-dashoffset: 0; opacity: .98; } 42% { stroke-dashoffset: -1; opacity: .98; } 42.01%, 100% { stroke-dashoffset: -1; opacity: 0; } }
-@keyframes family-flow-out { 0%, 50.99% { stroke-dashoffset: 0; opacity: 0; } 51% { stroke-dashoffset: 0; opacity: .98; } 95% { stroke-dashoffset: -1; opacity: .98; } 95.01%, 100% { stroke-dashoffset: -1; opacity: 0; } }
+@keyframes family-flow-out { 0%, 41.99% { stroke-dashoffset: 0; opacity: 0; } 42% { stroke-dashoffset: 0; opacity: .98; } 84% { stroke-dashoffset: -1; opacity: .98; } 84.01%, 100% { stroke-dashoffset: -1; opacity: 0; } }
 .breeding-tree__links .save-family-junction { fill: #153b44; stroke: #72d8d5; stroke-width: 3; transform-box: fill-box; transform-origin: center; animation: family-junction-pulse 6.2s linear infinite; }
-@keyframes family-junction-pulse { 0%, 41.99%, 51%, 100% { fill: #153b44; filter: none; } 42%, 50.99% { fill: #aafff7; filter: drop-shadow(0 0 5px rgba(140, 255, 247, .72)); } }
+@keyframes family-junction-pulse { 0%, 30.7% { fill: #153b44; filter: none; } 42%, 46% { fill: #aafff7; filter: drop-shadow(0 0 5px rgba(140, 255, 247, .72)); } 54%, 100% { fill: #153b44; filter: none; } }
 
 .save-breeding-panel { gap: 16px; padding: 0; overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .save-goal-card, .save-history { padding: 14px; border: 1px solid rgba(98, 190, 196, .24); border-radius: 10px; background: #0a2a34; box-shadow: 0 12px 26px rgba(0, 8, 14, .2); }
