@@ -69,8 +69,9 @@ if (activeTemplate.includes("data-save-roster") || activeTemplate.includes("data
 if (activeTemplate.includes("Ancien calcul") || activeTemplate.includes("Nouveau calcul") || activeTemplate.includes("data-tree-view")) {
   throw new Error("The retired solver switch is still rendered.");
 }
-if (activeTemplate.includes("Transmission des passifs") || activeTemplate.includes("Estimations communautaires")) {
-  throw new Error("The retired probability panel is still rendered.");
+if (!activeTemplate.includes("Transmission des passifs") || !activeTemplate.includes("1 à 4 au descendant")
+  || activeTemplate.includes("Estimations communautaires") || activeTemplate.includes("Le Cumoir travaille avec les Pals")) {
+  throw new Error("The permanent transmission help or simplified page header is missing.");
 }
 if (!activeTemplate.includes("save-goal-card") || !activeTemplate.includes("save-history")) throw new Error("Goal and history are not separate cards.");
 if (!api.historyPinIcon().includes('viewBox="0 0 122.48 122.88"') || !api.historyPinIcon().includes("53.48 82.11 40.77 69.4")) {
@@ -106,7 +107,7 @@ if (!api.renderGraph({ root: { speciesId: absentSpeciesId, mask: 0, owned: false
 const linkedGraph = api.renderGraph({ status: "found", root: { speciesId: ownedSpeciesId, mask: 0, parents: [
   { speciesId: ownedSpeciesId, mask: 0, owned: true }, { speciesId: ownedSpeciesId, mask: 0, owned: true },
 ] } });
-if ((linkedGraph.match(/save-family-link-flow/g) || []).length !== 3 || !linkedGraph.includes("save-family-junction")
+if ((linkedGraph.match(/save-family-link-flow/g) || []).length !== 3 || !linkedGraph.includes("save-family-fusion")
   || !/save-family-link-flow[^>]*pathLength="1"[^>]*d="M [^"]+ V [^"]+ H [^"]+ V [^"]+"/.test(linkedGraph)) {
   throw new Error("Continuous parent-to-child transmission paths are missing.");
 }
@@ -116,6 +117,16 @@ if (!styles.includes("stroke-dashoffset: -1") || !styles.includes("stroke-dashar
 if (!styles.includes(".breeding-tree__links .save-family-link-flow { stroke: #affff8; stroke-width: 4;")) {
   throw new Error("The animated flow does not override the generic SVG path skin.");
 }
+const ownedFixture = normalized.find((pal) => pal.passives.length > 1) || normalized[0];
+const ownedFixtureGraph = api.renderGraph({ status: "already-owned", root: {
+  speciesId: ownedFixture.speciesId, mask: 0, sex: ownedFixture.sex, owned: true,
+  individualId: ownedFixture.id, level: ownedFixture.level,
+} });
+for (const passiveId of ownedFixture.passives) {
+  const name = context.PALWORLD_PASSIVES.find((passive) => passive.id === passiveId)?.name;
+  if (name && !ownedFixtureGraph.includes(name)) throw new Error(`Owned parent is missing its real passive: ${name}`);
+}
+if (!ownedFixtureGraph.includes(`Niv. ${ownedFixture.level} · Sauvegarde`)) throw new Error("Owned parent identification is missing.");
 if (!styles.includes(".save-tree-node__passives { grid-template-columns: repeat(2, minmax(0, 1fr))")
   || styles.includes(".save-tree-node__passives .save-passive { font-size:")
   || styles.includes(".save-history-tooltip__chips { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; color:")) {
@@ -271,7 +282,7 @@ api.setTarget("Baphomet_Dark", []);
 const incineramNoct = api.solveCarrier();
 if (!incineramNoct.root) throw new Error(`Structural zero-passive route failed: ${JSON.stringify(incineramNoct)}`);
 const zeroPassiveGraph = api.renderGraph(incineramNoct);
-if (zeroPassiveGraph.includes("save-tree-node__passives")) throw new Error("Zero-passive graph renders empty passive areas.");
+if (/save-tree-node__passives[^>]*><\/span>/.test(zeroPassiveGraph)) throw new Error("Zero-passive graph renders an empty passive area.");
 solveChecks.push({
   count: "incineram-noct-0", solved: true, status: incineramNoct.status, breedingCount: incineramNoct.breedingCount,
   owned: Boolean(incineramNoct.root.owned), depth: plannedDepth(incineramNoct.root),
