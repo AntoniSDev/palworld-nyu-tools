@@ -2250,7 +2250,7 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 .save-workspace { padding: 0; }
 .breeding-page--save .breeding-canvas { align-self: stretch; height: auto; min-height: calc(100vh - 148px); border-bottom: 0; border-radius: 12px 12px 0 0; }
 .save-source-panel { margin: 0; padding: 14px; gap: 0; }
-.save-source-panel > header { display: flex; min-height: 34px; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid rgba(103, 214, 216, .16); }
+.save-source-panel > header { display: flex; min-height: 34px; align-items: center; margin-bottom: 12px; padding: 0; border-bottom: 1px solid rgba(103, 214, 216, .16); }
 .save-source-panel > header .eyebrow { margin: 0; color: #f3d79b; font-size: .78rem; }
 .save-source-panel .save-world-status { display: grid; width: 100%; grid-template-columns: minmax(0, 1fr); gap: 11px; padding: 0 0 13px; border-bottom: 1px solid rgba(103, 214, 216, .16); }
 .save-source-panel .save-world-status > div:last-of-type { justify-content: flex-start; }

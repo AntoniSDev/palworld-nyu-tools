@@ -74,7 +74,7 @@ if (!saveCumoirSource.includes('placeholder="Rechercher un Pal…" aria-label="R
   throw new Error("The target search label or native clear-button pointer is incorrect.");
 }
 if (!styles.includes(".save-passive-goal { gap: 8px; margin-top: 17px; }")
-  || !styles.includes(".save-source-panel > header { display: flex; min-height: 34px; align-items: center;")
+  || !styles.includes(".save-source-panel > header { display: flex; min-height: 34px; align-items: center; margin-bottom: 12px; padding: 0;")
   || !styles.includes(".save-passive-goal > div:first-child { min-height: 20px; }")
   || !styles.includes(".save-history > header { display: flex; min-height: 26px; align-items: center;")) {
   throw new Error("The unified sidebar heading rhythm is missing.");
