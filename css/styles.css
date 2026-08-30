@@ -2324,7 +2324,7 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 .save-history-tooltip__chips { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; color: #a9c2c4 !important; }
 .save-history-tooltip__chips .save-passive { height: 29px; font-size: .7rem; }
 
-.save-passive-modal__count, .save-passive-modal__clear { align-self: end; margin-bottom: 0; }
+.save-passive-modal__count, .save-passive-modal__clear { align-self: end; margin-bottom: 8px; }
 
 .topbar { border-bottom-color: rgba(89, 217, 219, .2); background: rgba(5, 27, 37, .94); }
 .topbar::after { right: 7%; width: min(390px, 36vw); height: 1px; background: linear-gradient(90deg, transparent, #5ddedb 45%, rgba(93, 222, 219, .15)); opacity: .85; }
