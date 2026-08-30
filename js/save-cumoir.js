@@ -504,14 +504,15 @@
       const joinY = childY + (parentY - childY) * .48;
       const radius = 12;
       const path = `M ${leftX} ${parentY} V ${joinY + radius} Q ${leftX} ${joinY} ${leftX + radius} ${joinY} H ${rightX - radius} Q ${rightX} ${joinY} ${rightX} ${joinY + radius} V ${parentY} M ${childX} ${joinY} V ${childY}`;
-      const flowPath = (parentX) => {
+      const incomingFlowPath = (parentX) => {
         const direction = Math.sign(childX - parentX);
-        if (!direction) return `M ${parentX} ${parentY} V ${childY}`;
-        return `M ${parentX} ${parentY} V ${joinY + radius} Q ${parentX} ${joinY} ${parentX + direction * radius} ${joinY} H ${childX - direction * radius} Q ${childX} ${joinY} ${childX} ${joinY - radius} V ${childY}`;
+        if (!direction) return `M ${parentX} ${parentY} V ${joinY}`;
+        return `M ${parentX} ${parentY} V ${joinY + radius} Q ${parentX} ${joinY} ${parentX + direction * radius} ${joinY} H ${childX}`;
       };
-      const leftFlow = flowPath(leftX);
-      const rightFlow = flowPath(rightX);
-      return `<path class="save-family-link" d="${path}" /><path class="save-family-link-flow" pathLength="1" d="${leftFlow}" /><path class="save-family-link-flow save-family-link-flow--alternate" pathLength="1" d="${rightFlow}" /><circle class="save-family-junction" cx="${childX}" cy="${joinY}" r="7" />`;
+      const leftFlow = incomingFlowPath(leftX);
+      const rightFlow = incomingFlowPath(rightX);
+      const outgoingFlow = `M ${childX} ${joinY} V ${childY}`;
+      return `<path class="save-family-link" d="${path}" /><path class="save-family-link-flow save-family-link-flow--incoming" pathLength="1" d="${leftFlow}" /><path class="save-family-link-flow save-family-link-flow--incoming" pathLength="1" d="${rightFlow}" /><circle class="save-family-junction" cx="${childX}" cy="${joinY}" r="7" /><path class="save-family-link-flow save-family-link-flow--outgoing" pathLength="1" d="${outgoingFlow}" />`;
     }).join("");
     const nodes = layout.nodes.map(({ node, x, y }) => {
       const pal = palInfo(node.speciesId); if (!pal) return "";

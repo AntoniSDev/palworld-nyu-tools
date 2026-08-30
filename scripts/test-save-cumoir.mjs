@@ -110,9 +110,12 @@ if (!api.renderGraph({ root: { speciesId: absentSpeciesId, mask: 0, owned: false
 const linkedGraph = api.renderGraph({ status: "found", root: { speciesId: ownedSpeciesId, mask: 0, parents: [
   { speciesId: ownedSpeciesId, mask: 0, owned: true }, { speciesId: ownedSpeciesId, mask: 0, owned: true },
 ] } });
-if ((linkedGraph.match(/save-family-link-flow/g) || []).length !== 3 || !linkedGraph.includes("save-family-junction")
-  || !/save-family-link-flow[^>]*pathLength="1"[^>]*d="M [^"]+ V [^"]+ Q [^"]+ H [^"]+ Q [^"]+ V [^"]+"/.test(linkedGraph)) {
-  throw new Error("Continuous parent-to-child transmission paths are missing.");
+if ((linkedGraph.match(/class="save-family-link-flow /g) || []).length !== 3 || !linkedGraph.includes("save-family-junction")
+  || (linkedGraph.match(/save-family-link-flow--incoming/g) || []).length !== 2
+  || (linkedGraph.match(/save-family-link-flow--outgoing/g) || []).length !== 1
+  || !/save-family-link-flow--incoming[^>]*pathLength="1"[^>]*d="M [^"]+ V [^"]+ Q [^"]+ H [^"]+"/.test(linkedGraph)
+  || !/save-family-junction[^>]+><path class="save-family-link-flow save-family-link-flow--outgoing"/.test(linkedGraph)) {
+  throw new Error("Synchronized incoming, junction and outgoing transmission phases are missing.");
 }
 if (!styles.includes("stroke-dashoffset: -1") || !styles.includes("stroke-dasharray: .27 .73") || !styles.includes("prefers-reduced-motion")) {
   throw new Error("Upward connector flow or reduced-motion fallback is missing.");
@@ -136,8 +139,16 @@ if (!/\.save-tree-node\s*\{[^}]*height:\s*165px;[^}]*grid-template-rows:\s*70px 
   || !linkedGraph.includes('<span class="save-tree-node__passives"></span>')) {
   throw new Error("Tree cards do not reserve the same fixed passive area for zero to four passives.");
 }
-if (!styles.includes("animation: family-flow-up 6.2s linear infinite") || !styles.includes("animation: final-border-travel 5s linear infinite")) {
+if (!styles.includes("animation: family-flow-in 6.2s linear infinite")
+  || !styles.includes("animation: family-flow-out 6.2s linear infinite")
+  || !styles.includes("animation: family-junction-pulse 6.2s linear infinite")
+  || !styles.includes("animation: final-border-travel 5s linear infinite")) {
   throw new Error("Connector and final-card animation hierarchy is incorrect.");
+}
+if (!styles.includes(".breeding-page--save .breeding-canvas { align-self: stretch; height: auto; min-height: calc(100vh - 148px); border-bottom: 0;")
+  || !styles.includes(".save-passive-tooltip strong { font-size: .86rem;")
+  || !styles.includes(".save-passive-tooltip span { font-size: .78rem; line-height: 1.55;")) {
+  throw new Error("Open-bottom canvas or shared tooltip readability adjustments are missing.");
 }
 if (api.renderGraph({ status: "already-owned", root: { speciesId: ownedSpeciesId, mask: 0, sex: "Female", owned: true, individualId: "fixture" } }).includes('save-tree-node__new">Nouveau')) {
   throw new Error("An owned individual is incorrectly marked Nouveau.");
