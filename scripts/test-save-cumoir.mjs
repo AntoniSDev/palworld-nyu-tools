@@ -69,6 +69,10 @@ if (activeTemplate.includes("data-save-roster") || activeTemplate.includes("data
 if (activeTemplate.includes("Ancien calcul") || activeTemplate.includes("Nouveau calcul") || activeTemplate.includes("data-tree-view")) {
   throw new Error("The retired solver switch is still rendered.");
 }
+if (!saveCumoirSource.includes('placeholder="Rechercher un Pal…" aria-label="Rechercher un Pal"')
+  || !styles.includes(".save-target-search input::-webkit-search-cancel-button { cursor: pointer; }")) {
+  throw new Error("The target search label or native clear-button pointer is incorrect.");
+}
 if (!activeTemplate.includes("Transmission des passifs") || !activeTemplate.includes("1 à 4 au descendant")
   || activeTemplate.includes("Estimations communautaires") || activeTemplate.includes("Le Cumoir travaille avec les Pals")) {
   throw new Error("The permanent transmission help or simplified page header is missing.");

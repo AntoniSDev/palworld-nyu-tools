@@ -290,7 +290,7 @@
     const target = palInfo(state.target);
     return `<div class="save-target-picker">
       <span class="eyebrow">Pal cible</span>
-      ${target ? `<div class="save-target-selected"><img src="${target.portrait}" alt="" /><strong>${escapeHtml(target.name)}</strong><button type="button" class="breeding-parent-remove" data-clear-save-target aria-label="Retirer ${escapeHtml(target.name)}">×</button></div>` : `<label class="save-target-search"><span class="pal-search__field"><input data-target-search type="search" placeholder="Rechercher un Pal cible…" aria-label="Rechercher un Pal cible" value="${escapeHtml(targetQuery)}" autocomplete="off" /><span aria-hidden="true">⌕</span></span></label><div class="save-target-results" data-target-results>${targetResults()}</div>`}
+      ${target ? `<div class="save-target-selected"><img src="${target.portrait}" alt="" /><strong>${escapeHtml(target.name)}</strong><button type="button" class="breeding-parent-remove" data-clear-save-target aria-label="Retirer ${escapeHtml(target.name)}">×</button></div>` : `<label class="save-target-search"><span class="pal-search__field"><input data-target-search type="search" placeholder="Rechercher un Pal…" aria-label="Rechercher un Pal" value="${escapeHtml(targetQuery)}" autocomplete="off" /><span aria-hidden="true">⌕</span></span></label><div class="save-target-results" data-target-results>${targetResults()}</div>`}
     </div>`;
   }
 

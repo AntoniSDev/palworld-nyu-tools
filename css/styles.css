@@ -1982,6 +1982,7 @@ body[data-view="breeding"] footer { margin-top: 18px; }
 .save-target-picker img { width: 50px; height: 50px; object-fit: contain; }
 .save-target-selected > .breeding-parent-remove { top: 7px; right: 7px; }
 .save-target-search .pal-search__field { margin: 0; }
+.save-target-search input::-webkit-search-cancel-button { cursor: pointer; }
 .save-target-results { display: grid; max-height: 230px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; overflow-y: auto; }
 .save-target-results:empty { display: none; }
 .save-target-results > button { display: grid; min-width: 0; min-height: 78px; place-items: center; padding: 5px; border: 1px solid rgba(99, 190, 197, .16); border-radius: 7px; background: rgba(5, 24, 33, .62); color: #c8dfe0; cursor: pointer; font: inherit; font-size: .7rem; font-weight: 700; }
