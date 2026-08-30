@@ -428,13 +428,13 @@ function partnerEffectTemplate(effect, metadata) {
     return `<section class="partner-effect partner-effect--constant" aria-label="${escapeHtml(label)}">
       <span>${escapeHtml(label)}</span>
       <strong>${escapeHtml(formatted[0])}</strong>
-      <small>Valeur identique de 0★ à 4★</small>
+      <small>Identique de <span>0</span><b>★</b> à <span>4</span><b>★</b></small>
     </section>`;
   }
   return `<section class="partner-effect" aria-label="${escapeHtml(label)}">
     <p class="partner-effect__label">${escapeHtml(label)}</p>
     <div class="partner-effect__progress">
-      ${formatted.map((value, star) => `<span><small>${star}★</small><strong>${escapeHtml(value)}</strong></span>`).join("")}
+      ${formatted.map((value, star) => `<span><small><span>${star}</span><b>★</b></small><strong>${escapeHtml(value)}</strong></span>`).join("")}
     </div>
   </section>`;
 }
@@ -450,16 +450,16 @@ function workPartnerCardTemplate(reference) {
   const descriptions = resolvedEffects
     .map(({ metadata }) => `<p>${highlightPartnerText(metadata.description, reference.highlights)}</p>`)
     .join("");
-  const notes = [
-    reference.note ? highlightPartnerText(reference.note, reference.highlights) : "",
-    reference.nonCumulative ? "Effet non cumulable." : "",
-  ].filter(Boolean);
+  const notes = [reference.note ? highlightPartnerText(reference.note, reference.highlights) : ""].filter(Boolean);
 
   return `<article class="partner-skill-card">
     <div class="partner-skill-card__portrait"><img src="${pal.portrait}" alt="" /></div>
     <div class="partner-skill-card__body">
       <header class="partner-skill-card__identity">
-        <p>${escapeHtml(pal.name)}</p>
+        <div class="partner-skill-card__pal-row">
+          <p>${escapeHtml(pal.name)}</p>
+          ${reference.nonCumulative ? '<span class="partner-skill-card__non-cumulative">Non cumulable</span>' : ""}
+        </div>
         <h3>${escapeHtml(skill.name)}</h3>
       </header>
       <div class="partner-skill-card__description">${descriptions}</div>

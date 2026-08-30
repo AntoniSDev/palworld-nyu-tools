@@ -947,9 +947,9 @@ tbody tr:hover { background: linear-gradient(90deg, rgba(91, 218, 223, 0.055), r
 
 .partner-skill-card {
   display: grid;
-  grid-template-columns: 108px minmax(0, 1fr);
+  grid-template-columns: 112px minmax(0, 1fr);
   width: 100%;
-  height: 392px;
+  height: 276px;
   min-width: 0;
   overflow: hidden;
   border: 1px solid rgba(126, 220, 225, 0.2);
@@ -962,7 +962,7 @@ tbody tr:hover { background: linear-gradient(90deg, rgba(91, 218, 223, 0.055), r
   display: grid;
   width: 88px;
   height: 88px;
-  margin: 14px 10px;
+  margin: 12px;
   place-items: center;
   overflow: hidden;
   border: 1px solid rgba(122, 218, 222, 0.16);
@@ -979,13 +979,22 @@ tbody tr:hover { background: linear-gradient(90deg, rgba(91, 218, 223, 0.055), r
 
 .partner-skill-card__body {
   display: grid;
-  grid-template-rows: auto minmax(74px, auto) 1fr minmax(24px, auto);
+  align-content: start;
+  gap: 7px;
   min-width: 0;
-  padding: 15px 15px 14px 5px;
+  padding: 12px 12px 12px 4px;
+}
+
+.partner-skill-card__pal-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .partner-skill-card__identity p {
-  margin: 0 0 3px;
+  margin: 0;
   color: var(--sand);
   font-size: 0.68rem;
   font-weight: 850;
@@ -993,8 +1002,17 @@ tbody tr:hover { background: linear-gradient(90deg, rgba(91, 218, 223, 0.055), r
   text-transform: uppercase;
 }
 
+.partner-skill-card__non-cumulative {
+  flex: none;
+  color: #90aeb3;
+  font-size: 0.73rem;
+  font-weight: 750;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
 .partner-skill-card__identity h3 {
-  margin: 0;
+  margin: 3px 0 0;
   color: var(--cyan-bright);
   font-size: 0.96rem;
   line-height: 1.25;
@@ -1003,8 +1021,7 @@ tbody tr:hover { background: linear-gradient(90deg, rgba(91, 218, 223, 0.055), r
 .partner-skill-card__description {
   display: grid;
   align-content: start;
-  gap: 5px;
-  padding-top: 10px;
+  gap: 4px;
 }
 
 .partner-skill-card__description p {
@@ -1022,9 +1039,8 @@ tbody tr:hover { background: linear-gradient(90deg, rgba(91, 218, 223, 0.055), r
 .partner-skill-card__effects {
   display: grid;
   align-content: start;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
-  padding-top: 8px;
 }
 
 .partner-effect {
@@ -1060,8 +1076,15 @@ tbody tr:hover { background: linear-gradient(90deg, rgba(91, 218, 223, 0.055), r
 }
 
 .partner-effect__progress small {
-  color: #78989e;
-  font-size: 0.6rem;
+  color: #9ab3b7;
+  font-size: 0.66rem;
+  line-height: 1.1;
+}
+
+.partner-effect__progress small b,
+.partner-effect--constant small b {
+  color: var(--sand);
+  font-weight: 800;
 }
 
 .partner-effect__progress strong {
@@ -1072,8 +1095,8 @@ tbody tr:hover { background: linear-gradient(90deg, rgba(91, 218, 223, 0.055), r
 
 .partner-effect--constant {
   display: grid;
-  min-height: 74px;
-  padding: 8px 10px;
+  min-height: 64px;
+  padding: 7px 10px;
   place-content: center;
   border: 1px solid rgba(100, 207, 214, 0.16);
   border-radius: 6px;
@@ -1095,16 +1118,14 @@ tbody tr:hover { background: linear-gradient(90deg, rgba(91, 218, 223, 0.055), r
 
 .partner-effect--constant small {
   margin-top: 2px;
-  color: #718f95;
-  font-size: 0.62rem;
+  color: #8ba8ad;
+  font-size: 0.68rem;
+  line-height: 1.2;
 }
 
 .partner-skill-card__notes {
   display: grid;
-  align-content: end;
   gap: 3px;
-  min-height: 24px;
-  padding-top: 7px;
 }
 
 .partner-skill-card__notes p {
@@ -1118,12 +1139,11 @@ body[data-view="jobs"] .capabilities-picker { margin-bottom: 18px; }
 
 @media (max-width: 780px) {
   .partner-skill-card {
-    grid-template-columns: 96px minmax(0, 1fr);
+    grid-template-columns: 98px minmax(0, 1fr);
     height: auto;
-    min-height: 300px;
+    min-height: 0;
   }
-  .partner-skill-card__portrait { width: 78px; height: 78px; margin-inline: 9px; }
-  .partner-skill-card__body { grid-template-rows: auto auto auto minmax(24px, auto); }
+  .partner-skill-card__portrait { width: 78px; height: 78px; margin: 10px; }
 }
 
 
