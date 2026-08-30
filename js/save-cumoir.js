@@ -280,7 +280,7 @@
     return `<aside class="save-transmission-panel" aria-labelledby="transmission-title">
       <span class="eyebrow" id="transmission-title">Transmission des passifs</span>
       <p>À chaque accouplement, le jeu prend en compte les passifs présents chez les deux parents et en transmet aléatoirement 1 à 4 au descendant.</p>
-      <div class="save-transmission-rates" aria-label="Probabilités de transmission"><span><b>1</b>40 %</span><span><b>2</b>30 %</span><span><b>3</b>20 %</span><span><b>4</b>10 %</span></div>
+      <div class="save-transmission-rates" aria-label="Probabilités de transmission"><span><b>1 :</b>40 %</span><span><b>2 :</b>30 %</span><span><b>3 :</b>20 %</span><span><b>4 :</b>10 %</span></div>
       <p>Les doublons ne comptent qu’une fois ; les passifs indésirables réduisent les chances d’obtenir exactement la combinaison voulue.</p>
       <small>Des passifs aléatoires peuvent apparaître s’il reste des emplacements.</small>
     </aside>`;
@@ -401,9 +401,9 @@
   function template() {
     const graphMarkup = calculating ? calculationStateTemplate() : graphTemplate(treeResult);
     return `<section class="breeding-page breeding-page--save" aria-label="Cumoir avec sauvegarde">
-      ${activeWorld ? `<div class="save-workspace"><div class="save-top-cluster"><section class="save-source-panel" aria-label="Planificateur d’élevage et sauvegarde active"><header><span class="eyebrow">Planificateur d’élevage</span></header>${worldStatus()}</section>${transmissionPanel()}</div>
-      <div class="breeding-layout breeding-layout--save">
+      ${activeWorld ? `<div class="save-workspace"><div class="breeding-layout breeding-layout--save">
         <aside class="breeding-panel save-breeding-panel">
+          <section class="save-source-panel" aria-label="Planificateur d’élevage, sauvegarde active et transmission des passifs"><header><span class="eyebrow">Planificateur d’élevage</span></header>${worldStatus()}${transmissionPanel()}</section>
           ${selectionSummary()}
         </aside>
         <section class="breeding-canvas" data-save-viewport aria-label="Arbre généalogique interactif"><div class="breeding-canvas__tip">Molette : zoom · Cliquer-glisser : déplacer</div><div class="breeding-canvas__summary">${escapeHtml(resultSummary(treeResult))}</div><div class="breeding-canvas__controls" aria-label="Contrôles du terrain"><button type="button" data-canvas-zoom-out aria-label="Dézoomer">−</button><button type="button" data-canvas-zoom-in aria-label="Zoomer">+</button><button type="button" data-canvas-fit title="Recentrer l’arbre">Recentrer</button><output data-canvas-scale>100 %</output></div>${graphMarkup}</section>
@@ -468,18 +468,18 @@
     const nodeWidth = 350;
     const horizontalStep = 366;
     const verticalStep = 250;
-    const nodeHeight = (node) => state.selectedPassives.filter((id, index) => (node.mask & (1 << index)) !== 0).length > 2 ? 165 : 158;
+    const nodeHeight = 165;
     function visit(node, depth = 0) {
       const key = `node-${keyCursor++}`;
       if (!node.parents) {
-        nodes.push({ key, node, x: leafCursor++ * horizontalStep, depth, height: nodeHeight(node) });
+        nodes.push({ key, node, x: leafCursor++ * horizontalStep, depth, height: nodeHeight });
         return key;
       }
       const a = visit(node.parents[0], depth + 1);
       const b = visit(node.parents[1], depth + 1);
       const left = nodes.find((entry) => entry.key === a);
       const right = nodes.find((entry) => entry.key === b);
-      nodes.push({ key, node, x: (left.x + right.x) / 2, depth, height: nodeHeight(node) });
+      nodes.push({ key, node, x: (left.x + right.x) / 2, depth, height: nodeHeight });
       families.push({ parents: [a, b], child: key });
       return key;
     }
@@ -487,16 +487,6 @@
     const maxDepth = Math.max(...nodes.map((node) => node.depth), 0);
     nodes.forEach((node) => { node.y = node.depth * verticalStep + 42; node.x += 64; });
     return { nodes, families, nodeWidth, width: Math.max(560, leafCursor * horizontalStep + 128), height: Math.max(...nodes.map((node) => node.y + node.height), 158) + 84 };
-  }
-
-  function fusionNodeTemplate(x, y) {
-    return `<svg class="save-family-fusion" x="${x - 11}" y="${y - 11}" width="22" height="22" viewBox="0 0 64 64" aria-hidden="true">
-      <circle class="save-family-fusion__outer" cx="32" cy="32" r="14" />
-      <circle class="save-family-fusion__core" cx="32" cy="32" r="7.2" />
-      <path class="save-family-fusion__swirl save-family-fusion__swirl--a" d="M22.7 32 C22.7 26.9 26.9 22.7 32 22.7 C35.1 22.7 37.8 24.2 39.5 26.5" />
-      <path class="save-family-fusion__swirl save-family-fusion__swirl--b" d="M41.3 32 C41.3 37.1 37.1 41.3 32 41.3 C28.9 41.3 26.2 39.8 24.5 37.5" />
-      <circle class="save-family-fusion__spark" cx="32" cy="32" r="2.2" />
-    </svg>`;
   }
 
   function graphTemplate(result) {
@@ -521,7 +511,7 @@
       };
       const leftFlow = flowPath(leftX);
       const rightFlow = flowPath(rightX);
-      return `<path class="save-family-link" d="${path}" /><path class="save-family-link-flow" pathLength="1" d="${leftFlow}" /><path class="save-family-link-flow save-family-link-flow--alternate" pathLength="1" d="${rightFlow}" />${fusionNodeTemplate(childX, joinY)}`;
+      return `<path class="save-family-link" d="${path}" /><path class="save-family-link-flow" pathLength="1" d="${leftFlow}" /><path class="save-family-link-flow save-family-link-flow--alternate" pathLength="1" d="${rightFlow}" /><circle class="save-family-junction" cx="${childX}" cy="${joinY}" r="7" />`;
     }).join("");
     const nodes = layout.nodes.map(({ node, x, y }) => {
       const pal = palInfo(node.speciesId); if (!pal) return "";
@@ -535,7 +525,7 @@
         ${node.owned ? "" : `<span class="save-egg"><img src="${eggAsset}" alt="${escapeHtml(eggName)}" /></span>`}
         ${isNewSpecies ? `<span class="save-tree-node__new">Nouveau</span>` : ""}
         <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span class="save-tree-node__name"><strong>${escapeHtml(pal.name)}</strong>${requiredSex ? `<b class="breeding-node__sex breeding-node__sex--${requiredSex.toLowerCase()}" aria-label="${requiredSex === "Male" ? "Mâle requis" : "Femelle requise"}">${sexIcon(requiredSex)}</b>` : ""}</span></span>
-        ${useful.length ? `<span class="save-tree-node__passives">${useful.map((id) => passiveChip(id)).join("")}</span>` : ""}
+        <span class="save-tree-node__passives">${useful.map((id) => passiveChip(id)).join("")}</span>
       </article>`;
     }).join("");
     return `<div class="breeding-canvas__world" data-save-world><div class="breeding-tree" data-save-tree style="width:${layout.width}px;height:${layout.height}px"><svg class="breeding-tree__links" width="${layout.width}" height="${layout.height}" viewBox="0 0 ${layout.width} ${layout.height}">${paths}</svg>${nodes}</div></div>`;

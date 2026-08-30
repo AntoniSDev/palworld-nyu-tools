@@ -73,8 +73,8 @@ if (!activeTemplate.includes("Transmission des passifs") || !activeTemplate.incl
   || activeTemplate.includes("Estimations communautaires") || activeTemplate.includes("Le Cumoir travaille avec les Pals")) {
   throw new Error("The permanent transmission help or simplified page header is missing.");
 }
-if (!activeTemplate.includes("save-workspace") || !/save-workspace[^]*save-source-panel[^]*Planificateur d’élevage[^]*Sauvegarde active[^]*save-transmission-panel[^]*breeding-layout--save/.test(activeTemplate)) {
-  throw new Error("The fixed workspace header is not grouped above the sidebar and zoomable tree.");
+if (!activeTemplate.includes("save-workspace") || !/breeding-layout--save[^]*save-breeding-panel[^]*save-source-panel[^]*Planificateur d’élevage[^]*Sauvegarde active[^]*save-transmission-panel[^]*save-goal-card[^]*breeding-canvas/.test(activeTemplate)) {
+  throw new Error("The title, save status and transmission help are not grouped in one fixed sidebar card.");
 }
 if (!activeTemplate.includes("save-goal-card") || !activeTemplate.includes("save-history")) throw new Error("Goal and history are not separate cards.");
 if (!api.historyPinIcon().includes('viewBox="0 0 122.48 122.88"') || !api.historyPinIcon().includes("53.48 82.11 40.77 69.4")) {
@@ -110,7 +110,7 @@ if (!api.renderGraph({ root: { speciesId: absentSpeciesId, mask: 0, owned: false
 const linkedGraph = api.renderGraph({ status: "found", root: { speciesId: ownedSpeciesId, mask: 0, parents: [
   { speciesId: ownedSpeciesId, mask: 0, owned: true }, { speciesId: ownedSpeciesId, mask: 0, owned: true },
 ] } });
-if ((linkedGraph.match(/save-family-link-flow/g) || []).length !== 3 || !linkedGraph.includes("save-family-fusion")
+if ((linkedGraph.match(/save-family-link-flow/g) || []).length !== 3 || !linkedGraph.includes("save-family-junction")
   || !/save-family-link-flow[^>]*pathLength="1"[^>]*d="M [^"]+ V [^"]+ Q [^"]+ H [^"]+ Q [^"]+ V [^"]+"/.test(linkedGraph)) {
   throw new Error("Continuous parent-to-child transmission paths are missing.");
 }
@@ -123,15 +123,22 @@ if (!styles.includes(".breeding-tree__links .save-family-link-flow { stroke: #af
 if (saveCumoirSource.includes("rosterById") || saveCumoirSource.includes("treeNodePassives") || saveCumoirSource.includes("· Sauvegarde")) {
   throw new Error("Abandoned owned-individual identification code remains in the tree renderer.");
 }
-if (!styles.includes(".breeding-tree__links .save-family-fusion__swirl") || !linkedGraph.includes("save-family-fusion__spark")) {
-  throw new Error("The complete fusion node is missing or its swirls remain under the generic SVG path skin.");
+if (styles.includes("save-family-fusion") || linkedGraph.includes("save-family-fusion") || !styles.includes(".breeding-tree__links .save-family-junction")) {
+  throw new Error("The complex fusion SVG remains or the simple animated junction is missing.");
 }
 if (!styles.includes(".save-tree-node__passives { grid-template-columns: repeat(2, minmax(0, 1fr))")
   || styles.includes(".save-tree-node__passives .save-passive { font-size:")
   || styles.includes(".save-history-tooltip__chips { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; color:")) {
   throw new Error("Tree or history passives no longer reuse the shared two-column visual component.");
 }
-if (!styles.includes("border: 4px solid transparent") || !styles.includes("linear-gradient(#12343b, #12343b) padding-box")) throw new Error("The single matte final-card border is missing.");
+if (!styles.includes("border: 5px solid transparent") || !styles.includes("linear-gradient(#12343b, #12343b) padding-box")) throw new Error("The stronger single matte final-card border is missing.");
+if (!/\.save-tree-node\s*\{[^}]*height:\s*165px;[^}]*grid-template-rows:\s*70px 65px;/s.test(styles)
+  || !linkedGraph.includes('<span class="save-tree-node__passives"></span>')) {
+  throw new Error("Tree cards do not reserve the same fixed passive area for zero to four passives.");
+}
+if (!styles.includes("animation: family-flow-up 6.2s linear infinite") || !styles.includes("animation: final-border-travel 5s linear infinite")) {
+  throw new Error("Connector and final-card animation hierarchy is incorrect.");
+}
 if (api.renderGraph({ status: "already-owned", root: { speciesId: ownedSpeciesId, mask: 0, sex: "Female", owned: true, individualId: "fixture" } }).includes('save-tree-node__new">Nouveau')) {
   throw new Error("An owned individual is incorrectly marked Nouveau.");
 }
@@ -288,7 +295,9 @@ api.setTarget("Baphomet_Dark", []);
 const incineramNoct = api.solveCarrier();
 if (!incineramNoct.root) throw new Error(`Structural zero-passive route failed: ${JSON.stringify(incineramNoct)}`);
 const zeroPassiveGraph = api.renderGraph(incineramNoct);
-if (/save-tree-node__passives[^>]*><\/span>/.test(zeroPassiveGraph)) throw new Error("Zero-passive graph renders an empty passive area.");
+const zeroPassiveCards = (zeroPassiveGraph.match(/<article class="breeding-node save-tree-node/g) || []).length;
+const reservedPassiveAreas = (zeroPassiveGraph.match(/<span class="save-tree-node__passives">/g) || []).length;
+if (!zeroPassiveCards || reservedPassiveAreas !== zeroPassiveCards) throw new Error("Zero-passive cards do not reserve their uniform passive area.");
 solveChecks.push({
   count: "incineram-noct-0", solved: true, status: incineramNoct.status, breedingCount: incineramNoct.breedingCount,
   owned: Boolean(incineramNoct.root.owned), depth: plannedDepth(incineramNoct.root),
