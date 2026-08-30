@@ -73,6 +73,12 @@ if (!saveCumoirSource.includes('placeholder="Rechercher un Pal…" aria-label="R
   || !styles.includes(".save-target-search input::-webkit-search-cancel-button { cursor: pointer; }")) {
   throw new Error("The target search label or native clear-button pointer is incorrect.");
 }
+if (!styles.includes(".save-passive-goal { gap: 8px; margin-top: 17px; }")
+  || !styles.includes(".save-source-panel > header { display: flex; min-height: 34px; align-items: center;")
+  || !styles.includes(".save-passive-goal > div:first-child { min-height: 20px; }")
+  || !styles.includes(".save-history > header { display: flex; min-height: 26px; align-items: center;")) {
+  throw new Error("The unified sidebar heading rhythm is missing.");
+}
 if (!activeTemplate.includes("Transmission des passifs") || !activeTemplate.includes("1 à 4 au descendant")
   || activeTemplate.includes("Estimations communautaires") || activeTemplate.includes("Le Cumoir travaille avec les Pals")) {
   throw new Error("The permanent transmission help or simplified page header is missing.");
