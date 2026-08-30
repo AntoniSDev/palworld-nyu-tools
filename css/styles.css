@@ -2324,10 +2324,10 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 .breeding-tree__links .save-family-link-flow { stroke: #affff8; stroke-width: 4; stroke-dasharray: .27 .73; stroke-dashoffset: 0; opacity: 0; }
 .save-family-link-flow--incoming { animation: family-flow-in 6.2s linear infinite; }
 .save-family-link-flow--outgoing { animation: family-flow-out 6.2s linear infinite; }
-@keyframes family-flow-in { 0% { stroke-dashoffset: 0; opacity: .98; } 42% { stroke-dashoffset: -1; opacity: .98; } 43%, 100% { stroke-dashoffset: -1; opacity: 0; } }
-@keyframes family-flow-out { 0%, 50% { stroke-dashoffset: 0; opacity: 0; } 51% { stroke-dashoffset: 0; opacity: .98; } 95% { stroke-dashoffset: -1; opacity: .98; } 96%, 100% { stroke-dashoffset: -1; opacity: 0; } }
+@keyframes family-flow-in { 0% { stroke-dashoffset: 0; opacity: .98; } 42% { stroke-dashoffset: -1; opacity: .98; } 42.01%, 100% { stroke-dashoffset: -1; opacity: 0; } }
+@keyframes family-flow-out { 0%, 50.99% { stroke-dashoffset: 0; opacity: 0; } 51% { stroke-dashoffset: 0; opacity: .98; } 95% { stroke-dashoffset: -1; opacity: .98; } 95.01%, 100% { stroke-dashoffset: -1; opacity: 0; } }
 .breeding-tree__links .save-family-junction { fill: #153b44; stroke: #72d8d5; stroke-width: 3; transform-box: fill-box; transform-origin: center; animation: family-junction-pulse 6.2s linear infinite; }
-@keyframes family-junction-pulse { 0%, 41%, 51%, 100% { fill: #153b44; filter: none; } 42%, 50% { fill: #aafff7; filter: drop-shadow(0 0 5px rgba(140, 255, 247, .72)); } }
+@keyframes family-junction-pulse { 0%, 41.99%, 51%, 100% { fill: #153b44; filter: none; } 42%, 50.99% { fill: #aafff7; filter: drop-shadow(0 0 5px rgba(140, 255, 247, .72)); } }
 
 .save-breeding-panel { gap: 16px; padding: 0; overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .save-goal-card, .save-history { padding: 14px; border: 1px solid rgba(98, 190, 196, .24); border-radius: 10px; background: #0a2a34; box-shadow: 0 12px 26px rgba(0, 8, 14, .2); }
