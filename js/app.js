@@ -134,391 +134,21 @@ const jobs = [
   },
 ];
 
-const passiveSkills = {
-  demonsHand: {
-    name: "Main du Démon",
-    rarity: "rank-5",
-    effects: [
-      "Vitesse de travail +90 %",
-      "Chute des points MEN accélérée +15 %",
-      "Permet de récolter les arbres et rochers de l’Arbre-Monde sans les faire disparaître.",
-    ],
-  },
-  remarkableCraftsmanship: {
-    name: "Maîtrise Exceptionnelle",
-    rarity: "rank-4",
-    effects: ["Vitesse de travail +75 %"],
-  },
-  artisan: {
-    name: "Appliqué",
-    rarity: "rank-3",
-    effects: ["Vitesse de travail +50 %"],
-  },
-  workSlave: {
-    name: "Soumis",
-    rarity: "rank-1",
-    effects: ["Vitesse de travail +30 %", "Attaque -30 %"],
-  },
-  lucky: {
-    name: "Chanceux",
-    rarity: "rank-4",
-    effects: ["Attaque +15 %", "Défense +15 %", "Vitesse de travail +20 %"],
-  },
-  serious: {
-    name: "Sérieux",
-    rarity: "rank-1",
-    effects: ["Vitesse de travail +20 %"],
-  },
-  nocturnal: {
-    name: "Nocturne",
-    rarity: "rank-3",
-    effects: ["Ne dort pas et continue à travailler la nuit."],
-    note: "Inutile pour un Pal qui travaille déjà naturellement la nuit.",
-  },
-  vampiric: {
-    name: "Vampire",
-    rarity: "rank-4",
-    effects: [
-      "Absorbe 5 % des dégâts infligés pour restaurer ses PV.",
-      "Ne dort pas et continue à travailler la nuit.",
-    ],
-    note: "Inutile pour un Pal qui travaille déjà naturellement la nuit.",
-  },
-  worldTraverser: {
-    name: "Traverse-Mondes",
-    rarity: "rank-5",
-    effects: [
-      "Vitesse de déplacement +50 %",
-      "Chute du degré de satiété accélérée +15 %",
-      "Permet de récolter les arbres et rochers de l’Arbre-Monde sans les faire disparaître.",
-    ],
-  },
-  swift: {
-    name: "Sprinteur",
-    rarity: "rank-4",
-    effects: ["Vitesse de déplacement +30 %"],
-  },
-  legend: {
-    name: "Légende",
-    rarity: "rank-4",
-    effects: ["Attaque +20 %", "Défense +20 %", "Vitesse de déplacement +20 %"],
-  },
-  runner: {
-    name: "Coursier",
-    rarity: "rank-3",
-    effects: ["Vitesse de déplacement +20 %"],
-  },
-  nimble: {
-    name: "Vif",
-    rarity: "rank-1",
-    effects: ["Vitesse de déplacement +10 %"],
-  },
-  masteryOfFasting: {
-    name: "Maîtrise de la Faim",
-    rarity: "rank-4",
-    effects: ["Le degré de satiété diminue 20 % plus lentement."],
-  },
-  immortalSage: {
-    name: "Sage Immortel",
-    rarity: "rank-5",
-    effects: [
-      "Les points MEN diminuent 50 % plus lentement.",
-      "Vitesse de travail -20 %",
-      "Permet de récolter les arbres et rochers de l’Arbre-Monde sans les faire disparaître.",
-    ],
-  },
-  divineCradle: {
-    name: "Berceau Divin",
-    rarity: "rank-5",
-    effects: [
-      "Le degré de satiété diminue 50 % plus lentement.",
-      "PV -20 %",
-      "Permet de récolter les arbres et rochers de l’Arbre-Monde sans les faire disparaître.",
-    ],
-  },
-  unwavering: {
-    name: "Inébranlable",
-    rarity: "rank-4",
-    effects: ["Les points MEN diminuent 20 % plus lentement."],
-  },
-  workaholic: {
-    name: "Acharné",
-    rarity: "rank-3",
-    effects: ["Les points MEN diminuent 15 % plus lentement."],
-  },
-  positiveThinker: {
-    name: "Optimiste",
-    rarity: "rank-1",
-    effects: ["Les points MEN diminuent 10 % plus lentement."],
-  },
-  nutritionist: {
-    name: "Nutritionniste",
-    rarity: "rank-3",
-    effects: ["Le degré de satiété diminue 15 % plus lentement."],
-  },
-  frugal: {
-    name: "Frugal",
-    rarity: "rank-1",
-    effects: ["Le degré de satiété diminue 10 % plus lentement."],
-  },
-  ranchMaster: {
-    name: "Maître Éleveur",
-    rarity: "rank-4",
-    effects: ["Exploitation : Capacité de travail +2"],
-  },
-  ranchApprentice: {
-    name: "Apprenti Éleveur",
-    rarity: "rank-1",
-    effects: ["Exploitation : Capacité de travail +1"],
-  },
-};
-
-const passiveGroups = {
-  classic: [
-    "demonsHand",
-    "immortalSage",
-    "divineCradle",
-    "remarkableCraftsmanship",
-    "lucky",
-    "vampiric",
-    "unwavering",
-    "masteryOfFasting",
-    "artisan",
-    "nocturnal",
-    "workaholic",
-    "nutritionist",
-    "workSlave",
-    "serious",
-    "positiveThinker",
-    "frugal",
-  ],
-  transport: [
-    "worldTraverser",
-    "immortalSage",
-    "divineCradle",
-    "swift",
-    "legend",
-    "vampiric",
-    "unwavering",
-    "masteryOfFasting",
-    "workaholic",
-    "nutritionist",
-    "runner",
-    "nocturnal",
-    "positiveThinker",
-    "frugal",
-    "nimble",
-  ],
-  farming: [
-    "demonsHand",
-    "ranchMaster",
-    "remarkableCraftsmanship",
-    "lucky",
-    "artisan",
-    "workSlave",
-    "serious",
-    "ranchApprentice",
-  ],
-};
-
-const passiveJobs = jobs.map((job) => ({
-  ...job,
-  group: job.id === "transport" ? "transport" : job.id === "farming" ? "farming" : "classic",
-}));
-
-const partnerActivities = [
-  ...jobs,
-  {
-    id: "global",
-    name: "Global",
-    shortName: "Global",
-    icon: "assets/ui/palbox.png",
-    color: "#8fcf9e",
-  },
-  {
-    id: "breeding",
-    name: "Élevage / Œufs",
-    shortName: "Élevage / Œufs",
-    icon: "assets/ui/mutant-pal-egg.png",
-    color: "#f0b987",
-  },
+const workOptimization = window.WORK_OPTIMIZATION || { passiveProfiles: {}, passiveJobProfiles: {}, partnerActivities: {} };
+const passiveById = new Map((window.PALWORLD_PASSIVES || []).map((passive) => [passive.id, passive]));
+const specialPartnerActivities = [
+  { id: "global", name: "Base", shortName: "Base", icon: "assets/ui/palbox.png", color: "#8fcf9e" },
+  { id: "breeding", name: "Élevage / Œufs", shortName: "Élevage / Œufs", icon: "assets/ui/mutant-pal-egg.png", color: "#f0b987" },
 ];
-
-const basePartnerSkills = [
-  {
-    activity: "kindling",
-    pal: "Katress Ignis",
-    portrait: "katress-ignis",
-    skill: "Passion Magie Noire",
-    effects: ["Augmente de +1 l’Allumage de feu des autres Pals présents dans la base."],
-    note: "Effet non cumulable.",
-  },
-  {
-    activity: "watering",
-    pal: "Amione",
-    portrait: "amione",
-    skill: "Jumelage Magique",
-    effects: ["Augmente de +1 l’Arrosage des autres Pals présents dans la base."],
-    note: "Effet non cumulable.",
-  },
-  {
-    activity: "planting",
-    pal: "Petallia",
-    portrait: "petallia",
-    skill: "Bénédiction Florale",
-    effects: ["Augmente de +1 la Semence des autres Pals présents dans la base."],
-    note: "Effet non cumulable.",
-  },
-  {
-    activity: "planting",
-    pal: "Lullu",
-    portrait: "lullu",
-    skill: "Turbo Floral",
-    effects: ["Augmente de 50 % la vitesse de croissance des cultures lorsqu’elle est présente dans la base."],
-  },
-  {
-    activity: "electricity",
-    pal: "Puffolt",
-    portrait: "puffolt",
-    skill: "Poussée Crépitante",
-    effects: ["Augmente de +1 la Génération d’énergie des autres Pals présents dans la base."],
-    note: "Effet non cumulable.",
-  },
-  {
-    activity: "handiwork",
-    pal: "Ribbuny",
-    portrait: "ribbuny",
-    skill: "Princesse Lapinou Souriant",
-    effects: ["Augmente de +1 l’Artisanat des autres Pals présents dans la base."],
-    note: "Effet non cumulable.",
-  },
-  {
-    activity: "handiwork",
-    pal: "Sekhmet",
-    portrait: "sekhmet",
-    skill: "Impératrice des Sables",
-    effects: [
-      "Augmente de 20 % la Vitesse de travail des Anubis présents dans la base.",
-      "Augmente de 30 % l’efficacité de Sekhmet lorsqu’elle travaille sur un établi ou dans une usine.",
-    ],
-    note: "Le bonus destiné aux Anubis est non cumulable.",
-  },
-  {
-    activity: "handiwork",
-    pal: "Ribbuny Botan",
-    portrait: "ribbuny-botan",
-    skill: "Lapin Dézerbe",
-    effects: ["Augmente de 200 % l’efficacité de Ribbuny Botan sur un établi ou dans une usine d’armes."],
-    note: "Bonus spécifique aux installations d’armes, pas à l’Artisanat en général.",
-  },
-  {
-    activity: "gathering",
-    pal: "Clovee",
-    portrait: "clovee",
-    skill: "Joyeux Trèfle",
-    effects: ["Augmente de +1 la Collecte des autres Pals présents dans la base."],
-    note: "Effet non cumulable.",
-  },
-  {
-    activity: "lumbering",
-    pal: "Eikthyrdeer Terra",
-    portrait: "eikthyrdeer-terra",
-    skill: "Gardien des Bois Dorés",
-    effects: ["Augmente de +1 l’Abattage des autres Pals présents dans la base."],
-    note: "Effet non cumulable.",
-  },
-  {
-    activity: "mining",
-    pal: "Tetroise",
-    portrait: "tetroise",
-    skill: "Tortue Maçonne",
-    effects: ["Augmente de +1 l’Extraction des autres Pals présents dans la base."],
-    note: "Effet non cumulable.",
-  },
-  {
-    activity: "medicine",
-    pal: "Mycora",
-    portrait: "mycora",
-    skill: "Spores Charmants",
-    effects: ["Augmente de +1 la Pharmacie des autres Pals présents dans la base."],
-    note: "Effet non cumulable.",
-  },
-  {
-    activity: "cooling",
-    pal: "Smokie Cryst",
-    portrait: "smokie-cryst",
-    skill: "Froide Bête",
-    effects: ["Augmente de +1 la Réfrigération des autres Pals présents dans la base."],
-    note: "Effet non cumulable.",
-  },
-  {
-    activity: "transport",
-    pal: "Wumpo",
-    portrait: "wumpo",
-    skill: "Gardien des Montagnes Enneigées",
-    effects: ["Augmente de +1 le Transport des autres Pals présents dans la base."],
-    note: "Effet non cumulable.",
-  },
-  {
-    activity: "farming",
-    pal: "Cinnamoth",
-    portrait: "cinnamoth",
-    skill: "Écailles Mystérieuses",
-    effects: ["Augmente de +1 l’Exploitation des autres Pals présents dans la base."],
-    note: "Effet non cumulable.",
-  },
-  {
-    activity: "global",
-    pal: "Shroomer Noct",
-    portrait: "shroomer-noct",
-    skill: "Spores Fumantes",
-    effects: ["Les points MEN des Pals présents dans la base diminuent 10 % plus lentement."],
-  },
-  {
-    activity: "global",
-    pal: "Woolipop",
-    portrait: "woolipop",
-    skill: "Petit Bonbon",
-    effects: ["La satiété des Pals présents dans la base diminue 10 % plus lentement."],
-    note: "Effet non cumulable.",
-  },
-  {
-    activity: "global",
-    pal: "Woolipop Terra",
-    portrait: "woolipop-terra",
-    skill: "Bonbon Amer",
-    effects: ["La satiété des Pals présents dans la base diminue 15 % plus lentement."],
-    note: "Effet non cumulable.",
-  },
-  {
-    activity: "breeding",
-    pal: "Braloha",
-    portrait: "braloha",
-    skill: "Soleil Accablant",
-    effects: ["Augmente de 20 % la vitesse de production des œufs des Pals affectés à un Élevage."],
-    note: "Effet non cumulable.",
-  },
-  {
-    activity: "breeding",
-    pal: "Dynamoff",
-    portrait: "dynamoff",
-    skill: "Couvaison Électromassante",
-    effects: ["Augmente de 20 % la vitesse d’éclosion des œufs lorsqu’il est présent dans la base."],
-    note: "Effet non cumulable.",
-  },
-];
-
+const partnerActivities = [...jobs, ...specialPartnerActivities];
 const picker = document.querySelector("#job-picker");
 const content = document.querySelector("#content");
 const brand = document.querySelector(".brand");
 const singleButton = document.querySelector("#single-view");
-const skillsMenuButton = document.querySelector("#skills-menu-button");
-const skillsMenu = document.querySelector("#skills-menu");
-const passiveButton = document.querySelector("#passive-view");
+const workButton = document.querySelector("#work-view");
+const combatButton = document.querySelector("#combat-view");
 const condensationButton = document.querySelector("#condensation-view");
 const breedingButton = document.querySelector("#breeding-view");
-const partnerButton = document.querySelector("#partner-view");
-const combatPartnerButton = document.querySelector("#combat-partner-view");
 const memoButton = document.querySelector("#memo-view");
 const intro = document.querySelector(".intro");
 const pageEyebrow = document.querySelector("#page-eyebrow");
@@ -526,14 +156,17 @@ const pageCopy = document.querySelector("#page-copy");
 const formatter = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2 });
 
 let selectedId = jobs[0].id;
-let selectedPassiveJobId = jobs[0].id;
-let selectedPartnerActivityId = partnerActivities[0].id;
+let workMode = "passives";
+let selectedWorkPassiveJobId = null;
+let selectedWorkPartnerActivityId = null;
+let partnerSkillsData = null;
+let partnerSkillsError = false;
+let partnerSkillsPromise = null;
 let selectedCondensationPalId = null;
 let condensationStars = 0;
 let condensationQuery = "";
-let currentView = "jobs";
+let currentView = "breeding";
 let viewTransitionTimer;
-let skillsMenuCloseTimer;
 let draggedMemoId = null;
 let memoDragPlaceholder = null;
 let memoDragGhost = null;
@@ -677,83 +310,168 @@ function renderPicker() {
     .join("");
 }
 
+function cleanPassiveEffect(effect) {
+  return String(effect || "")
+    .replace(/<[^>]+>/g, "")
+    .replace(/(\d+)\.0(?=\s*%)/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function passiveSkillTemplate(skillId) {
-  const skill = passiveSkills[skillId];
+  const skill = passiveById.get(skillId);
+  if (!skill) return "";
+  const rarity = `rank-${skill.rank}`;
 
   return `
-    <article class="passive-skill passive-skill--${skill.rarity}">
+    <article class="passive-skill passive-skill--${rarity}">
       <header class="passive-skill__header">
         <span class="passive-skill__rarity" aria-hidden="true"></span>
-        <h3>${skill.name}</h3>
+        <h3>${escapeHtml(skill.name)}</h3>
         <span class="passive-skill__rank-icon" aria-hidden="true"></span>
       </header>
-      <div class="passive-skill__effects">
-        ${skill.effects.map((effect) => `<p>${effect}</p>`).join("")}
-      </div>
-      ${skill.note ? `<p class="passive-skill__note">${skill.note}</p>` : ""}
+      <div class="passive-skill__effects"><p>${escapeHtml(cleanPassiveEffect(skill.effect))}</p></div>
     </article>`;
 }
 
 function passiveListTemplate(skillIds) {
-  return ["rank-5", "rank-4", "rank-3", "rank-1"]
-    .map((rarity) => {
-      const tierSkills = skillIds.filter((skillId) => passiveSkills[skillId].rarity === rarity);
-      if (!tierSkills.length) return "";
-
-      return `
-        <div class="passive-tier-group passive-tier-group--${rarity}">
-          ${tierSkills.map(passiveSkillTemplate).join("")}
-        </div>`;
+  const ranks = [...new Set(skillIds.map((id) => passiveById.get(id)?.rank).filter(Number.isFinite))]
+    .sort((a, b) => b - a);
+  return ranks
+    .map((rank) => {
+      const tierSkills = skillIds.filter((id) => passiveById.get(id)?.rank === rank);
+      return `<div class="passive-tier-group passive-tier-group--rank-${rank}">
+        ${tierSkills.map(passiveSkillTemplate).join("")}
+      </div>`;
     })
     .join("");
 }
 
-function passivePageTemplate() {
-  const selectedJob = passiveJobs.find((job) => job.id === selectedPassiveJobId) || passiveJobs[0];
-  const skillIds = passiveGroups[selectedJob.group];
-  const context =
-    selectedJob.group === "transport"
-      ? "La Vitesse de travail n’améliore pas le Transport : privilégiez la vitesse de déplacement et l’autonomie."
-      : selectedJob.group === "farming"
-        ? "L’Exploitation bénéficie de ses passifs dédiés et des bonus de Vitesse de travail."
-        : "Ces passifs peuvent soutenir la Vitesse de travail, les MEN, la satiété ou l’activité nocturne.";
-
-  return `
-    <section class="passive-page" aria-labelledby="passive-result-title">
-      <nav class="job-picker passive-job-picker" aria-label="Choisir une capacité de travail">
-        ${passiveJobs
-          .map(
-            (job) => `
-              <button
-                type="button"
-                data-passive-job="${job.id}"
-                class="${selectedJob.id === job.id ? "selected" : ""}"
-                aria-pressed="${selectedJob.id === job.id}"
-                style="--job-color:${job.color}"
-              >
-                <img src="${job.icon}" alt="" />
-                <span>${job.name}</span>
-              </button>`,
-          )
-          .join("")}
-      </nav>
-      <div class="passive-results">
-        <header class="passive-results__header" style="--job-color:${selectedJob.color}">
-          <span class="work-card__icon">
-            <img src="${selectedJob.icon}" alt="" />
-          </span>
-          <div>
-            <p>Passifs utiles pour</p>
-            <h2 id="passive-result-title">${selectedJob.name}</h2>
-            <span>${context}</span>
-          </div>
-        </header>
-        <div class="passive-list">
-          ${passiveListTemplate(skillIds)}
-        </div>
-      </div>
-    </section>`;
+function workActivityPickerTemplate(mode) {
+  const isPartner = mode === "partners";
+  const selectedId = isPartner ? selectedWorkPartnerActivityId : selectedWorkPassiveJobId;
+  const activities = isPartner ? partnerActivities : jobs;
+  return `<nav class="work-activity-picker" aria-label="${isPartner ? "Choisir une activité" : "Choisir une capacité de travail"}">
+    ${activities.map((activity, index) => `
+      ${isPartner && index === jobs.length ? '<span class="work-activity-picker__separator" aria-hidden="true"></span>' : ""}
+      <button type="button" data-work-activity="${activity.id}" class="${selectedId === activity.id ? "selected" : ""}"
+        aria-pressed="${selectedId === activity.id}" aria-label="${escapeHtml(activity.name)}"
+        title="${escapeHtml(activity.name)}" style="--job-color:${activity.color}">
+        <img src="${activity.icon}" alt="" />
+      </button>`).join("")}
+  </nav>`;
 }
+
+function passiveResultsTemplate() {
+  if (!selectedWorkPassiveJobId) {
+    return `<div class="work-empty"><strong>Choisissez une capacité de travail</strong><span>Sélectionnez une icône pour afficher les compétences utiles.</span></div>`;
+  }
+  const job = jobs.find((entry) => entry.id === selectedWorkPassiveJobId);
+  const profile = workOptimization.passiveJobProfiles[job.id];
+  const skillIds = profile === "farming"
+    ? [...workOptimization.passiveProfiles.standard, ...workOptimization.passiveProfiles.farming]
+    : workOptimization.passiveProfiles[profile];
+  const context = profile === "transport"
+    ? "La Vitesse de travail n’améliore pas le Transport : privilégiez la vitesse de déplacement et l’autonomie."
+    : profile === "farming"
+      ? "L’Exploitation bénéficie de ses passifs dédiés et des bonus de Vitesse de travail."
+      : "Vitesse de travail, autonomie et activité nocturne.";
+  return `<div class="passive-results">
+    <header class="passive-results__header" style="--job-color:${job.color}">
+      <span class="work-card__icon"><img src="${job.icon}" alt="" /></span>
+      <div><p>Compétences passives utiles pour</p><h2>${escapeHtml(job.name)}</h2><span>${context}</span></div>
+    </header>
+    <div class="passive-list">${passiveListTemplate(skillIds)}</div>
+  </div>`;
+}
+
+function formatPartnerValue(value) {
+  return String(value || "")
+    .replace(/^\+-(\d)/, "-$1")
+    .replace(/\s*%$/, " %")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function partnerProgressTemplate(effect) {
+  const values = effect.values || [];
+  const formatted = values.map(formatPartnerValue);
+  if (!formatted.length) return "";
+  if (new Set(formatted).size === 1) {
+    return `<p class="work-partner-effect"><span>${escapeHtml(effect.label)}</span><strong>${escapeHtml(formatted[0])}</strong></p>`;
+  }
+  return `<div class="work-partner-progression">
+    <p class="work-partner-effect-title">${escapeHtml(effect.label)}</p>
+    <div class="work-partner-progress" aria-label="Progression selon la condensation">
+      ${formatted.map((value, star) => `<span><small>${star}★</small><strong>${escapeHtml(value)}</strong></span>`).join("")}
+    </div>
+  </div>`;
+}
+
+function workPartnerCardTemplate(reference) {
+  const skill = partnerSkillsData?.skills?.[reference.pal];
+  const pal = condensationPals.find((entry) => entry.code === reference.pal);
+  const effect = skill?.effects?.find((entry) => entry.label === reference.effect);
+  if (!skill || !pal || !effect) return "";
+  return `<article class="partner-card work-partner-card">
+    <img class="partner-card__portrait" src="${pal.portrait}" alt="${escapeHtml(pal.name)}" />
+    <div class="partner-card__content">
+      <p class="partner-card__pal">${escapeHtml(pal.name)}</p>
+      <h3>${escapeHtml(skill.name)}</h3>
+      ${reference.description ? `<p class="work-partner-description">${escapeHtml(skill.description)}</p>` : ""}
+      ${partnerProgressTemplate(effect)}
+    </div>
+  </article>`;
+}
+
+function partnerResultsTemplate() {
+  if (!selectedWorkPartnerActivityId) {
+    return `<div class="work-empty"><strong>Choisissez une activité</strong><span>Sélectionnez une icône pour afficher les compétences partenaire utiles.</span></div>`;
+  }
+  const activity = partnerActivities.find((entry) => entry.id === selectedWorkPartnerActivityId);
+  if (partnerSkillsError) return '<div class="work-empty work-empty--error"><strong>Données indisponibles</strong><span>Les compétences partenaire n’ont pas pu être chargées.</span></div>';
+  if (!partnerSkillsData) return '<div class="work-empty"><strong>Chargement des données…</strong></div>';
+  const references = workOptimization.partnerActivities[activity.id] || [];
+  return `<div class="partner-results" style="--job-color:${activity.color}">
+    <header class="partner-results__header">
+      <span class="work-card__icon"><img src="${activity.icon}" alt="" /></span>
+      <div><p>Compétences partenaire utiles pour</p><h2>${escapeHtml(activity.name)}</h2></div>
+    </header>
+    <div class="partner-list">${references.map(workPartnerCardTemplate).join("")}</div>
+  </div>`;
+}
+
+function ensurePartnerSkills() {
+  if (partnerSkillsData || partnerSkillsError || partnerSkillsPromise) return;
+  partnerSkillsPromise = fetch("data/partner-skills-fr.json")
+    .then((response) => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .then((data) => { partnerSkillsData = data; })
+    .catch(() => { partnerSkillsError = true; })
+    .finally(() => {
+      partnerSkillsPromise = null;
+      if (currentView === "work" && workMode === "partners") render();
+    });
+}
+
+function workPageTemplate() {
+  const partnerMode = workMode === "partners";
+  return `<section class="work-optimization-page">
+    <header class="work-optimization-header">
+      <p class="eyebrow">Optimisation du travail</p>
+      <p>Trouvez les compétences utiles pour optimiser les Pals de votre base.</p>
+      <nav class="work-mode-tabs" aria-label="Type de compétence">
+        <button type="button" data-work-mode="passives" class="${partnerMode ? "" : "active"}" aria-pressed="${!partnerMode}">Compétences passives</button>
+        <button type="button" data-work-mode="partners" class="${partnerMode ? "active" : ""}" aria-pressed="${partnerMode}">Compétences partenaire</button>
+      </nav>
+    </header>
+    ${workActivityPickerTemplate(workMode)}
+    <div class="work-optimization-results">${partnerMode ? partnerResultsTemplate() : passiveResultsTemplate()}</div>
+  </section>`;
+}
+
 
 function normalizeSearch(value) {
   return value
@@ -975,59 +693,6 @@ function updateCondensationState() {
   content.querySelectorAll("[data-condensation-star]").forEach((button) => {
     button.classList.toggle("active", Number(button.dataset.condensationStar) === condensationStars);
   });
-}
-
-function basePartnerCardTemplate(entry) {
-  return `
-    <article class="partner-card">
-      <img class="partner-card__portrait" src="assets/pals/${entry.portrait}.png" alt="${entry.pal}" />
-      <div class="partner-card__content">
-        <p class="partner-card__pal">${entry.pal}</p>
-        <h3>${entry.skill}</h3>
-        <div class="partner-card__effects">
-          ${entry.effects.map((effect) => `<p>${effect}</p>`).join("")}
-        </div>
-        ${entry.note ? `<p class="partner-card__note">${entry.note}</p>` : ""}
-      </div>
-    </article>`;
-}
-
-function basePartnersTemplate() {
-  const selectedActivity =
-    partnerActivities.find((activity) => activity.id === selectedPartnerActivityId) || partnerActivities[0];
-  const entries = basePartnerSkills.filter((entry) => entry.activity === selectedActivity.id);
-
-  return `
-    <section class="partner-page" aria-labelledby="partner-result-title">
-      <p class="info-section-copy">Choisissez une activité pour identifier rapidement les Pals dont la Compétence partenaire apporte un bonus utile à la base.</p>
-      <nav class="job-picker partner-activity-picker" aria-label="Choisir une activité de base">
-        ${partnerActivities
-          .map(
-            (activity) => `
-              <button
-                type="button"
-                data-partner-activity="${activity.id}"
-                class="${selectedActivity.id === activity.id ? "selected" : ""}"
-                aria-pressed="${selectedActivity.id === activity.id}"
-                style="--job-color:${activity.color}"
-              >
-                <img src="${activity.icon}" alt="" />
-                <span>${activity.name}</span>
-              </button>`,
-          )
-          .join("")}
-      </nav>
-      <div class="partner-results" style="--job-color:${selectedActivity.color}">
-        <header class="partner-results__header">
-          <span class="work-card__icon"><img src="${selectedActivity.icon}" alt="" /></span>
-          <div>
-            <p>Compétences partenaire utiles pour</p>
-            <h2 id="partner-result-title">${selectedActivity.name}</h2>
-          </div>
-        </header>
-        <div class="partner-list">${entries.map(basePartnerCardTemplate).join("")}</div>
-      </div>
-    </section>`;
 }
 
 function combatPartnersTemplate() {
@@ -1398,15 +1063,8 @@ function renderMemoPage(focusNewTask = false) {
 function updateIntro() {
   intro.classList.toggle(
     "hidden",
-    currentView === "condensation" || currentView === "breeding" || currentView === "partners" || currentView === "combat-partners" || currentView === "memo",
+    currentView !== "jobs",
   );
-
-  if (currentView === "passives") {
-    pageEyebrow.textContent = "Aide à la Palbox";
-    pageCopy.textContent =
-      "Sélectionnez une capacité de travail pour afficher les compétences passives intéressantes pour les Pals affectés à cette tâche.";
-    return;
-  }
 
   pageEyebrow.textContent = "Guide rapide de la base";
   pageCopy.textContent = "Compare l’efficacité de chaque niveau d’aptitude, de 1 à 10.";
@@ -1430,14 +1088,6 @@ function switchView(nextView) {
     content.classList.add("view-entering");
     window.setTimeout(() => content.classList.remove("view-entering"), 230);
   }, 115);
-}
-
-function setSkillsMenu(open, focusFirst = false) {
-  clearTimeout(skillsMenuCloseTimer);
-  skillsMenu.setAttribute("aria-hidden", String(!open));
-  skillsMenuButton.setAttribute("aria-expanded", String(open));
-  skillsMenuButton.parentElement.classList.toggle("site-nav__group--open", open);
-  if (open && focusFirst) skillsMenu.querySelector('[role="menuitem"]')?.focus();
 }
 
 function animateMemoReflow(mutateLayout) {
@@ -1468,13 +1118,10 @@ function render() {
   renderPicker();
   updateIntro();
   singleButton.classList.toggle("active", currentView === "jobs");
-  const skillsViewActive = ["passives", "partners", "combat-partners"].includes(currentView);
-  skillsMenuButton.classList.toggle("active", skillsViewActive);
-  passiveButton.classList.toggle("active", currentView === "passives");
+  workButton.classList.toggle("active", currentView === "work");
+  combatButton.classList.toggle("active", currentView === "combat");
   condensationButton.classList.toggle("active", currentView === "condensation");
   breedingButton.classList.toggle("active", currentView === "breeding");
-  partnerButton.classList.toggle("active", currentView === "partners");
-  combatPartnerButton.classList.toggle("active", currentView === "combat-partners");
   memoButton.classList.toggle("active", currentView === "memo");
   picker.classList.toggle("hidden", currentView !== "jobs");
 
@@ -1492,26 +1139,19 @@ function render() {
     return;
   }
 
-  if (currentView === "partners") {
-    content.innerHTML = `<section class="standalone-page" aria-label="Compétences partenaire utilitaires">
-      <p class="eyebrow">Gestion de la base</p>
-      ${basePartnersTemplate()}
-    </section>`;
+  if (currentView === "work") {
+    content.innerHTML = workPageTemplate();
+    if (workMode === "partners") ensurePartnerSkills();
     return;
   }
 
-  if (currentView === "combat-partners") {
+  if (currentView === "combat") {
     content.innerHTML = combatPartnersTemplate();
     return;
   }
 
   if (currentView === "memo") {
     renderMemoPage();
-    return;
-  }
-
-  if (currentView === "passives") {
-    content.innerHTML = passivePageTemplate();
     return;
   }
 
@@ -1636,17 +1276,19 @@ content.addEventListener("click", (event) => {
     return;
   }
 
-  const passiveJobButton = event.target.closest("[data-passive-job]");
-  if (passiveJobButton) {
-    selectedPassiveJobId = passiveJobButton.dataset.passiveJob;
+  const workModeButton = event.target.closest("[data-work-mode]");
+  if (workModeButton) {
+    workMode = workModeButton.dataset.workMode;
     render();
     return;
   }
 
-  const partnerActivityButton = event.target.closest("[data-partner-activity]");
-  if (partnerActivityButton) {
-    selectedPartnerActivityId = partnerActivityButton.dataset.partnerActivity;
+  const workActivityButton = event.target.closest("[data-work-activity]");
+  if (workActivityButton) {
+    if (workMode === "partners") selectedWorkPartnerActivityId = workActivityButton.dataset.workActivity;
+    else selectedWorkPassiveJobId = workActivityButton.dataset.workActivity;
     render();
+    return;
   }
 });
 
@@ -1747,56 +1389,16 @@ document.addEventListener("pointercancel", finishMemoDrag);
 
 brand.addEventListener("click", (event) => {
   event.preventDefault();
-  switchView("jobs");
+  switchView("breeding");
   window.scrollTo(0, 0);
 });
 
 singleButton.addEventListener("click", () => {
-  setSkillsMenu(false);
   switchView("jobs");
 });
 
-skillsMenuButton.addEventListener("click", () => {
-  const mouseIsInside = window.matchMedia("(hover: hover)").matches && skillsMenuButton.parentElement.matches(":hover");
-  setSkillsMenu(mouseIsInside || skillsMenuButton.getAttribute("aria-expanded") !== "true");
-});
-
-skillsMenuButton.parentElement.addEventListener("pointerenter", (event) => {
-  if (event.pointerType !== "touch") setSkillsMenu(true);
-});
-
-skillsMenuButton.parentElement.addEventListener("pointerleave", (event) => {
-  if (event.pointerType === "touch") return;
-  skillsMenuCloseTimer = window.setTimeout(() => setSkillsMenu(false), 90);
-});
-
-skillsMenuButton.addEventListener("keydown", (event) => {
-  if (event.key === "ArrowDown") {
-    event.preventDefault();
-    setSkillsMenu(true, true);
-  }
-});
-
-skillsMenu.addEventListener("keydown", (event) => {
-  const items = [...skillsMenu.querySelectorAll('[role="menuitem"]')];
-  const index = items.indexOf(document.activeElement);
-  if (event.key === "Escape") {
-    setSkillsMenu(false);
-    skillsMenuButton.focus();
-  } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-    event.preventDefault();
-    items[(index + (event.key === "ArrowDown" ? 1 : -1) + items.length) % items.length].focus();
-  }
-});
-
-document.addEventListener("click", (event) => {
-  if (!event.target.closest(".site-nav__group")) setSkillsMenu(false);
-});
-
-passiveButton.addEventListener("click", () => {
-  setSkillsMenu(false);
-  switchView("passives");
-});
+workButton.addEventListener("click", () => switchView("work"));
+combatButton.addEventListener("click", () => switchView("combat"));
 
 condensationButton.addEventListener("click", () => {
   if (currentView !== "condensation") {
@@ -1812,18 +1414,8 @@ breedingButton.addEventListener("click", () => {
   switchView("breeding");
 });
 
-partnerButton.addEventListener("click", () => {
-  setSkillsMenu(false);
-  switchView("partners");
-});
-
-combatPartnerButton.addEventListener("click", () => {
-  setSkillsMenu(false);
-  switchView("combat-partners");
-});
-
 memoButton.addEventListener("click", () => {
   switchView("memo");
 });
 
-render();
+window.addEventListener("DOMContentLoaded", render, { once: true });
