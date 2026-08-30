@@ -2269,13 +2269,13 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 .save-egg img { width: 41px; height: 41px; }
 
 .save-tree-node {
-  width: 272px;
-  min-height: 158px;
+  width: 316px;
+  min-height: 236px;
   grid-template-rows: 70px auto;
-  border: 2px solid #385f69;
+  border: 2px solid #527d87;
   border-radius: 10px;
-  background: #102832;
-  box-shadow: 0 12px 24px rgba(0, 8, 14, .34);
+  background: #091e27;
+  box-shadow: 0 14px 28px rgba(0, 6, 11, .52);
 }
 .save-tree-node--final {
   --final-border-angle: 0deg;
@@ -2287,7 +2287,7 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 .save-tree-node--final::before, .save-tree-node--final::after { content: none; }
 .save-tree-node--final .save-egg { top: -20px; right: -16px; width: 51px; height: 51px; border: 3px solid #bd984f; }
 .save-tree-node--final .save-egg img { width: 47px; height: 47px; }
-.save-target-selected { border-color: rgba(190, 151, 75, .68); background: #11343b; box-shadow: none; }
+.save-target-selected { border-color: rgba(190, 151, 75, .76); background: #16434c; box-shadow: 0 7px 16px rgba(0, 9, 14, .22); }
 
 @property --final-border-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
 @keyframes final-border-travel { to { --final-border-angle: 360deg; } }
@@ -2296,13 +2296,13 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 .save-tree-node .breeding-node__portrait { width: 66px; height: 66px; }
 .save-tree-node__name { display: flex !important; min-width: 0; align-items: center; gap: 5px; }
 .save-tree-node__name strong { min-width: 0; overflow: hidden; font-family: "Sora", sans-serif; font-size: .88rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-.save-tree-node__passives { gap: 4px 7px; }
-.save-tree-node__passives .save-passive { height: 27px; padding-block: 2px; font-size: .69rem; }
+.save-tree-node__passives { grid-template-columns: minmax(0, 1fr); gap: 7px; }
+.save-tree-node__passives .save-passive { height: 29px; padding: 3px 6px 3px 8px; font-size: .7rem; }
 
-.save-family-link { stroke: #477985; stroke-width: 2.4; }
-.save-family-link-flow { stroke: #7de5df; stroke-width: 2.4; stroke-dasharray: 12 170; stroke-dashoffset: 0; opacity: .78; animation: family-flow-up 4.8s linear infinite; }
-.save-family-junction { fill: #102832; stroke: #72c9c9; stroke-width: 2.4; }
-@keyframes family-flow-up { to { stroke-dashoffset: -182; } }
+.save-family-link { stroke: #5f919b; stroke-width: 3; }
+.save-family-link-flow { stroke: #a0fff7; stroke-width: 3.6; stroke-dasharray: 26 104; stroke-dashoffset: 0; opacity: .98; animation: family-flow-up 3.4s linear infinite; }
+.save-family-junction { fill: #091e27; stroke: #83e2dd; stroke-width: 3; }
+@keyframes family-flow-up { to { stroke-dashoffset: -130; } }
 
 .save-breeding-panel { gap: 16px; padding: 0; overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .save-goal-card, .save-history { padding: 14px; border: 1px solid rgba(98, 190, 196, .24); border-radius: 10px; background: #0a2a34; box-shadow: 0 12px 26px rgba(0, 8, 14, .2); }
@@ -2312,18 +2312,19 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 .save-history > div { display: grid; max-height: min(430px, calc(100vh - 430px)); gap: 7px; overflow-y: auto; padding-right: 3px; scrollbar-color: rgba(95, 201, 205, .42) transparent; scrollbar-width: thin; }
 .save-history__entry { display: grid; min-width: 0; grid-template-columns: minmax(0, 1fr) 32px 32px; align-items: center; gap: 4px; border: 1px solid rgba(91, 158, 166, .24); border-radius: 7px; background: #0d2530; }
 .save-history__entry:hover, .save-history__entry.is-active { border-color: rgba(109, 213, 211, .46); background: rgba(14, 48, 57, .7); }
-.save-history__entry button { border: 0; background: transparent; color: #90aeb1; cursor: pointer; font: inherit; }
+.save-history__entry button:not(.breeding-parent-remove) { border: 0; background: transparent; color: #90aeb1; cursor: pointer; font: inherit; }
 .save-history__load { display: grid; min-width: 0; height: 56px; grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 9px; padding: 5px 7px; text-align: left; }
 .save-history__load img { width: 42px; height: 42px; object-fit: contain; }
 .save-history__load span { overflow: hidden; color: #e3f2f2; font-family: "Sora", sans-serif; font-size: .78rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-.save-history__pin, .save-history__delete { display: grid; width: 32px; height: 32px; place-items: center; border-radius: 6px !important; font-size: .76rem !important; }
+.save-history__pin { display: grid; width: 32px; height: 32px; place-items: center; border-radius: 6px !important; font-size: .76rem !important; }
 .history-pin-icon { width: 16px; height: 16px; transform: rotate(-12deg); }
 .save-history__pin:hover, .save-history__pin.is-pinned { color: #e3bd68; background: rgba(110, 82, 38, .35) !important; }
-.save-history__delete { font-size: 1rem !important; }
-.save-history__delete:hover { color: #f0a3b2; background: rgba(101, 34, 48, .38) !important; }
-.save-history-tooltip { width: min(360px, calc(100vw - 20px)); }
+.save-history__delete.breeding-parent-remove { position: static; width: 24px; height: 24px; justify-self: center; font-size: 1rem; }
+.save-history-tooltip { width: min(420px, calc(100vw - 20px)); }
 .save-history-tooltip__chips { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; color: #a9c2c4 !important; }
-.save-history-tooltip__chips .save-passive { font-size: .67rem; }
+.save-history-tooltip__chips .save-passive { height: 29px; font-size: .7rem; }
+
+.save-passive-modal__count, .save-passive-modal__clear { align-self: end; margin-bottom: 0; }
 
 .topbar { border-bottom-color: rgba(89, 217, 219, .2); background: rgba(5, 27, 37, .94); }
 .topbar::after { right: 7%; width: min(390px, 36vw); height: 1px; background: linear-gradient(90deg, transparent, #5ddedb 45%, rgba(93, 222, 219, .15)); opacity: .85; }

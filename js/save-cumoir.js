@@ -324,7 +324,7 @@
       return `<article class="save-history__entry${entry.id === activeHistoryId ? " is-active" : ""}" data-history-tooltip="${escapeHtml(entry.id)}">
         <button type="button" class="save-history__load" data-load-history="${escapeHtml(entry.id)}"><img src="${escapeHtml(pal.portrait)}" alt="" /><span>${escapeHtml(pal.name)}</span></button>
         <button type="button" class="save-history__pin${entry.pinned ? " is-pinned" : ""}" data-pin-history="${escapeHtml(entry.id)}" aria-label="${entry.pinned ? "Désépingler ce plan" : "Épingler ce plan"}" title="${entry.pinned ? "Désépingler ce plan" : "Épingler ce plan"}" aria-pressed="${entry.pinned}">${historyPinIcon()}</button>
-        <button type="button" class="save-history__delete" data-delete-history="${escapeHtml(entry.id)}" aria-label="Supprimer ${escapeHtml(pal.name)} de l’historique">×</button>
+        <button type="button" class="save-history__delete breeding-parent-remove" data-delete-history="${escapeHtml(entry.id)}" aria-label="Supprimer ${escapeHtml(pal.name)} de l’historique">×</button>
       </article>`;
     }).join("")}</div></section>`;
   }
@@ -457,10 +457,10 @@
     const families = [];
     let leafCursor = 0;
     let keyCursor = 0;
-    const nodeWidth = 272;
-    const nodeHeight = 164;
-    const horizontalStep = 296;
-    const verticalStep = 224;
+    const nodeWidth = 316;
+    const nodeHeight = 244;
+    const horizontalStep = 330;
+    const verticalStep = 270;
     function visit(node, depth = 0) {
       const key = `node-${keyCursor++}`;
       if (!node.parents) {
