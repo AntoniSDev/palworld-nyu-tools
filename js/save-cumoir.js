@@ -18,7 +18,6 @@
   const condensationByCode = new Map(condensation.map((pal) => [String(pal.code).toLowerCase(), pal]));
   const allAvailable = new Set();
   const ownedSpecies = new Set();
-  const rosterById = new Map();
 
   let roster = [];
   let activeWorld = null;
@@ -402,17 +401,15 @@
   function template() {
     const graphMarkup = calculating ? calculationStateTemplate() : graphTemplate(treeResult);
     return `<section class="breeding-page breeding-page--save" aria-label="Cumoir avec sauvegarde">
-      <header class="breeding-page__header save-page-title"><p class="eyebrow">Planificateur d’élevage</p></header>
-      ${activeWorld ? `<div class="save-top-cluster"><section class="save-source-panel" aria-label="Sauvegarde active">${worldStatus()}</section>${transmissionPanel()}</div>` : ""}
-      ${activeWorld ? "" : importEmpty()}
-      ${parsing ? `<div class="save-progress"><span></span>${escapeHtml(progress || "Lecture de la sauvegarde…")}</div>` : ""}
-      ${error ? `<div class="save-error">${escapeHtml(error)}</div>` : ""}
-      ${activeWorld ? `<div class="breeding-layout breeding-layout--save">
+      ${activeWorld ? `<div class="save-workspace"><div class="save-top-cluster"><section class="save-source-panel" aria-label="Planificateur d’élevage et sauvegarde active"><header><span class="eyebrow">Planificateur d’élevage</span></header>${worldStatus()}</section>${transmissionPanel()}</div>
+      <div class="breeding-layout breeding-layout--save">
         <aside class="breeding-panel save-breeding-panel">
           ${selectionSummary()}
         </aside>
         <section class="breeding-canvas" data-save-viewport aria-label="Arbre généalogique interactif"><div class="breeding-canvas__tip">Molette : zoom · Cliquer-glisser : déplacer</div><div class="breeding-canvas__summary">${escapeHtml(resultSummary(treeResult))}</div><div class="breeding-canvas__controls" aria-label="Contrôles du terrain"><button type="button" data-canvas-zoom-out aria-label="Dézoomer">−</button><button type="button" data-canvas-zoom-in aria-label="Zoomer">+</button><button type="button" data-canvas-fit title="Recentrer l’arbre">Recentrer</button><output data-canvas-scale>100 %</output></div>${graphMarkup}</section>
-      </div>` : ""}
+      </div></div>` : `<header class="breeding-page__header"><p class="eyebrow">Planificateur d’élevage</p></header>${importEmpty()}`}
+      ${parsing ? `<div class="save-progress"><span></span>${escapeHtml(progress || "Lecture de la sauvegarde…")}</div>` : ""}
+      ${error ? `<div class="save-error">${escapeHtml(error)}</div>` : ""}
       ${modalTemplates()}
     </section>`;
   }
@@ -471,7 +468,7 @@
     const nodeWidth = 350;
     const horizontalStep = 366;
     const verticalStep = 250;
-    const nodeHeight = (node) => treeNodePassives(node).length > 2 ? 165 : 158;
+    const nodeHeight = (node) => state.selectedPassives.filter((id, index) => (node.mask & (1 << index)) !== 0).length > 2 ? 165 : 158;
     function visit(node, depth = 0) {
       const key = `node-${keyCursor++}`;
       if (!node.parents) {
@@ -492,14 +489,8 @@
     return { nodes, families, nodeWidth, width: Math.max(560, leafCursor * horizontalStep + 128), height: Math.max(...nodes.map((node) => node.y + node.height), 158) + 84 };
   }
 
-  function treeNodePassives(node) {
-    const owned = node.owned ? rosterById.get(String(node.individualId)) : null;
-    if (owned) return owned.passives.filter((id) => passiveById.has(id)).slice(0, 4);
-    return state.selectedPassives.filter((id, index) => (node.mask & (1 << index)) !== 0);
-  }
-
   function fusionNodeTemplate(x, y) {
-    return `<svg class="save-family-fusion" x="${x - 9}" y="${y - 9}" width="18" height="18" viewBox="0 0 64 64" aria-hidden="true">
+    return `<svg class="save-family-fusion" x="${x - 11}" y="${y - 11}" width="22" height="22" viewBox="0 0 64 64" aria-hidden="true">
       <circle class="save-family-fusion__outer" cx="32" cy="32" r="14" />
       <circle class="save-family-fusion__core" cx="32" cy="32" r="7.2" />
       <path class="save-family-fusion__swirl save-family-fusion__swirl--a" d="M22.7 32 C22.7 26.9 26.9 22.7 32 22.7 C35.1 22.7 37.8 24.2 39.5 26.5" />
@@ -521,25 +512,30 @@
       const parentY = left.y;
       const childY = target.y + target.height;
       const joinY = childY + (parentY - childY) * .48;
-      const path = `M ${leftX} ${parentY} V ${joinY} H ${rightX} V ${parentY} M ${childX} ${joinY} V ${childY}`;
-      const leftFlow = `M ${leftX} ${parentY} V ${joinY} H ${childX} V ${childY}`;
-      const rightFlow = `M ${rightX} ${parentY} V ${joinY} H ${childX} V ${childY}`;
+      const radius = 12;
+      const path = `M ${leftX} ${parentY} V ${joinY + radius} Q ${leftX} ${joinY} ${leftX + radius} ${joinY} H ${rightX - radius} Q ${rightX} ${joinY} ${rightX} ${joinY + radius} V ${parentY} M ${childX} ${joinY} V ${childY}`;
+      const flowPath = (parentX) => {
+        const direction = Math.sign(childX - parentX);
+        if (!direction) return `M ${parentX} ${parentY} V ${childY}`;
+        return `M ${parentX} ${parentY} V ${joinY + radius} Q ${parentX} ${joinY} ${parentX + direction * radius} ${joinY} H ${childX - direction * radius} Q ${childX} ${joinY} ${childX} ${joinY - radius} V ${childY}`;
+      };
+      const leftFlow = flowPath(leftX);
+      const rightFlow = flowPath(rightX);
       return `<path class="save-family-link" d="${path}" /><path class="save-family-link-flow" pathLength="1" d="${leftFlow}" /><path class="save-family-link-flow save-family-link-flow--alternate" pathLength="1" d="${rightFlow}" />${fusionNodeTemplate(childX, joinY)}`;
     }).join("");
     const nodes = layout.nodes.map(({ node, x, y }) => {
       const pal = palInfo(node.speciesId); if (!pal) return "";
       const final = node === result.root;
       const requiredSex = final ? null : node.sex;
-      const displayedPassives = treeNodePassives(node);
-      const ownedIndividual = node.owned ? rosterById.get(String(node.individualId)) : null;
+      const useful = state.selectedPassives.filter((id) => (node.mask & (1 << state.selectedPassives.indexOf(id))) !== 0);
       const [eggSuffix, eggName] = eggKind(node.speciesId);
       const eggAsset = `assets/eggs/t_itemicon_material_palegg${eggSuffix ? `_${eggSuffix}` : ""}.webp`;
       const isNewSpecies = !isSpeciesKnown(node.speciesId);
       return `<article class="breeding-node save-tree-node${final ? " save-tree-node--final" : ""}" style="left:${x}px;top:${y}px">
         ${node.owned ? "" : `<span class="save-egg"><img src="${eggAsset}" alt="${escapeHtml(eggName)}" /></span>`}
         ${isNewSpecies ? `<span class="save-tree-node__new">Nouveau</span>` : ""}
-        <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span class="save-tree-node__details"><span class="save-tree-node__name"><strong>${escapeHtml(pal.name)}</strong>${requiredSex ? `<b class="breeding-node__sex breeding-node__sex--${requiredSex.toLowerCase()}" aria-label="${requiredSex === "Male" ? "Mâle requis" : "Femelle requise"}">${sexIcon(requiredSex)}</b>` : ""}</span>${ownedIndividual ? `<small>Niv. ${ownedIndividual.level} · Sauvegarde</small>` : ""}</span></span>
-        ${displayedPassives.length ? `<span class="save-tree-node__passives">${displayedPassives.map((id) => passiveChip(id)).join("")}</span>` : ""}
+        <span class="save-tree-node__identity"><span class="breeding-node__portrait"><img src="${pal.portrait}" alt="" /></span><span class="save-tree-node__name"><strong>${escapeHtml(pal.name)}</strong>${requiredSex ? `<b class="breeding-node__sex breeding-node__sex--${requiredSex.toLowerCase()}" aria-label="${requiredSex === "Male" ? "Mâle requis" : "Femelle requise"}">${sexIcon(requiredSex)}</b>` : ""}</span></span>
+        ${useful.length ? `<span class="save-tree-node__passives">${useful.map((id) => passiveChip(id)).join("")}</span>` : ""}
       </article>`;
     }).join("");
     return `<div class="breeding-canvas__world" data-save-world><div class="breeding-tree" data-save-tree style="width:${layout.width}px;height:${layout.height}px"><svg class="breeding-tree__links" width="${layout.width}" height="${layout.height}" viewBox="0 0 ${layout.width} ${layout.height}">${paths}</svg>${nodes}</div></div>`;
@@ -556,9 +552,7 @@
   function refreshRosterIndexes() {
     allAvailable.clear();
     ownedSpecies.clear();
-    rosterById.clear();
     roster.forEach((pal) => {
-      rosterById.set(String(pal.id), pal);
       ownedSpecies.add(normalizeSpeciesId(pal.speciesId));
       pal.passives.forEach((id) => allAvailable.add(id));
     });

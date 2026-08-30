@@ -73,6 +73,9 @@ if (!activeTemplate.includes("Transmission des passifs") || !activeTemplate.incl
   || activeTemplate.includes("Estimations communautaires") || activeTemplate.includes("Le Cumoir travaille avec les Pals")) {
   throw new Error("The permanent transmission help or simplified page header is missing.");
 }
+if (!activeTemplate.includes("save-workspace") || !/save-workspace[^]*save-source-panel[^]*Planificateur d’élevage[^]*Sauvegarde active[^]*save-transmission-panel[^]*breeding-layout--save/.test(activeTemplate)) {
+  throw new Error("The fixed workspace header is not grouped above the sidebar and zoomable tree.");
+}
 if (!activeTemplate.includes("save-goal-card") || !activeTemplate.includes("save-history")) throw new Error("Goal and history are not separate cards.");
 if (!api.historyPinIcon().includes('viewBox="0 0 122.48 122.88"') || !api.historyPinIcon().includes("53.48 82.11 40.77 69.4")) {
   throw new Error("The exact history pin SVG is missing.");
@@ -108,7 +111,7 @@ const linkedGraph = api.renderGraph({ status: "found", root: { speciesId: ownedS
   { speciesId: ownedSpeciesId, mask: 0, owned: true }, { speciesId: ownedSpeciesId, mask: 0, owned: true },
 ] } });
 if ((linkedGraph.match(/save-family-link-flow/g) || []).length !== 3 || !linkedGraph.includes("save-family-fusion")
-  || !/save-family-link-flow[^>]*pathLength="1"[^>]*d="M [^"]+ V [^"]+ H [^"]+ V [^"]+"/.test(linkedGraph)) {
+  || !/save-family-link-flow[^>]*pathLength="1"[^>]*d="M [^"]+ V [^"]+ Q [^"]+ H [^"]+ Q [^"]+ V [^"]+"/.test(linkedGraph)) {
   throw new Error("Continuous parent-to-child transmission paths are missing.");
 }
 if (!styles.includes("stroke-dashoffset: -1") || !styles.includes("stroke-dasharray: .27 .73") || !styles.includes("prefers-reduced-motion")) {
@@ -117,22 +120,18 @@ if (!styles.includes("stroke-dashoffset: -1") || !styles.includes("stroke-dashar
 if (!styles.includes(".breeding-tree__links .save-family-link-flow { stroke: #affff8; stroke-width: 4;")) {
   throw new Error("The animated flow does not override the generic SVG path skin.");
 }
-const ownedFixture = normalized.find((pal) => pal.passives.length > 1) || normalized[0];
-const ownedFixtureGraph = api.renderGraph({ status: "already-owned", root: {
-  speciesId: ownedFixture.speciesId, mask: 0, sex: ownedFixture.sex, owned: true,
-  individualId: ownedFixture.id, level: ownedFixture.level,
-} });
-for (const passiveId of ownedFixture.passives) {
-  const name = context.PALWORLD_PASSIVES.find((passive) => passive.id === passiveId)?.name;
-  if (name && !ownedFixtureGraph.includes(name)) throw new Error(`Owned parent is missing its real passive: ${name}`);
+if (saveCumoirSource.includes("rosterById") || saveCumoirSource.includes("treeNodePassives") || saveCumoirSource.includes("· Sauvegarde")) {
+  throw new Error("Abandoned owned-individual identification code remains in the tree renderer.");
 }
-if (!ownedFixtureGraph.includes(`Niv. ${ownedFixture.level} · Sauvegarde`)) throw new Error("Owned parent identification is missing.");
+if (!styles.includes(".breeding-tree__links .save-family-fusion__swirl") || !linkedGraph.includes("save-family-fusion__spark")) {
+  throw new Error("The complete fusion node is missing or its swirls remain under the generic SVG path skin.");
+}
 if (!styles.includes(".save-tree-node__passives { grid-template-columns: repeat(2, minmax(0, 1fr))")
   || styles.includes(".save-tree-node__passives .save-passive { font-size:")
   || styles.includes(".save-history-tooltip__chips { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; color:")) {
   throw new Error("Tree or history passives no longer reuse the shared two-column visual component.");
 }
-if (!styles.includes("border: 3px solid transparent") || !styles.includes("linear-gradient(#12343b, #12343b) padding-box")) throw new Error("The single matte final-card border is missing.");
+if (!styles.includes("border: 4px solid transparent") || !styles.includes("linear-gradient(#12343b, #12343b) padding-box")) throw new Error("The single matte final-card border is missing.");
 if (api.renderGraph({ status: "already-owned", root: { speciesId: ownedSpeciesId, mask: 0, sex: "Female", owned: true, individualId: "fixture" } }).includes('save-tree-node__new">Nouveau')) {
   throw new Error("An owned individual is incorrectly marked Nouveau.");
 }
@@ -186,6 +185,13 @@ for (let count = 0; count <= 4; count += 1) {
   if (addButtons !== count + Number(count < 4)) throw new Error(`Passive slot layout failed at ${count} selected passives.`);
   if (panel.includes("data-remove-passive") || panel.includes(">×</button>")) throw new Error("Sidebar passive chips still expose individual remove buttons.");
   if (count && !panel.includes(`data-passive-id="${objectives[0]}"`)) throw new Error(`Passive chips are missing at ${count} selected passives.`);
+}
+api.setTarget(target, objectives.slice(0, 4));
+const usefulOnlyGraph = api.renderGraph({ status: "already-owned", root: {
+  speciesId: ownedSpeciesId, mask: 1, sex: "Male", owned: true, individualId: normalized[0].id, level: normalized[0].level,
+} });
+if ((usefulOnlyGraph.match(/class="save-passive /g) || []).length !== 1 || usefulOnlyGraph.includes("· Sauvegarde") || usefulOnlyGraph.includes("Niv. ")) {
+  throw new Error("Owned tree nodes expose real-individual metadata or non-useful passives.");
 }
 api.setTarget(target, objectives.slice(0, 4));
 const fullModal = api.passiveModal();
