@@ -113,6 +113,9 @@ if ((linkedGraph.match(/save-family-link-flow/g) || []).length !== 3 || !linkedG
 if (!styles.includes("stroke-dashoffset: -1") || !styles.includes("stroke-dasharray: .27 .73") || !styles.includes("prefers-reduced-motion")) {
   throw new Error("Upward connector flow or reduced-motion fallback is missing.");
 }
+if (!styles.includes(".breeding-tree__links .save-family-link-flow { stroke: #affff8; stroke-width: 4;")) {
+  throw new Error("The animated flow does not override the generic SVG path skin.");
+}
 if (!styles.includes(".save-tree-node__passives { grid-template-columns: repeat(2, minmax(0, 1fr))")
   || styles.includes(".save-history-tooltip__chips { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; color:")) {
   throw new Error("Tree or history passives no longer reuse the shared two-column visual component.");

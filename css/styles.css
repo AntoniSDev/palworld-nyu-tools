@@ -2298,8 +2298,8 @@ body[data-view="breeding"] .site-nav button { min-height: 54px; font-size: 1rem;
 .save-tree-node__name strong { min-width: 0; overflow: hidden; font-family: "Sora", sans-serif; font-size: .88rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .save-tree-node__passives { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
 
-.save-family-link { stroke: #65919a; stroke-width: 3; }
-.save-family-link-flow { stroke: #affff8; stroke-width: 4; stroke-dasharray: .27 .73; stroke-dashoffset: 0; opacity: .98; animation: family-flow-up 3.8s linear infinite; }
+.breeding-tree__links .save-family-link { stroke: #65919a; stroke-width: 3; }
+.breeding-tree__links .save-family-link-flow { stroke: #affff8; stroke-width: 4; stroke-dasharray: .27 .73; stroke-dashoffset: 0; opacity: .98; animation: family-flow-up 3.8s linear infinite; }
 .save-family-link-flow--alternate { animation-delay: -1.9s; }
 .save-family-junction { fill: #0d3038; stroke: #94ebe4; stroke-width: 3; animation: family-junction-pulse 3.8s ease-in-out infinite; }
 @keyframes family-flow-up { to { stroke-dashoffset: -1; } }
