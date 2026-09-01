@@ -2722,7 +2722,7 @@ body[data-view="breeding"] .site-nav a { min-height: 54px; font-size: 1rem; font
   border-radius: 0;
   background: transparent;
 }
-.save-source-panel > .save-world-status {
+.save-source-panel > .save-world-status-wrap .save-world-status {
   width: auto;
   max-width: none;
   padding: 3px;

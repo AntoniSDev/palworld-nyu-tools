@@ -19,6 +19,7 @@ for (const file of ["js/condensation-data.js", "js/egg-size-data.js", "js/breedi
 
 const api = context.SaveCumoir.__test;
 const source = fs.readFileSync(new URL("../js/save-cumoir.js", import.meta.url), "utf8");
+const styles = fs.readFileSync(new URL("../css/styles.css", import.meta.url), "utf8");
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
 const fakeFile = (name, path, modified = 1) => ({ name, webkitRelativePath: path, lastModified: modified, arrayBuffer: async () => new ArrayBuffer(2) });
 
@@ -52,6 +53,7 @@ assert(legacyWithExtraFields && Object.keys(legacyWithExtraFields).length === 2,
 assert(Object.keys(api.storedSaveRecord({ path: "world" }, [])).join(",") === "activeWorld,roster", "IndexedDB storage should only contain activeWorld and roster.");
 
 assert(source.includes("data-show-update-help") && source.includes("data-open-save-picker"), "The manual update help flow is missing.");
+assert(/\.save-source-panel > \.save-world-status-wrap \.save-world-status\s*\{[^}]*border:\s*0;[^}]*background:\s*transparent;/s.test(styles), "The active-save block should not regain its obsolete inner card.");
 assert(source.includes("Sélectionnez à nouveau votre dossier") && source.includes("%localappdata%\\\\Pal\\\\Saved\\\\SaveGames"), "The update path reminder is missing.");
 assert(/worldSelection\(pendingWorlds\) === "direct"[^]*parseWorld\(pendingWorlds\[0\]\)/.test(source), "Single-world direct import is not wired to parsing.");
 assert(/const replacingSameWorld = activeWorld\?\.path === world\.path/.test(source), "Same-world target/passive preservation is missing.");
