@@ -15,22 +15,29 @@
   ];
 
   const combatPassives = {
-    general: ["TrainerATK_UP_1", "TrainerDEF_UP_1", "ReloadSpeedUp_Passive", "AutoHPRegeneRate_Passive", "CoolTimeReduction_Up_1"],
-    neutral: ["ElementBoost_Normal_2_PAL", "ElementBoost_Normal_1_PAL", "ElementResist_Normal_1_PAL"],
-    fire: ["ElementBoost_Fire_2_PAL", "ElementBoost_Fire_1_PAL", "ElementResist_Fire_1_PAL"],
-    water: ["ElementBoost_Aqua_2_PAL", "ElementBoost_Aqua_1_PAL", "ElementResist_Aqua_1_PAL"],
-    grass: ["ElementBoost_Leaf_2_PAL", "ElementBoost_Leaf_1_PAL", "ElementResist_Leaf_1_PAL"],
-    electric: ["ElementBoost_Thunder_2_PAL", "ElementBoost_Thunder_1_PAL", "ElementResist_Thunder_1_PAL"],
-    ice: ["ElementBoost_Ice_2_PAL", "ElementBoost_Ice_1_PAL", "ElementResist_Ice_1_PAL"],
+    general: ["PAL_ALLAttack_up3", "Legend", "PAL_ALLAttack_up2", "Deffence_up3", "MutationPal_Immortal", "Vampire", "CoolTimeReduction_Up_1", "TrainerATK_UP_1", "TrainerDEF_UP_1", "ReloadSpeedUp_Passive", "AutoHPRegeneRate_Passive"],
+    neutral: ["Salvation", "ElementBoost_Normal_2_PAL", "ElementBoost_Normal_1_PAL", "ElementResist_Normal_1_PAL"],
+    fire: ["EternalFlame", "ElementBoost_Fire_2_PAL", "ElementBoost_Fire_1_PAL", "ElementResist_Fire_1_PAL"],
+    water: ["Nushi", "ElementBoost_Aqua_2_PAL", "ElementBoost_Aqua_1_PAL", "ElementResist_Aqua_1_PAL"],
+    grass: ["Salvation", "ElementBoost_Leaf_2_PAL", "ElementBoost_Leaf_1_PAL", "ElementResist_Leaf_1_PAL"],
+    electric: ["EternalFlame", "ElementBoost_Thunder_2_PAL", "ElementBoost_Thunder_1_PAL", "ElementResist_Thunder_1_PAL"],
+    ice: ["Witch", "Nushi", "ElementBoost_Ice_2_PAL", "ElementBoost_Ice_1_PAL", "ElementResist_Ice_1_PAL"],
     ground: ["ElementBoost_Earth_2_PAL", "ElementBoost_Earth_1_PAL", "ElementResist_Earth_1_PAL"],
-    dark: ["ElementBoost_Dark_2_PAL", "ElementBoost_Dark_1_PAL", "ElementResist_Dark_1_PAL"],
-    dragon: ["ElementBoost_Dragon_2_PAL", "ElementBoost_Dragon_1_PAL", "ElementResist_Dragon_1_PAL"],
+    dark: ["Invader", "Witch", "ElementBoost_Dark_2_PAL", "ElementBoost_Dark_1_PAL", "ElementResist_Dark_1_PAL"],
+    dragon: ["Invader", "ElementBoost_Dragon_2_PAL", "ElementBoost_Dragon_1_PAL", "ElementResist_Dragon_1_PAL"],
   };
+
+  const movementPassives = [
+    "MoveSpeed_up_1", "MoveSpeed_up_2", "MoveSpeed_up_3", "Legend", "WorldTree_MoveSpeed",
+    "SwimSpeed_up_1", "SwimSpeed_up_2", "SwimSpeed_up_3",
+    "Stamina_Up_2", "Stamina_Up_1", "Stamina_Up_3",
+    "RideJumpCount_Increase1", "RideJumpCount_Increase2",
+  ];
 
   window.GUIDE_DATA = {
     categories: [
       { id: "combat", name: "Combat", eyebrow: "Guide de combat", copy: "Comprenez les forces élémentaires et trouvez les compétences et Pals utiles en combat." },
-      { id: "farming", name: "Farming", eyebrow: "Guide de farming", copy: "Trouvez les compétences et Pals utiles pour l'abattage, l'extraction, le loot et les ressources spéciales." },
+      { id: "farming", name: "Farming", eyebrow: "Guide de farming", copy: "Trouvez les compétences et Pals utiles pour l'abattage, l'extraction et le loot." },
       { id: "fishing", name: "Pêche", eyebrow: "Guide de pêche", copy: "Améliorez vos parties de pêche, vos récompenses et vos chances de trouver des Pals talentueux." },
       { id: "capture", name: "Capture", eyebrow: "Guide de capture", copy: "Augmentez vos chances de capture, économisez vos sphères et recherchez plus facilement les passifs souhaités." },
       { id: "exploration", name: "Exploration", eyebrow: "Guide d'exploration", copy: "Retrouvez les Pals utiles pour vous déplacer, planer, détecter des ressources et explorer Palpagos." },
@@ -49,7 +56,6 @@
         { id: "logging", name: "Abattage", icon: "assets/work-suitabilities/06.webp" },
         { id: "mining", name: "Extraction", icon: "assets/work-suitabilities/07.webp" },
         { id: "loot", name: "Loot", icon: "assets/partner-skills/T_icon_skill_pal_014.webp" },
-        { id: "special", name: "Ressources spéciales", icon: "assets/guide-chromite.webp" },
       ],
       logging: {
         passives: ["TrainerLogging_up1"],
@@ -59,6 +65,8 @@
             effect("Réduction du poids des objets")
           ], { nonCumulative: true }),
           partner("Deer", [effect("Efficacité d’abattage")]),
+          partner("GrassMammoth", [effect("Efficacité d’abattage"), effect("Efficacité d’extraction")]),
+          partner("GrassMammoth_Ice", [effect("Efficacité d’abattage"), effect("Efficacité d’extraction")]),
         ],
       },
       mining: {
@@ -69,10 +77,19 @@
             effect("Réduction du poids des objets")
           ], { nonCumulative: true }),
           partner("Boar", [effect("Efficacité d’extraction")]),
+          partner("DrillGame", [effect("Efficacité d’extraction")]),
+          partner("GrassMammoth", [effect("Efficacité d’extraction")]),
+          partner("GrassMammoth_Ice", [effect("Efficacité d’extraction")]),
+          partner("BlackMetalDragon", [effect("Efficacité d’extraction"), effect("Rendement de collecte")]),
+          partner("TentacleTurtle", [effect("Réduction du poids des objets")], { nonCumulative: true }),
+          partner("TentacleTurtle_Ground", [effect("Réduction du poids des objets")], { nonCumulative: true }),
+          partner("VolcanicMonster", [effect("Réduction du poids des objets")], { nonCumulative: true }),
+          partner("VolcanicMonster_Ice", [effect("Réduction du poids des objets")], { nonCumulative: true }),
+          partner("BlackPuppy", [effect("Rendement de collecte")], { nonCumulative: true, highlights: ["Chromite"] }),
         ],
       },
-      special: {
-        partners: [partner("BlackPuppy", [effect("Rendement de collecte")], { nonCumulative: true, highlights: ["Chromite"] })],
+      loot: {
+        specific: [partner("GhostRabbit", [effect("Objets supplémentaires obtenus")], { nonCumulative: true })],
       },
     },
     fishing: [
@@ -127,11 +144,18 @@
         { id: "detection", name: "Détection" },
         { id: "utilities", name: "Utilitaires" },
       ],
-      movement: [
-        partner("Deer"),
-        partner("KendoFrog", [effect("Attaque")]),
-        partner("Mutant", [effect("Capacité de charge")], { nonCumulative: true }),
-      ],
+      movement: {
+        passives: movementPassives,
+        partners: [
+          partner("Deer"),
+          partner("KendoFrog", [effect("Attaque")]),
+          partner("Mutant", [effect("Capacité de charge")], { nonCumulative: true }),
+          partner("FengyunDeeper", [effect("Vitesse de déplacement")]),
+          partner("Garm", [effect("Vitesse de déplacement")]),
+          partner("BlueThunderHorse"),
+          partner("LongCat"),
+        ],
+      },
       gliders: [
         partner("Eagle"),
         partner("FlyingManta", [effect("Réduction des dégâts de chute")]),
@@ -144,12 +168,21 @@
       detection: [
         partner("NightFox"),
         partner("CatBat"),
-        partner("BlackPuppy", [effect("Rendement de collecte")], { nonCumulative: true, highlights: ["Chromite"] }),
+        partner("DarkCrow"),
       ],
       utilities: [
-        partner("MimicDog"),
-        partner("SifuDog"),
-        partner("Mutant", [effect("Capacité de charge")], { nonCumulative: true }),
+        { title: "Outils d’exploration", partners: [partner("MimicDog"), partner("SifuDog")] },
+        { title: "Ramassage & inventaire", partners: [
+          partner("FlowerRabbit"),
+          partner("IceCrocodile", [effect("Réduction du poids des objets"), effect("Vitesse de détérioration des objets")], { nonCumulative: true }),
+          partner("Mutant", [effect("Capacité de charge")], { nonCumulative: true }),
+        ] },
+        { title: "Survie", partners: [partner("LavaGirl", [effect("Régénération des PV")], { nonCumulative: true })] },
+        { title: "Progression", partners: [partner("MysteryMask", [effect("EXP obtenue par les Pals")], { nonCumulative: true })] },
+        { title: "Œufs", partners: [
+          partner("SakuraSaurus", [effect("Chance d’obtenir un Pal Alpha dans un œuf")], { nonCumulative: true }),
+          partner("SakuraSaurus_Water", [effect("Chance d’obtenir un Pal Alpha dans un œuf")], { nonCumulative: true }),
+        ] },
       ],
     },
   };

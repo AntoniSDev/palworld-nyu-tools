@@ -851,6 +851,7 @@ function guideFarmingTemplate() {
     <div class="guide-results">
       ${guidePassiveSectionTemplate(current.passives || [])}
       ${loot ? guideLootSectionTemplate() : guidePartnerSectionTemplate("Pals / compétences partenaires", current.partners)}
+      ${loot ? guidePartnerSectionTemplate("Loot spécifique", current.specific) : ""}
     </div>`;
 }
 
@@ -859,8 +860,17 @@ function guideDirectSectionsTemplate(sections) {
 }
 
 function guideExplorationTemplate() {
+  const selection = guideData.exploration[selectedGuideExplorationTab];
+  let results = "";
+  if (selectedGuideExplorationTab === "movement") {
+    results = `${guidePassiveSectionTemplate(selection.passives)}${guidePartnerSectionTemplate("Pals / compétences partenaires", selection.partners)}`;
+  } else if (selectedGuideExplorationTab === "utilities") {
+    results = selection.map((section) => guidePartnerSectionTemplate(section.title, section.partners)).join("");
+  } else {
+    results = guidePartnerSectionTemplate("Pals / compétences partenaires", selection);
+  }
   return `${guideTabsTemplate(guideData.exploration.tabs, selectedGuideExplorationTab, "guide-exploration-tab", "Objectif d’exploration")}
-    <div class="guide-results">${guidePartnerSectionTemplate("Pals / compétences partenaires", guideData.exploration[selectedGuideExplorationTab])}</div>`;
+    <div class="guide-results">${results}</div>`;
 }
 
 function guidePageTemplate() {

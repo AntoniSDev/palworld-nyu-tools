@@ -82,8 +82,49 @@ assert.match(appSource, /name: "Aides au combat"/);
 assert.doesNotMatch(appSource, /data-guide-combat-element/);
 assert.match(appSource, /<article class="guide-element-card">/);
 assert.match(appSource, /selectedGuideCombatMode === "elements"/);
-assert.deepEqual(Array.from(guide.farming.tabs, (tab) => tab.name), ["Abattage", "Extraction", "Loot", "Ressources spéciales"]);
+const referenceCodes = (items) => Array.from(items, (item) => item.pal);
+const assertIncludesAll = (actual, expected, label) => {
+  for (const value of expected) assert(actual.includes(value), `${label} : ${value} absent.`);
+};
+
+assert.deepEqual(Array.from(guide.farming.tabs, (tab) => tab.name), ["Abattage", "Extraction", "Loot"]);
+assert.equal("special" in guide.farming, false, "Ressources spéciales ne doit plus exister.");
 for (const tab of guide.farming.tabs) assert(tab.icon && fs.existsSync(tab.icon), `Icône Farming absente : ${tab.name}`);
+assertIncludesAll(referenceCodes(guide.farming.logging.partners), ["GrassMammoth", "GrassMammoth_Ice"], "Abattage");
+assertIncludesAll(referenceCodes(guide.farming.mining.partners), [
+  "DrillGame", "BlackMetalDragon", "TentacleTurtle", "TentacleTurtle_Ground", "VolcanicMonster",
+  "VolcanicMonster_Ice", "GrassMammoth", "GrassMammoth_Ice", "BlackPuppy",
+], "Extraction");
+assert(referenceCodes(guide.farming.loot.specific).includes("GhostRabbit"), "Nitemary doit apparaître dans Loot spécifique.");
+
+assert.deepEqual(Object.keys(guide.combat.passives), ["general", "neutral", "fire", "water", "grass", "electric", "ice", "ground", "dark", "dragon"]);
+assertIncludesAll(Array.from(guide.combat.passives.general), [
+  "PAL_ALLAttack_up3", "Legend", "PAL_ALLAttack_up2", "Deffence_up3", "MutationPal_Immortal", "Vampire", "CoolTimeReduction_Up_1",
+  "TrainerATK_UP_1", "TrainerDEF_UP_1", "ReloadSpeedUp_Passive", "AutoHPRegeneRate_Passive",
+], "Combat général");
+for (const [id, filters] of Object.entries({
+  EternalFlame: ["fire", "electric"], Invader: ["dark", "dragon"], Salvation: ["neutral", "grass"],
+  Witch: ["dark", "ice"], Nushi: ["water", "ice"],
+})) {
+  for (const filter of filters) assert(guide.combat.passives[filter].includes(id), `${id} absent du filtre ${filter}.`);
+}
+
+assertIncludesAll(Array.from(guide.exploration.movement.passives), [
+  "MoveSpeed_up_1", "MoveSpeed_up_2", "MoveSpeed_up_3", "Legend", "WorldTree_MoveSpeed",
+  "SwimSpeed_up_1", "SwimSpeed_up_2", "SwimSpeed_up_3", "Stamina_Up_2", "Stamina_Up_1", "Stamina_Up_3",
+  "RideJumpCount_Increase1", "RideJumpCount_Increase2",
+], "Passifs de déplacement");
+assertIncludesAll(referenceCodes(guide.exploration.movement.partners), ["FengyunDeeper", "Garm", "BlueThunderHorse", "LongCat"], "Pals de déplacement");
+assertIncludesAll(referenceCodes(guide.exploration.detection), ["NightFox", "CatBat", "DarkCrow"], "Détection");
+assert(!referenceCodes(guide.exploration.detection).includes("BlackPuppy"), "Smokie ne doit plus apparaître dans Détection.");
+const utilityCodes = guide.exploration.utilities.flatMap((section) => referenceCodes(section.partners));
+assertIncludesAll(utilityCodes, ["FlowerRabbit", "IceCrocodile", "MysteryMask", "LavaGirl", "SakuraSaurus", "SakuraSaurus_Water"], "Utilitaires");
+
+assert(!referenceCodes(guide.farming.mining.partners).some((code) => ["DarkAlien", "WhiteAlienDragon"].includes(code)), "Xenovader et Xenogard ne doivent pas apparaître dans Extraction.");
+assert(!references.some((reference) => reference.pal === "GhostAnglerfish"), "Ghangler ne doit pas apparaître dans le Guide.");
+assert(!Object.values(guide.combat.passives).flat().some((id) => ["SelfDeathAddItemDrop_up_2", "SelfDeathAddItemDrop_up_3"].includes(id)), "Généreux et Grand Prince ne doivent pas être recommandés.");
+assert.match(appSource, /guidePartnerSectionTemplate\("Loot spécifique", current\.specific\)/);
+assert.match(appSource, /guidePassiveSectionTemplate\(selection\.passives\)/);
 assert(!fs.readFileSync("js/guide-data.js", "utf8").includes("description:"), "guide-data.js ne doit pas réécrire les pouvoirs.");
 
 console.log("Guide pratique: OK");
