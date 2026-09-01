@@ -9,6 +9,7 @@ The public application never contacts either website at runtime.
 from __future__ import annotations
 
 import argparse
+from datetime import date
 import html
 import json
 import re
@@ -56,7 +57,7 @@ LABELS_FR = {
     "Farm Crop Growup Speed": "Vitesse de croissance des cultures",
     "Farm Crop Harvest Num Rate": "Quantité récoltée",
     "Fishing Start Progress Add": "Progression initiale de pêche",
-    "Fishing Success Amount Up": "Quantité obtenue en pêche",
+    "Fishing Success Amount Up": "Progression de la jauge de pêche",
     "Fishing Failed Amount Down": "Réduction des échecs de pêche",
     "Fishing Good Talent Pal Probability": "Chance d’obtenir un Pal talentueux en pêche",
     "Avoid Duration Up Partner Skill": "Durée d’esquive",
@@ -91,11 +92,19 @@ LABELS_FR = {
     "Player Inflict Effect Weak Point Hit Damage Up": "Dégâts aux points faibles du joueur",
     "Regene Stomatch Hungriest": "Restauration de la satiété",
     "Sphere Recovery": "Récupération des Sphères",
-    "Syncro Passive When Capture": "Chance de transmettre une compétence passive à la capture",
+    "Syncro Passive When Capture": "Chance de rencontrer un Pal avec la même compétence passive",
     "Temperature Resist Cold": "Résistance au froid",
     "Temperature Resist Heat": "Résistance à la chaleur",
     "Normal Damage": "Dégâts Non élém.",
     "Dark Damage": "Dégâts de Ténèbres",
+}
+
+STATUSES_FR = {
+    "Burn": "Brûlure", "Burning": "Brûlure",
+    "Wet": "Trempé", "Wetness": "Trempé",
+    "Ivy Cling": "Entrave", "Electrical": "Électrisation", "Electrified": "Électrisation",
+    "Freeze": "Gel", "Frozen": "Gel", "Muddy": "Embourbement",
+    "Darkness": "Cécité", "Poison": "Empoisonnement", "Poisoned": "Empoisonnement",
 }
 
 ELEMENTS_FR = {
@@ -117,6 +126,27 @@ STRUCTURED_EFFECT_OVERRIDES = {
     "Sekhmet": [
         ("Vitesse de travail des Anubis", ["+20%", "+24%", "+28%", "+32%", "+40%"]),
         ("Efficacité personnelle de Sekhmet", ["+30%", "+36%", "+42%", "+48%", "+60%"]),
+    ],
+}
+
+# Certaines descriptions PalDB documentent plusieurs courbes confirmées alors
+# que Palworld-DB n'en expose qu'une partie dans son tableau. Ces additions sont
+# fusionnées sans remplacer les lignes déjà structurées par la source.
+STRUCTURED_EFFECT_ADDITIONS = {
+    "StuffedShark_Fire": [
+        ("Dégâts de Feu aux points faibles", ["+25%", "+27%", "+30%", "+34%", "+40%"]),
+    ],
+    "TentacleTurtle_Ground": [
+        ("Dégâts de Terre aux points faibles", ["+25%", "+27%", "+30%", "+34%", "+40%"]),
+    ],
+    "PinkRabbit_Grass": [
+        ("Dégâts de Herbe aux points faibles", ["+25%", "+27%", "+30%", "+34%", "+40%"]),
+    ],
+    "CaptainPenguin": [
+        ("Objets obtenus sur les Pals de Feu", ["+40%", "+50%", "+60%", "+70%", "+80%"]),
+    ],
+    "CatMage": [
+        ("Objets obtenus sur les Pals de Non élém.", ["+40%", "+50%", "+60%", "+70%", "+80%"]),
     ],
 }
 
@@ -172,13 +202,15 @@ def effect_label(raw: str) -> str | None:
         ("Resist Additional Effect ", "Résistance à l’effet {element}"),
     ):
         if raw.startswith(prefix):
-            element = ELEMENTS_FR.get(raw.removeprefix(prefix), raw.removeprefix(prefix))
+            key = raw.removeprefix(prefix)
+            element = ELEMENTS_FR.get(key, STATUSES_FR.get(key, key))
             return label.format(element=element)
     if raw.endswith(" Resist"):
         element = ELEMENTS_FR.get(raw.removesuffix(" Resist"), raw.removesuffix(" Resist"))
         return f"Résistance aux dégâts de {element}"
     if raw.startswith("Damage Rate If Defender "):
-        state = raw.removeprefix("Damage Rate If Defender ").lower()
+        key = raw.removeprefix("Damage Rate If Defender ")
+        state = STATUSES_FR.get(key, key)
         return f"Dégâts sur une cible affectée ({state})"
     return "Valeur de l’effet"
 
@@ -220,6 +252,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--paldb-fr-html", type=Path, required=True)
     parser.add_argument("--scales-html", type=Path, required=True)
     parser.add_argument("--output", type=Path, default=Path(__file__).resolve().parents[1] / "data" / "partner-skills-fr.json")
+    parser.add_argument("--retrieved-date", default=date.today().isoformat())
     return parser.parse_args()
 
 
@@ -231,11 +264,17 @@ def main() -> None:
         scales[code] = [{"label": label, "values": values} for label, values in effects]
     for code, effects in STRUCTURED_EFFECT_OVERRIDES.items():
         scales[code] = [{"label": label, "values": values} for label, values in effects]
+    for code, additions in STRUCTURED_EFFECT_ADDITIONS.items():
+        existing = {effect["label"] for effect in scales.setdefault(code, [])}
+        for label, values in additions:
+            if label not in existing:
+                scales[code].append({"label": label, "values": values})
+                existing.add(label)
 
     output = {
         "meta": {
-            "localizationSource": "paldb.cc/fr/Partner_Skill, retrieved 2026-08-26",
-            "scaleSource": "palworld-db.com/partner-skills, retrieved 2026-08-26",
+            "localizationSource": f"paldb.cc/fr/Partner_Skill, retrieved {args.retrieved_date}",
+            "scaleSource": f"palworld-db.com/partner-skills, retrieved {args.retrieved_date}",
         },
         "skills": {
             code: {**entry, "effects": scales.get(code, [])}

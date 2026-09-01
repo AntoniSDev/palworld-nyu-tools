@@ -35,7 +35,7 @@ assert(!config.passiveProfiles.transport.some((id) => id.startsWith("CraftSpeed"
 assert(config.passiveProfiles.farming.includes("WorkSuitabilityAddRank_MonsterFarm_2"));
 assert(config.passiveProfiles.farming.includes("WorkSuitabilityAddRank_MonsterFarm_1"));
 assert(!pagesConfig.includes("data/partner-skills-fr.json"), "Le JSON partenaire doit être publié par GitHub Pages.");
-const primaryRoutes = ["#cumoir", "#capacites", "#optimisation", "#combat", "#condensation", "#memo"];
+const primaryRoutes = ["#cumoir", "#capacites", "#optimisation", "#guide", "#condensation", "#memo"];
 const primaryLinks = [...indexHtml.matchAll(/<a id="(?:breeding|single|work|combat|condensation|memo)-view"[^>]+href="([^"]+)"/g)];
 assert.equal(primaryLinks.length, 6, "La navigation principale doit contenir six liens.");
 assert.deepEqual(primaryLinks.map((match) => match[1]), primaryRoutes);
@@ -43,11 +43,13 @@ assert.match(indexHtml, /<a class="brand" href="#cumoir"/);
 assert(!indexHtml.includes("skills-menu"), "L’ancien menu Compétences doit être supprimé.");
 assert.match(appSource, /const viewFromHash = \(hash\) => viewRoutes\.get\(hash\) \|\| "breeding"/);
 for (const route of primaryRoutes) assert(appSource.includes(`["${route}",`), `Route absente : ${route}`);
+assert(appSource.includes('["#combat", "guide"]'), "#combat doit rester un alias du Guide pratique.");
 assert(!appSource.includes("brand.addEventListener"), "Le logo doit conserver son comportement natif de lien.");
 assert(!appSource.includes('title="${escapeHtml(activity.name)}"'), "Les icônes ne doivent plus dépendre du title natif.");
 assert.match(appSource, /data-job-tooltip=/);
 assert.match(appSource, /aria-label=/);
 assert.match(indexHtml, />Optimisation de la base<\/a>/, "Le libellé de navigation doit être explicite.");
+assert.match(indexHtml, />Guide pratique<\/a>/, "La navigation doit présenter le Guide pratique.");
 
 const partnerCodes = Object.values(config.partnerActivities).flat().map((entry) => entry.pal);
 assert(!partnerCodes.includes("NegativeKoala"), "Depresso doit rester exclu.");

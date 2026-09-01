@@ -1,7 +1,7 @@
 {
   "meta": {
-    "localizationSource": "paldb.cc/fr/Partner_Skill, retrieved 2026-08-26",
-    "scaleSource": "palworld-db.com/partner-skills, retrieved 2026-08-26"
+    "localizationSource": "paldb.cc/fr/Partner_Skill, retrieved 2026-09-01",
+    "scaleSource": "palworld-db.com/partner-skills, retrieved 2026-09-01"
   },
   "skills": {
     "Alpaca": {
@@ -24,7 +24,7 @@
           ]
         },
         {
-          "label": "Résistance à l’effet Freeze",
+          "label": "Résistance à l’effet Gel",
           "values": [
             "+100%",
             "+100%",
@@ -60,7 +60,7 @@
           ]
         },
         {
-          "label": "Résistance à l’effet Darkness",
+          "label": "Résistance à l’effet Cécité",
           "values": [
             "+100%",
             "+100%",
@@ -423,7 +423,7 @@
       "description": "Augmente de (50~65) % les dégâts infligés par le joueur et les Pals aux ennemis affectés par l'état Entrave lorsqu'il est dans l'équipe. (Effet non cumulable)",
       "effects": [
         {
-          "label": "Dégâts sur une cible affectée (ivy cling)",
+          "label": "Dégâts sur une cible affectée (Entrave)",
           "values": [
             "+50%",
             "+53%",
@@ -439,7 +439,7 @@
       "description": "Lorsqu'il est dans l'équipe, ajoute une valeur d'accumulation d'état Entrave de (2~6) aux attaques du joueur. (Effet non cumulable)",
       "effects": [
         {
-          "label": "Chance d’infliger l’effet Ivy Cling",
+          "label": "Chance d’infliger l’effet Entrave",
           "values": [
             "+2%",
             "+3%",
@@ -469,7 +469,18 @@
     "CaptainPenguin": {
       "name": "Guerrier des Mers",
       "description": "Lorsqu'il est dans l'équipe, augmente de (40~80)% la quantité d'objets obtenus en battant des Pals de type Feu. (Effet non cumulable)",
-      "effects": []
+      "effects": [
+        {
+          "label": "Objets obtenus sur les Pals de Feu",
+          "values": [
+            "+40%",
+            "+50%",
+            "+60%",
+            "+70%",
+            "+80%"
+          ]
+        }
+      ]
     },
     "CaptainPenguin_Black": {
       "name": "Commandement Inflexible",
@@ -498,6 +509,16 @@
             "+20%",
             "+30%",
             "+50%"
+          ]
+        },
+        {
+          "label": "Objets obtenus sur les Pals de Non élém.",
+          "values": [
+            "+40%",
+            "+50%",
+            "+60%",
+            "+70%",
+            "+80%"
           ]
         }
       ]
@@ -939,7 +960,7 @@
       "description": "Lorsqu'il est dans l'équipe, ajoute une valeur d'accumulation d'état Électrisation de (2~6) aux attaques du joueur. (Effet non cumulable)",
       "effects": [
         {
-          "label": "Chance d’infliger l’effet Electrical",
+          "label": "Chance d’infliger l’effet Électrisation",
           "values": [
             "+2%",
             "+3%",
@@ -965,7 +986,7 @@
           ]
         },
         {
-          "label": "Résistance à l’effet Wetness",
+          "label": "Résistance à l’effet Trempé",
           "values": [
             "+100%",
             "+100%",
@@ -996,7 +1017,7 @@
           ]
         },
         {
-          "label": "Résistance à l’effet Burn",
+          "label": "Résistance à l’effet Brûlure",
           "values": [
             "+100%",
             "+100%",
@@ -1192,7 +1213,7 @@
           ]
         },
         {
-          "label": "Résistance à l’effet Ivy Cling",
+          "label": "Résistance à l’effet Entrave",
           "values": [
             "+100%",
             "+100%",
@@ -1208,7 +1229,7 @@
       "description": "Lorsqu'activée, confère (2~6) de Empoisonnement aux attaques du joueur. Lorsqu'il est dans l'équipe, le joueur et les Pals deviennent immunisés contre Empoisonnement et les gaz toxiques de la zone de l'Arbre-Monde sont neutralisés. (Effet non cumulable)",
       "effects": [
         {
-          "label": "Résistance à l’effet Poison",
+          "label": "Résistance à l’effet Empoisonnement",
           "values": [
             "+100%",
             "+100%",
@@ -1218,7 +1239,7 @@
           ]
         },
         {
-          "label": "Chance d’infliger l’effet Poison",
+          "label": "Chance d’infliger l’effet Empoisonnement",
           "values": [
             "+2%",
             "+3%",
@@ -1709,7 +1730,7 @@
       "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il combat à vos côtés, augmente de (15~30)% les chances de rencontrer des Pals possédant la même compétence passive. * À l'exception de certaines compétences passives.",
       "effects": [
         {
-          "label": "Chance de transmettre une compétence passive à la capture",
+          "label": "Chance de rencontrer un Pal avec la même compétence passive",
           "values": [
             "+15%",
             "+18%",
@@ -1919,7 +1940,7 @@
           ]
         },
         {
-          "label": "Chance d’infliger l’effet Freeze",
+          "label": "Chance d’infliger l’effet Gel",
           "values": [
             "+2%",
             "+3%",
@@ -1945,7 +1966,7 @@
           ]
         },
         {
-          "label": "Chance d’infliger l’effet Darkness",
+          "label": "Chance d’infliger l’effet Cécité",
           "values": [
             "+2%",
             "+3%",
@@ -1971,7 +1992,7 @@
           ]
         },
         {
-          "label": "Quantité obtenue en pêche",
+          "label": "Progression de la jauge de pêche",
           "values": [
             "+5%",
             "+7%",
@@ -2007,7 +2028,7 @@
           ]
         },
         {
-          "label": "Quantité obtenue en pêche",
+          "label": "Progression de la jauge de pêche",
           "values": [
             "+7%",
             "+9%",
@@ -2148,7 +2169,7 @@
       "description": "Lorsqu'il est dans l'équipe, ajoute (2~6) d'accumulation d'état Brûlure aux attaques du joueur. (Effet non cumulable)",
       "effects": [
         {
-          "label": "Chance d’infliger l’effet Burn",
+          "label": "Chance d’infliger l’effet Brûlure",
           "values": [
             "+2%",
             "+3%",
@@ -2529,7 +2550,7 @@
       "description": "Lorsqu'il est dans l'équipe, ajoute (2~6) d'accumulation d'état Trempé aux attaques du joueur. (Effet non cumulable)",
       "effects": [
         {
-          "label": "Chance d’infliger l’effet Wetness",
+          "label": "Chance d’infliger l’effet Trempé",
           "values": [
             "+2%",
             "+3%",
@@ -3029,6 +3050,16 @@
             "+320%",
             "+400%"
           ]
+        },
+        {
+          "label": "Dégâts de Herbe aux points faibles",
+          "values": [
+            "+25%",
+            "+27%",
+            "+30%",
+            "+34%",
+            "+40%"
+          ]
         }
       ]
     },
@@ -3211,7 +3242,7 @@
       "description": "Augmente de (50~65) % les dégâts infligés par le joueur et les Pals aux ennemis affectés par l'état Embourbement lorsqu'il est dans l'équipe. (Effet non cumulable)",
       "effects": [
         {
-          "label": "Dégâts sur une cible affectée (muddy)",
+          "label": "Dégâts sur une cible affectée (Embourbement)",
           "values": [
             "+50%",
             "+53%",
@@ -3328,7 +3359,7 @@
       "description": "Lorsqu'il est dans l'équipe, augmente de (50~65)% les dégâts infligés aux ennemis affectés par Empoisonnement. (effet non cumulable)",
       "effects": [
         {
-          "label": "Dégâts sur une cible affectée (poison)",
+          "label": "Dégâts sur une cible affectée (Empoisonnement)",
           "values": [
             "+50%",
             "+53%",
@@ -3402,7 +3433,7 @@
       "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, ajoute (2~6) d'accumulation d'état Embourbement aux attaques du joueur. (effet non cumulable)",
       "effects": [
         {
-          "label": "Chance d’infliger l’effet Muddy",
+          "label": "Chance d’infliger l’effet Embourbement",
           "values": [
             "+2%",
             "+3%",
@@ -3550,7 +3581,7 @@
       "description": "Lorsqu'il est dans l'équipe, ajoute (2~6) d'accumulation d'état Cécité aux attaques du joueur. (Effet non cumulable)",
       "effects": [
         {
-          "label": "Chance d’infliger l’effet Darkness",
+          "label": "Chance d’infliger l’effet Cécité",
           "values": [
             "+2%",
             "+3%",
@@ -3616,6 +3647,16 @@
             "+90%",
             "+100%"
           ]
+        },
+        {
+          "label": "Dégâts de Feu aux points faibles",
+          "values": [
+            "+25%",
+            "+27%",
+            "+30%",
+            "+34%",
+            "+40%"
+          ]
         }
       ]
     },
@@ -3634,7 +3675,7 @@
           ]
         },
         {
-          "label": "Résistance à l’effet Electrical",
+          "label": "Résistance à l’effet Électrisation",
           "values": [
             "+100%",
             "+100%",
@@ -3748,6 +3789,16 @@
             "+92%",
             "+100%"
           ]
+        },
+        {
+          "label": "Dégâts de Terre aux points faibles",
+          "values": [
+            "+25%",
+            "+27%",
+            "+30%",
+            "+34%",
+            "+40%"
+          ]
         }
       ]
     },
@@ -3756,7 +3807,7 @@
       "description": "Peut être utilisé comme monture pour voler. Augmente de (50~65) % les dégâts infligés par le joueur et les Pals aux ennemis affectés par l'état Cécité lorsqu'il est dans l'équipe. (Effet non cumulable)",
       "effects": [
         {
-          "label": "Dégâts sur une cible affectée (darkness)",
+          "label": "Dégâts sur une cible affectée (Cécité)",
           "values": [
             "+50%",
             "+53%",
@@ -3914,7 +3965,7 @@
       "description": "Peut être utilisé comme monture pour se déplacer sur l'eau. Lorsqu'il est dans l'équipe, augmente de (50~65)% les dégâts infligés aux ennemis affectés par Trempé. (effet non cumulable)",
       "effects": [
         {
-          "label": "Dégâts sur une cible affectée (wetness)",
+          "label": "Dégâts sur une cible affectée (Trempé)",
           "values": [
             "+50%",
             "+53%",
@@ -3940,7 +3991,7 @@
       "description": "Peut être utilisé comme monture pour se déplacer. Lorsqu'il est dans l'équipe, annule les dégâts de lave et augmente de (50~65)% les dégâts infligés aux ennemis affectés par Brûlure. (effet non cumulable)",
       "effects": [
         {
-          "label": "Dégâts sur une cible affectée (burn)",
+          "label": "Dégâts sur une cible affectée (Brûlure)",
           "values": [
             "+50%",
             "+53%",
@@ -4463,7 +4514,7 @@
           ]
         },
         {
-          "label": "Résistance à l’effet Muddy",
+          "label": "Résistance à l’effet Embourbement",
           "values": [
             "+100%",
             "+100%",

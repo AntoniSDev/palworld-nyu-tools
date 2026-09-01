@@ -135,6 +135,7 @@ const jobs = [
 ];
 
 const workOptimization = window.WORK_OPTIMIZATION || { passiveProfiles: {}, passiveJobProfiles: {}, partnerActivities: {} };
+const guideData = window.GUIDE_DATA || { categories: [], elements: [] };
 const passiveById = new Map((window.PALWORLD_PASSIVES || []).map((passive) => [passive.id, passive]));
 const specialPartnerActivities = [
   { id: "global", name: "Base", shortName: "Base", icon: "assets/ui/palbox.png", color: "#8fcf9e" },
@@ -168,6 +169,11 @@ let selectedWorkPartnerActivityId = null;
 let partnerSkillsData = null;
 let partnerSkillsError = false;
 let partnerSkillsPromise = null;
+let selectedGuideCategory = "combat";
+let selectedGuideCombatFilter = "general";
+let selectedGuideFarmingTab = "logging";
+let selectedGuideLootElement = "fire";
+let selectedGuideExplorationTab = "movement";
 let selectedCondensationPalId = null;
 let condensationStars = 0;
 let condensationQuery = "";
@@ -175,7 +181,8 @@ const viewRoutes = new Map([
   ["#cumoir", "breeding"],
   ["#capacites", "jobs"],
   ["#optimisation", "work"],
-  ["#combat", "combat"],
+  ["#guide", "guide"],
+  ["#combat", "guide"],
   ["#condensation", "condensation"],
   ["#memo", "memo"],
 ]);
@@ -447,9 +454,9 @@ function workPartnerCardTemplate(reference) {
     effect: skill?.effects?.find((entry) => entry.label === (metadata.sourceLabel || metadata.label)),
   }));
   if (!skill || !pal || resolvedEffects.some((entry) => !entry.effect)) return "";
-  const descriptions = resolvedEffects
+  const descriptions = [reference.description ? `<p>${highlightPartnerText(reference.description, reference.highlights)}</p>` : "", ...resolvedEffects
     .map(({ metadata }) => `<p>${highlightPartnerText(metadata.description, reference.highlights)}</p>`)
-    .join("");
+  ].filter(Boolean).join("");
   const notes = [reference.note ? highlightPartnerText(reference.note, reference.highlights) : ""].filter(Boolean);
 
   return `<article class="partner-skill-card">
@@ -491,7 +498,7 @@ function partnerResultsTemplate() {
 
 function ensurePartnerSkills() {
   if (partnerSkillsData || partnerSkillsError || partnerSkillsPromise) return;
-  const partnerSkillsUrl = new URL("data/partner-skills-fr.json?v=0.9.1", document.baseURI).href;
+  const partnerSkillsUrl = new URL("data/partner-skills-fr.json?v=0.9.2", document.baseURI).href;
   partnerSkillsPromise = fetch(partnerSkillsUrl)
     .then((response) => {
       if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
@@ -500,14 +507,14 @@ function ensurePartnerSkills() {
     .then((data) => { partnerSkillsData = data; })
     .catch((error) => {
       partnerSkillsError = true;
-      console.error("[Optimisation] Échec du chargement des compétences partenaires.", {
+      console.error("[Données partenaires] Échec du chargement des compétences partenaires.", {
         url: partnerSkillsUrl,
         error,
       });
     })
     .finally(() => {
       partnerSkillsPromise = null;
-      if (currentView === "work" && workMode === "partners") render();
+      if ((currentView === "work" && workMode === "partners") || currentView === "guide") render();
     });
 }
 
@@ -750,18 +757,104 @@ function updateCondensationState() {
   });
 }
 
-function combatPartnersTemplate() {
-  return `
-    <section class="construction-page" aria-labelledby="combat-construction-title">
-      <div class="construction-page__visual" aria-hidden="true">
-        <img src="assets/ui/cattiva-construction.gif" alt="" />
-      </div>
-      <div>
-        <p class="eyebrow">Prochaine fonctionnalité</p>
-        <h2 id="combat-construction-title">En cours de construction</h2>
-        <p>Cette rubrique arrivera dans une prochaine version.</p>
-      </div>
-    </section>`;
+function guideTabsTemplate(items, selected, attribute, label, withIcons = false) {
+  return `<nav class="guide-tabs ${withIcons ? "guide-tabs--icons" : ""}" aria-label="${escapeHtml(label)}">
+    ${items.map((item) => `<button type="button" data-${attribute}="${item.id}" class="${selected === item.id ? "active" : ""}" aria-pressed="${selected === item.id}" style="--guide-accent:${item.color || "#63ebe4"}">
+      ${withIcons && item.icon ? `<img src="${item.icon}" alt="" />` : ""}<span>${escapeHtml(item.name)}</span>
+    </button>`).join("")}
+  </nav>`;
+}
+
+function guidePartnerSectionTemplate(title, references) {
+  if (!references?.length) return "";
+  if (partnerSkillsError) return `<section class="guide-section"><h2>${escapeHtml(title)}</h2><div class="work-empty work-empty--error"><strong>Données indisponibles</strong><span>Les compétences partenaires n’ont pas pu être chargées.</span><button type="button" data-work-partner-retry>Réessayer</button></div></section>`;
+  if (!partnerSkillsData) return `<section class="guide-section"><h2>${escapeHtml(title)}</h2><div class="work-empty"><strong>Chargement des données…</strong></div></section>`;
+  const cards = references.map(workPartnerCardTemplate).filter(Boolean).join("");
+  return cards ? `<section class="guide-section"><h2>${escapeHtml(title)}</h2><div class="partner-list">${cards}</div></section>` : "";
+}
+
+function guidePassiveSectionTemplate(skillIds = []) {
+  return skillIds.length ? `<section class="guide-section"><h2>Compétences passives</h2><div class="passive-list">${passiveListTemplate(skillIds)}</div></section>` : "";
+}
+
+function guideElementMatrixTemplate() {
+  const byId = new Map(guideData.elements.map((element) => [element.id, element]));
+  const relation = (ids, empty = "Aucun") => ids.length
+    ? ids.map((id) => { const element = byId.get(id); return `<span><img src="${element.icon}" alt="" />${escapeHtml(element.name)}</span>`; }).join("")
+    : `<span class="guide-element-card__none">${empty}</span>`;
+  return `<section class="guide-element-panel" aria-labelledby="guide-elements-title">
+    <header><h2 id="guide-elements-title">Affinités élémentaires</h2><p>Cliquez sur un élément pour afficher les aides associées.</p></header>
+    <div class="guide-element-grid">
+      ${guideData.elements.map((element) => `<button type="button" class="guide-element-card ${selectedGuideCombatFilter === element.id ? "selected" : ""}" data-guide-combat-element="${element.id}">
+        <span class="guide-element-card__identity"><img src="${element.icon}" alt="" /><strong>${escapeHtml(element.name)}</strong></span>
+        <span class="guide-element-card__relation"><small>Fort contre</small>${relation(element.strong)}</span>
+        <span class="guide-element-card__relation"><small>Faible contre</small>${relation(element.weak)}</span>
+      </button>`).join("")}
+    </div>
+  </section>`;
+}
+
+function guideCombatTemplate() {
+  const filters = [{ id: "general", name: "Général" }, ...guideData.elements];
+  const passives = guideData.combat.passives[selectedGuideCombatFilter] || [];
+  const partners = guideData.combat.partners[selectedGuideCombatFilter] || [];
+  return `${guideElementMatrixTemplate()}
+    ${guideTabsTemplate(filters, selectedGuideCombatFilter, "guide-combat-filter", "Filtrer les aides de combat", true)}
+    <div class="guide-results">${guidePassiveSectionTemplate(passives)}${guidePartnerSectionTemplate("Pals / compétences partenaires", partners)}</div>`;
+}
+
+function guideLootPartners() {
+  if (!partnerSkillsData) return [];
+  const element = guideData.elements.find((entry) => entry.id === selectedGuideLootElement);
+  if (!element) return [];
+  const label = `Objets obtenus sur les Pals de ${element.name}`;
+  return Object.entries(partnerSkillsData.skills)
+    .filter(([pal, skill]) => pal !== "NegativeKoala" && skill.effects?.some((effect) => effect.label === label))
+    .map(([pal]) => ({ pal, nonCumulative: true, effects: [{ label, description: `Augmente les objets obtenus en battant des Pals de type ${element.name}.` }] }));
+}
+
+function guideLootSectionTemplate() {
+  if (partnerSkillsError) return `<section class="guide-section"><h2>Pals améliorant le loot</h2><div class="work-empty work-empty--error"><strong>Données indisponibles</strong><span>Les compétences partenaires n’ont pas pu être chargées.</span><button type="button" data-work-partner-retry>Réessayer</button></div></section>`;
+  if (!partnerSkillsData) return `<section class="guide-section"><h2>Pals améliorant le loot</h2><div class="work-empty"><strong>Chargement des données…</strong></div></section>`;
+  const references = guideLootPartners();
+  if (!references.length) return `<section class="guide-section"><h2>Pals améliorant le loot</h2><div class="work-empty"><strong>Aucun bonus partenaire répertorié</strong><span>Aucune compétence canonique n’augmente le loot pour cet élément.</span></div></section>`;
+  return guidePartnerSectionTemplate("Pals améliorant le loot", references);
+}
+
+function guideFarmingTemplate() {
+  const tabs = guideData.farming.tabs;
+  const current = guideData.farming[selectedGuideFarmingTab] || {};
+  const loot = selectedGuideFarmingTab === "loot";
+  return `${guideTabsTemplate(tabs, selectedGuideFarmingTab, "guide-farming-tab", "Objectif de farming")}
+    ${loot ? guideTabsTemplate(guideData.elements, selectedGuideLootElement, "guide-loot-element", "Type de Pal ciblé", true) : ""}
+    <div class="guide-results">
+      ${guidePassiveSectionTemplate(current.passives || [])}
+      ${loot ? guideLootSectionTemplate() : guidePartnerSectionTemplate("Pals / compétences partenaires", current.partners)}
+    </div>`;
+}
+
+function guideDirectSectionsTemplate(sections) {
+  return `<div class="guide-results">${sections.map((section) => guidePartnerSectionTemplate(section.title, section.partners)).join("")}</div>`;
+}
+
+function guideExplorationTemplate() {
+  return `${guideTabsTemplate(guideData.exploration.tabs, selectedGuideExplorationTab, "guide-exploration-tab", "Objectif d’exploration")}
+    <div class="guide-results">${guidePartnerSectionTemplate("Pals / compétences partenaires", guideData.exploration[selectedGuideExplorationTab])}</div>`;
+}
+
+function guidePageTemplate() {
+  const categoryContent = {
+    combat: guideCombatTemplate,
+    farming: guideFarmingTemplate,
+    fishing: () => guideDirectSectionsTemplate(guideData.fishing),
+    capture: () => guideDirectSectionsTemplate(guideData.capture),
+    exploration: guideExplorationTemplate,
+  }[selectedGuideCategory]?.() || "";
+  return `<section class="guide-page">
+    <header class="guide-header"><p class="eyebrow">Aides hors de la base</p><p>Choisissez votre objectif pour retrouver les passifs et Pals qui peuvent réellement vous aider.</p></header>
+    ${guideTabsTemplate(guideData.categories, selectedGuideCategory, "guide-category", "Catégorie du Guide pratique")}
+    <div class="guide-content">${categoryContent}</div>
+  </section>`;
 }
 
 function breedingPairIndex(parentAIndex, parentBIndex) {
@@ -1213,7 +1306,7 @@ function render() {
   const activeLink = {
     jobs: singleButton,
     work: workButton,
-    combat: combatButton,
+    guide: combatButton,
     condensation: condensationButton,
     breeding: breedingButton,
     memo: memoButton,
@@ -1246,8 +1339,9 @@ function render() {
     return;
   }
 
-  if (currentView === "combat") {
-    content.innerHTML = combatPartnersTemplate();
+  if (currentView === "guide") {
+    content.innerHTML = guidePageTemplate();
+    ensurePartnerSkills();
     return;
   }
 
@@ -1275,6 +1369,41 @@ content.addEventListener("click", (event) => {
     partnerSkillsPromise = null;
     render();
     ensurePartnerSkills();
+    return;
+  }
+
+  const guideCategoryButton = event.target.closest("[data-guide-category]");
+  if (guideCategoryButton) {
+    selectedGuideCategory = guideCategoryButton.dataset.guideCategory;
+    render();
+    return;
+  }
+
+  const guideCombatButton = event.target.closest("[data-guide-combat-filter], [data-guide-combat-element]");
+  if (guideCombatButton) {
+    selectedGuideCombatFilter = guideCombatButton.dataset.guideCombatFilter || guideCombatButton.dataset.guideCombatElement;
+    render();
+    return;
+  }
+
+  const guideFarmingButton = event.target.closest("[data-guide-farming-tab]");
+  if (guideFarmingButton) {
+    selectedGuideFarmingTab = guideFarmingButton.dataset.guideFarmingTab;
+    render();
+    return;
+  }
+
+  const guideLootButton = event.target.closest("[data-guide-loot-element]");
+  if (guideLootButton) {
+    selectedGuideLootElement = guideLootButton.dataset.guideLootElement;
+    render();
+    return;
+  }
+
+  const guideExplorationButton = event.target.closest("[data-guide-exploration-tab]");
+  if (guideExplorationButton) {
+    selectedGuideExplorationTab = guideExplorationButton.dataset.guideExplorationTab;
+    render();
     return;
   }
 
