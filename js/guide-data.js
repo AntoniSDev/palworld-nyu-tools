@@ -36,11 +36,11 @@
 
   window.GUIDE_DATA = {
     categories: [
-      { id: "combat", name: "Combat", eyebrow: "Guide de combat", copy: "Comprenez les forces élémentaires et trouvez les compétences et Pals utiles en combat." },
-      { id: "farming", name: "Farming", eyebrow: "Guide de farming", copy: "Trouvez les compétences et Pals utiles pour l'abattage, l'extraction et le loot." },
-      { id: "fishing", name: "Pêche", eyebrow: "Guide de pêche", copy: "Améliorez vos parties de pêche, vos récompenses et vos chances de trouver des Pals talentueux." },
-      { id: "capture", name: "Capture", eyebrow: "Guide de capture", copy: "Augmentez vos chances de capture, économisez vos sphères et recherchez plus facilement les passifs souhaités." },
-      { id: "exploration", name: "Exploration", eyebrow: "Guide d'exploration", copy: "Retrouvez les Pals utiles pour vous déplacer, planer, détecter des ressources et explorer Palpagos." },
+      { id: "combat", name: "Combat", eyebrow: "Guide de combat", copy: "Regroupe les compétences passives et partenaires utiles au combat." },
+      { id: "farming", name: "Farming", eyebrow: "Guide de farming", copy: "Présente les passifs, compétences partenaires et bonus de loot utiles au farming." },
+      { id: "fishing", name: "Pêche", eyebrow: "Guide de pêche", copy: "Regroupe les compétences partenaires liées à la pêche, à son loot et aux Pals talentueux." },
+      { id: "capture", name: "Capture", eyebrow: "Guide de capture", copy: "Regroupe les compétences partenaires liées aux chances de capture, aux Sphères et à la recherche de passifs." },
+      { id: "exploration", name: "Exploration", eyebrow: "Guide d'exploration", copy: "Présente les passifs et compétences partenaires utiles à l’exploration de Palpagos." },
     ],
     elements,
     combat: {

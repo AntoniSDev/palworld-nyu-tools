@@ -4,6 +4,8 @@
 @font-face { font-family: "Nunito Sans"; src: url("../assets/fonts/nunito-sans-600.ttf") format("truetype"); font-display: swap; font-weight: 600; }
 @font-face { font-family: "Nunito Sans"; src: url("../assets/fonts/nunito-sans-700.ttf") format("truetype"); font-display: swap; font-weight: 700; }
 @font-face { font-family: "Nunito Sans"; src: url("../assets/fonts/nunito-sans-800.ttf") format("truetype"); font-display: swap; font-weight: 800; }
+@font-face { font-family: "Chakra Petch"; src: url("../assets/fonts/chakra-petch-600.ttf") format("truetype"); font-display: swap; font-weight: 600; }
+@font-face { font-family: "Oxanium"; src: url("../assets/fonts/oxanium-variable.ttf") format("truetype"); font-display: swap; font-weight: 200 800; }
 
 :root {
   --ink: #eefcff;
@@ -2957,14 +2959,45 @@ body::before { opacity: .32; background: radial-gradient(ellipse at 55% 72%, rgb
 /* v1.0 — harmonisation typographique desktop */
 @media (min-width: 901px) {
   .site-nav a,
-  body[data-view="breeding"] .site-nav a { font-size: 1.04rem; }
+  body[data-view="breeding"] .site-nav a {
+    font-family: "Chakra Petch", "Sora", sans-serif;
+    font-size: 1.04rem;
+  }
 
-  body .site-nav .site-nav__guide-menu a { font-size: .78rem; }
+  body .site-nav .site-nav__guide-menu a {
+    font-family: "Chakra Petch", "Sora", sans-serif;
+    font-size: .82rem;
+  }
 
-  .eyebrow { font-size: .82rem; }
+  .eyebrow {
+    font-family: "Oxanium", "Sora", sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: .11em;
+  }
 
+  .intro .eyebrow,
+  .standalone-page > .eyebrow,
+  .breeding-panel__heading .eyebrow,
+  .breeding-source > .eyebrow,
+  .breeding-page--save > .breeding-source > .eyebrow,
+  .save-source-panel > header .eyebrow {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .guide-element-panel h2,
+  .guide-section > h2 {
+    font-family: "Oxanium", "Sora", sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: .11em;
+  }
+
+  .intro__copy,
   .work-optimization-header > p:not(.eyebrow),
-  .guide-header > p:last-child,
+  .guide-header > p:last-child { font-size: 1.1rem; font-weight: 400; line-height: 1.55; }
+
   .memo-page__toolbar p,
   .info-section-copy { font-size: .92rem; line-height: 1.55; }
 
@@ -2974,12 +3007,21 @@ body::before { opacity: .32; background: radial-gradient(ellipse at 55% 72%, rgb
   .pal-search > label,
   .condensation-slider > label { font-size: .84rem; }
 
-  .passive-skill__effects p { font-size: .84rem; line-height: 1.45; }
+  .passive-skill { height: 154px; min-height: 154px; }
+  .passive-skill__effects p { font-size: .86rem; line-height: 1.46; }
 
-  .partner-skill-card { height: auto; min-height: 253px; }
-  .partner-skill-card__description p { font-size: .82rem; line-height: 1.48; }
+  .partner-skill-card,
+  .guide-section .partner-skill-card { height: 340px; min-height: 340px; }
+  .partner-skill-card__description p { font-size: .84rem; line-height: 1.48; }
 
-  .save-transmission-panel > .eyebrow { font-size: .82rem; }
+  .partner-effect__label { font-size: .76rem; }
+  .partner-effect__progress small { font-size: .72rem; }
+  .partner-effect__progress strong { font-size: .78rem; }
+
+  .save-update-help p { font-size: .78rem; line-height: 1.5; }
+  .save-update-help code { font-size: .74rem; }
+
+  .save-transmission-panel > .eyebrow { font-size: 1rem; font-weight: 600; }
   .save-transmission-panel p { font-size: .86rem; line-height: 1.55; }
   .save-transmission-panel small { font-size: .82rem; line-height: 1.5; }
 }

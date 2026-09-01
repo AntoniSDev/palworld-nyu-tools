@@ -535,10 +535,13 @@ function ensurePartnerSkills() {
 
 function workPageTemplate() {
   const partnerMode = workMode === "partners";
+  const description = partnerMode
+    ? "Présente les compétences partenaires qui améliorent ou influencent le travail des Pals dans la base."
+    : "Présente les compétences passives utiles pour optimiser le travail des Pals dans la base.";
   return `<section class="work-optimization-page">
     <header class="work-optimization-header">
       <p class="eyebrow">Optimisation du travail</p>
-      <p>Trouvez les compétences adaptées pour optimiser le travail des Pals de votre base.</p>
+      <p>${description}</p>
       <nav class="work-mode-tabs" aria-label="Type de compétence">
         <button type="button" data-work-mode="passives" class="${partnerMode ? "" : "active"}" aria-pressed="${!partnerMode}">Compétences passives</button>
         <button type="button" data-work-mode="partners" class="${partnerMode ? "active" : ""}" aria-pressed="${partnerMode}">Compétences partenaires</button>
@@ -775,9 +778,9 @@ function updateCondensationState() {
   });
 }
 
-function guideTabsTemplate(items, selected, attribute, label, withIcons = false) {
+function guideTabsTemplate(items, selected, attribute, label, withIcons = false, withTooltips = false) {
   return `<nav class="guide-tabs ${withIcons ? "guide-tabs--icons" : ""}" aria-label="${escapeHtml(label)}">
-    ${items.map((item) => `<button type="button" data-${attribute}="${item.id}" class="${selected === item.id ? "active" : ""}" aria-pressed="${selected === item.id}"${withIcons ? ` aria-label="${escapeHtml(item.name)}" title="${escapeHtml(item.name)}"` : ""} style="--guide-accent:${item.color || "#63ebe4"}">
+    ${items.map((item) => `<button type="button" data-${attribute}="${item.id}" class="${selected === item.id ? "active" : ""}" aria-pressed="${selected === item.id}"${withIcons ? ` aria-label="${escapeHtml(item.name)}"` : ""}${withTooltips ? ` aria-describedby="work-job-tooltip" data-job-tooltip="${escapeHtml(item.name)}"` : ""} style="--guide-accent:${item.color || "#63ebe4"}">
       ${withIcons && item.icon ? `<img src="${item.icon}" alt="" />` : ""}<span>${escapeHtml(item.name)}</span>
     </button>`).join("")}
   </nav>`;
@@ -847,7 +850,7 @@ function guideFarmingTemplate() {
   const tabs = guideData.farming.tabs;
   const current = guideData.farming[selectedGuideFarmingTab] || {};
   const loot = selectedGuideFarmingTab === "loot";
-  return `<div class="guide-farming-picker">${guideTabsTemplate(tabs, selectedGuideFarmingTab, "guide-farming-tab", "Objectif de farming", true)}</div>
+  return `<div class="guide-farming-picker">${guideTabsTemplate(tabs, selectedGuideFarmingTab, "guide-farming-tab", "Objectif de farming", true, true)}</div>
     ${loot ? guideTabsTemplate(guideData.elements, selectedGuideLootElement, "guide-loot-element", "Type de Pal ciblé", true) : ""}
     <div class="guide-results">
       ${guidePassiveSectionTemplate(current.passives || [])}
@@ -876,6 +879,22 @@ function guideExplorationTemplate() {
 
 function guidePageTemplate() {
   const category = guideData.categories.find((entry) => entry.id === selectedGuideCategory) || guideData.categories[0];
+  const contextualCopy = {
+    combat: selectedGuideCombatMode === "elements"
+      ? "Affiche le tableau des forces et faiblesses élémentaires."
+      : "Regroupe les compétences passives et partenaires utiles au combat, notamment selon les éléments.",
+    farming: {
+      logging: "Présente les passifs et compétences partenaires utiles à l’abattage.",
+      mining: "Présente les passifs et compétences partenaires utiles à l’extraction.",
+      loot: "Recense les compétences partenaires qui améliorent le loot, notamment selon les éléments.",
+    }[selectedGuideFarmingTab],
+    exploration: {
+      movement: "Présente les passifs et compétences partenaires utiles au déplacement.",
+      gliders: "Présente les compétences partenaires liées aux planeurs.",
+      detection: "Présente les compétences partenaires utiles à la détection.",
+      utilities: "Regroupe les compétences partenaires utilitaires pour l’exploration.",
+    }[selectedGuideExplorationTab],
+  }[selectedGuideCategory] || category.copy;
   const categoryContent = {
     combat: guideCombatTemplate,
     farming: guideFarmingTemplate,
@@ -884,7 +903,7 @@ function guidePageTemplate() {
     exploration: guideExplorationTemplate,
   }[selectedGuideCategory]?.() || "";
   return `<section class="guide-page">
-    <header class="guide-header"><p class="eyebrow">${escapeHtml(category.eyebrow)}</p><p>${escapeHtml(category.copy)}</p></header>
+    <header class="guide-header"><p class="eyebrow">${escapeHtml(category.eyebrow)}</p><p>${escapeHtml(contextualCopy)}</p></header>
     <div class="guide-content">${categoryContent}</div>
   </section>`;
 }
