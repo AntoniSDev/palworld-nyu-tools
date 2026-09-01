@@ -1240,7 +1240,10 @@ function updateIntro() {
 }
 
 function switchView(nextView) {
-  if (nextView === currentView && !content.classList.contains("view-leaving")) return;
+  if (nextView === currentView && !content.classList.contains("view-leaving")) {
+    render();
+    return;
+  }
   clearTimeout(viewTransitionTimer);
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
