@@ -150,6 +150,7 @@ const combatButton = document.querySelector("#combat-view");
 const condensationButton = document.querySelector("#condensation-view");
 const breedingButton = document.querySelector("#breeding-view");
 const memoButton = document.querySelector("#memo-view");
+const guideNavigation = document.querySelector(".site-nav__guide");
 const intro = document.querySelector(".intro");
 const pageEyebrow = document.querySelector("#page-eyebrow");
 const pageCopy = document.querySelector("#page-copy");
@@ -1675,6 +1676,21 @@ document.addEventListener("focusout", (event) => {
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") hideJobTooltip();
+});
+
+guideNavigation?.addEventListener("click", (event) => {
+  const link = event.target.closest(".site-nav__guide-menu a");
+  if (!link) return;
+  guideNavigation.classList.add("is-dismissed");
+  link.blur();
+});
+
+guideNavigation?.addEventListener("pointerleave", () => {
+  guideNavigation.classList.remove("is-dismissed");
+});
+
+guideNavigation?.addEventListener("focusin", () => {
+  guideNavigation.classList.remove("is-dismissed");
 });
 
 window.addEventListener("hashchange", syncViewFromHash);

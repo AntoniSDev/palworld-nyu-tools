@@ -153,6 +153,7 @@ button { color: inherit; }
 }
 .site-nav__guide:hover .site-nav__guide-menu,
 .site-nav__guide:focus-within .site-nav__guide-menu { visibility: visible; opacity: 1; transform: translate(-50%, 0); }
+.site-nav__guide.is-dismissed .site-nav__guide-menu { visibility: hidden; opacity: 0; transform: translate(-50%, -4px); }
 .site-nav__guide-menu a { min-height: 36px; padding: 0 11px; border-radius: 6px; font-size: 0.8rem; }
 .site-nav__guide-menu a:hover { background: rgba(81, 204, 207, 0.13); color: #eaffff; }
 
