@@ -639,7 +639,9 @@
     const top = Math.max(occludedTop, rect.top);
     const bottom = Math.min(windowHeight, rect.bottom);
     if (right <= left || bottom <= top) return { x: rect.width / 2, y: rect.height / 2 };
-    return { x: (left + right) / 2 - rect.left, y: (top + bottom) / 2 - rect.top };
+    const screenCenterY = windowHeight / 2;
+    const visibleCenterY = screenCenterY >= top && screenCenterY <= bottom ? screenCenterY : (top + bottom) / 2;
+    return { x: (left + right) / 2 - rect.left, y: visibleCenterY - rect.top };
   }
 
   function centeredCamera(viewportCenterX, viewportCenterY, targetCenterX, targetCenterY) {

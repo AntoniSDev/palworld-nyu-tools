@@ -263,9 +263,9 @@ if (api.cameraAroundPoint(.01, { x: 0, y: 0 }, { x: 0, y: 0, scale: 1 }).scale !
 const fitted = api.fittedCamera(1600, 900, 20000, 8000);
 if (fitted.scale !== .1) throw new Error("Fit does not handle a very large tree at the 10% minimum zoom.");
 const visibleCenter = api.visibleViewportCenter({ left: 360, right: 1240, top: 150, bottom: 1050, width: 880, height: 900 }, 1600, 900, 114);
-if (visibleCenter.x !== 440 || visibleCenter.y !== 375) throw new Error("The visible canvas center ignores viewport clipping.");
+if (visibleCenter.x !== 440 || visibleCenter.y !== 300) throw new Error("The visible canvas center does not target the middle of the user’s screen.");
 const centered = api.centeredCamera(visibleCenter.x, visibleCenter.y, 910, 170);
-if (centered.x !== -470 || centered.y !== 205 || centered.scale !== 1) throw new Error("Recenter does not restore 100% zoom around the final Pal in the visible area.");
+if (centered.x !== -470 || centered.y !== 130 || centered.scale !== 1) throw new Error("Recenter does not restore 100% zoom around the final Pal in the visible area.");
 const panned = api.pannedCamera({ x: 0, y: 0, scale: 1 }, { x: 200, y: 150 }, { x: -1800, y: 2350 });
 if (panned.x !== -2000 || panned.y !== 2200) throw new Error("Camera pan is not 1:1 or is clamped.");
 if (!activeTemplate.includes("data-canvas-zoom-out") || !activeTemplate.includes("data-canvas-zoom-in") || !activeTemplate.includes("data-canvas-fit") || !activeTemplate.includes("data-canvas-scale") || !activeTemplate.includes("Recentrer")) {
