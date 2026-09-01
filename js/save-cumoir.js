@@ -633,8 +633,17 @@
     return { x: (viewportWidth - treeWidth * scale) / 2, y: (viewportHeight - treeHeight * scale) / 2, scale };
   }
 
-  function centeredCamera(viewportWidth, viewportHeight, targetCenterX, targetCenterY) {
-    return { x: viewportWidth / 2 - targetCenterX, y: viewportHeight / 2 - targetCenterY, scale: 1 };
+  function visibleViewportCenter(rect, windowWidth, windowHeight, occludedTop = 0) {
+    const left = Math.max(0, rect.left);
+    const right = Math.min(windowWidth, rect.right);
+    const top = Math.max(occludedTop, rect.top);
+    const bottom = Math.min(windowHeight, rect.bottom);
+    if (right <= left || bottom <= top) return { x: rect.width / 2, y: rect.height / 2 };
+    return { x: (left + right) / 2 - rect.left, y: (top + bottom) / 2 - rect.top };
+  }
+
+  function centeredCamera(viewportCenterX, viewportCenterY, targetCenterX, targetCenterY) {
+    return { x: viewportCenterX - targetCenterX, y: viewportCenterY - targetCenterY, scale: 1 };
   }
 
   function pannedCamera(origin, start, current) {
@@ -659,9 +668,12 @@
     const centerFinalPal = () => {
       const finalNode = tree.querySelector(".save-tree-node--final");
       if (!finalNode) return;
+      const viewportRect = viewport.getBoundingClientRect();
+      const stickyHeaderBottom = document.querySelector(".site-nav")?.getBoundingClientRect().bottom || 0;
+      const visibleCenter = visibleViewportCenter(viewportRect, window.innerWidth, window.innerHeight, stickyHeaderBottom);
       canvas = centeredCamera(
-        viewport.clientWidth,
-        viewport.clientHeight,
+        visibleCenter.x,
+        visibleCenter.y,
         finalNode.offsetLeft + finalNode.offsetWidth / 2,
         finalNode.offsetTop + finalNode.offsetHeight / 2,
       );
@@ -930,6 +942,7 @@
       isSpeciesKnown,
       cameraAroundPoint,
       fittedCamera,
+      visibleViewportCenter,
       centeredCamera,
       pannedCamera,
       scaleLimits: { min: MIN_SCALE, max: MAX_SCALE },
