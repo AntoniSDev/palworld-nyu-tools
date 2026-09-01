@@ -2954,6 +2954,36 @@ body {
 }
 body::before { opacity: .32; background: radial-gradient(ellipse at 55% 72%, rgba(41, 128, 143, .045), transparent 44rem); }
 
+/* v1.0 — harmonisation typographique desktop */
+@media (min-width: 901px) {
+  .site-nav a,
+  body[data-view="breeding"] .site-nav a { font-size: 1.04rem; }
+
+  body .site-nav .site-nav__guide-menu a { font-size: .78rem; }
+
+  .eyebrow { font-size: .82rem; }
+
+  .work-optimization-header > p:not(.eyebrow),
+  .guide-header > p:last-child,
+  .memo-page__toolbar p,
+  .info-section-copy { font-size: .92rem; line-height: 1.55; }
+
+  .work-empty span,
+  .memo-empty { font-size: .9rem; line-height: 1.5; }
+
+  .pal-search > label,
+  .condensation-slider > label { font-size: .84rem; }
+
+  .passive-skill__effects p { font-size: .84rem; line-height: 1.45; }
+
+  .partner-skill-card { height: auto; min-height: 253px; }
+  .partner-skill-card__description p { font-size: .82rem; line-height: 1.48; }
+
+  .save-transmission-panel > .eyebrow { font-size: .82rem; }
+  .save-transmission-panel p { font-size: .86rem; line-height: 1.55; }
+  .save-transmission-panel small { font-size: .82rem; line-height: 1.5; }
+}
+
 @media (max-width: 900px) {
   .site-nav a { min-height: 50px; font-size: .9rem; }
   .breeding-manual-tools { grid-template-columns: 1fr; }
