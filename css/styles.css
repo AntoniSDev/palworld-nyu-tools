@@ -2425,6 +2425,8 @@ body[data-view="breeding"] footer { margin-top: 18px; }
 .save-import-empty ol { margin: 12px 0 16px; padding-left: 20px; color: #a1bdc0; font-size: .78rem; line-height: 1.65; text-align: left; }
 .save-import-empty ol code { color: #b5dddd; }
 .save-primary { min-height: 34px; padding: 0 17px; border: 1px solid rgba(108, 235, 230, .6); border-radius: 7px; background: linear-gradient(120deg, rgba(29, 150, 163, .67), rgba(85, 77, 150, .66)); box-shadow: 0 7px 18px rgba(0, 12, 19, .25); color: #f2ffff; cursor: pointer; font: inherit; font-size: .72rem; font-weight: 850; }
+.save-primary:disabled, .save-world-status button:disabled { cursor: wait; opacity: .68; }
+.save-button-spinner { display: inline-block; width: 11px; height: 11px; margin-right: 5px; border: 2px solid rgba(220, 255, 253, .28); border-top-color: currentColor; border-radius: 50%; vertical-align: -2px; animation: save-spin .7s linear infinite; }
 .save-world-status { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 12px 15px; border: 1px solid rgba(103, 214, 216, .24); border-radius: 10px; background: linear-gradient(110deg, rgba(8, 56, 65, .67), rgba(25, 35, 60, .65)); }
 .save-world-status > div:first-child { display: grid; gap: 3px; }
 .save-world-status small { color: #65d9d5; font-size: .55rem; font-weight: 850; letter-spacing: .09em; text-transform: uppercase; }
@@ -2440,6 +2442,10 @@ body[data-view="breeding"] footer { margin-top: 18px; }
 .save-progress { display: flex; align-items: center; gap: 8px; background: rgba(46, 162, 171, .15); color: #a7dadb; }
 .save-progress span { width: 13px; height: 13px; border: 2px solid rgba(108, 224, 222, .25); border-top-color: #6de1dd; border-radius: 50%; animation: save-spin .7s linear infinite; }
 .save-error { border: 1px solid rgba(237, 106, 132, .3); background: rgba(95, 31, 49, .25); color: #ffabbc; }
+.save-error button { display: block; margin-top: 8px; padding: 6px 10px; border: 1px solid rgba(255, 171, 188, .38); border-radius: 6px; background: rgba(58, 17, 29, .45); color: inherit; cursor: pointer; font: inherit; font-weight: 800; }
+.save-error__path { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-top: 8px; color: #ffd3dc; }
+.save-error__path button { display: inline-block; margin: 0; }
+.save-toast { position: fixed; z-index: 80; right: 22px; bottom: 22px; padding: 10px 15px; border: 1px solid rgba(100, 233, 183, .5); border-radius: 8px; background: rgba(7, 53, 48, .96); box-shadow: 0 12px 28px rgba(0, 0, 0, .34); color: #b8f5d8; font-size: .76rem; font-weight: 800; }
 @keyframes save-spin { to { transform: rotate(360deg); } }
 .breeding-layout--save { grid-template-columns: minmax(310px, 370px) minmax(0, 1fr); }
 .save-breeding-panel { height: auto; min-height: 0; }
@@ -2665,7 +2671,7 @@ body[data-view="breeding"] .site-nav a { font-size: .92rem; font-weight: 700; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .save-progress span { animation: none; }
+  .save-progress span, .save-button-spinner { animation: none; }
 }
 
 /* v0.9 — dernière passe de finition du Cumoir */

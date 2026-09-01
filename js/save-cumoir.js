@@ -21,10 +21,16 @@
 
   let roster = [];
   let activeWorld = null;
+  let directoryHandle = null;
+  let worldRelativePath = "";
   let pendingWorlds = [];
   let parsing = false;
   let progress = "";
   let error = "";
+  let reconnectNeeded = false;
+  let operationKind = "";
+  let toast = "";
+  let toastTimer = 0;
   let targetQuery = "";
   let passiveQuery = "";
   let passiveModalOpen = false;
@@ -220,6 +226,20 @@
     }).finally(() => db.close());
   }
 
+  function normalizeStoredSave(saved) {
+    if (!saved?.activeWorld || !Array.isArray(saved.roster)) return null;
+    return {
+      activeWorld: saved.activeWorld,
+      roster: saved.roster,
+      directoryHandle: saved.directoryHandle || null,
+      worldRelativePath: typeof saved.worldRelativePath === "string" ? saved.worldRelativePath : "",
+    };
+  }
+
+  function storedSaveRecord(world = activeWorld, items = roster, handle = directoryHandle, relativePath = worldRelativePath) {
+    return { activeWorld: world, roster: items, directoryHandle: handle, worldRelativePath: relativePath };
+  }
+
   function currentRoster() {
     const selected = new Set(state.selectedPassives);
     return roster.slice().sort((a, b) => {
@@ -256,12 +276,13 @@
   }
 
   function importEmpty() {
+    const busy = parsing && operationKind === "import";
     return `<div class="save-import-empty">
       <div class="save-import-empty__icon" aria-hidden="true">⇩</div>
       <strong>Importez votre sauvegarde Steam</strong>
       <div class="save-import-path"><code>%localappdata%\\Pal\\Saved\\SaveGames</code><button type="button" data-copy-save-path>Copier le chemin</button></div>
       <ol><li>Ouvrez le sélecteur.</li><li>Collez le chemin.</li><li>Sélectionnez le dossier <code>SaveGames</code>, puis votre monde.</li></ol>
-      <button type="button" class="save-primary" data-import-save>Importer une sauvegarde</button>
+      <button type="button" class="save-primary" data-import-save ${busy ? "disabled" : ""}>${busy ? `<span class="save-button-spinner" aria-hidden="true"></span> Importation…` : "Importer une sauvegarde"}</button>
       <p>Lecture locale : aucun fichier n’est envoyé.</p>
       <input class="save-file-input" data-save-directory type="file" webkitdirectory directory multiple />
     </div>`;
@@ -269,9 +290,10 @@
 
   function worldStatus() {
     const player = activeWorld?.players?.[0];
+    const busy = parsing && operationKind === "update";
     return `<div class="save-world-status">
       <div><small>Sauvegarde active</small><strong>${escapeHtml(activeWorld?.label || "Monde Palworld")}</strong><span class="save-world-status__details">${player ? `<b>${escapeHtml(player.name)}</b><i>Niveau ${player.level}</i>` : ""}<i>${roster.length.toLocaleString("fr-FR")} Pals détectés</i></span></div>
-      <div><button type="button" data-import-save>Mettre à jour</button><button type="button" class="save-danger" data-delete-save>Supprimer</button></div>
+      <div><button type="button" data-import-save ${busy ? "disabled" : ""}>${busy ? `<span class="save-button-spinner" aria-hidden="true"></span> Mise à jour…` : "Mettre à jour"}</button><button type="button" class="save-danger" data-delete-save ${parsing ? "disabled" : ""}>Supprimer</button></div>
       <input class="save-file-input" data-save-directory type="file" webkitdirectory directory multiple />
     </div>`;
   }
@@ -409,7 +431,8 @@
         <section class="breeding-canvas" data-save-viewport aria-label="Arbre généalogique interactif"><div class="breeding-canvas__tip">Molette : zoom · Cliquer-glisser : déplacer</div><div class="breeding-canvas__summary">${escapeHtml(resultSummary(treeResult))}</div><div class="breeding-canvas__controls" aria-label="Contrôles du terrain"><button type="button" data-canvas-zoom-out aria-label="Dézoomer">−</button><button type="button" data-canvas-zoom-in aria-label="Zoomer">+</button><button type="button" data-canvas-fit title="Recentrer l’arbre">Recentrer</button><output data-canvas-scale>100 %</output></div>${graphMarkup}</section>
       </div></div>` : `<header class="breeding-page__header"><p class="eyebrow">Planificateur d’élevage</p></header>${importEmpty()}`}
       ${parsing ? `<div class="save-progress"><span></span>${escapeHtml(progress || "Lecture de la sauvegarde…")}</div>` : ""}
-      ${error ? `<div class="save-error">${escapeHtml(error)}</div>` : ""}
+      ${error ? `<div class="save-error">${escapeHtml(error)}${reconnectNeeded ? `<div class="save-error__path"><code>%localappdata%\\Pal\\Saved\\SaveGames</code><button type="button" data-copy-save-path>Copier le chemin</button></div><button type="button" data-import-save data-reconnect-save>Choisir à nouveau le dossier SaveGames</button>` : ""}</div>` : ""}
+      ${toast ? `<div class="save-toast" role="status" aria-live="polite">${escapeHtml(toast)}</div>` : ""}
       ${modalTemplates()}
     </section>`;
   }
@@ -703,8 +726,163 @@
       const players = entries.filter((entry) => entry.path.toLowerCase().startsWith(prefix) && entry.file.name.toLowerCase().endsWith(".sav")).map((entry) => entry.file);
       const inDirectory = (name) => entries.find((entry) => entry.path.toLowerCase() === `${directory}/${name}`.toLowerCase())?.file || null;
       const label = directory.split("/").filter(Boolean).pop() || "Monde Palworld";
-      return { label, path, level, levelMeta: inDirectory("LevelMeta.sav"), worldOption: inDirectory("WorldOption.sav"), players, modified: level.lastModified };
+      return { label, path, relativePath: directory, level, levelMeta: inDirectory("LevelMeta.sav"), worldOption: inDirectory("WorldOption.sav"), players, modified: level.lastModified };
     }).sort((a, b) => b.modified - a.modified);
+  }
+
+  function supportsDirectoryPicker() {
+    return typeof window.showDirectoryPicker === "function";
+  }
+
+  async function ensureReadPermission(handle) {
+    if (!handle || typeof handle.queryPermission !== "function") return false;
+    let permission = await handle.queryPermission({ mode: "read" });
+    if (permission === "granted") return true;
+    if (permission === "prompt" && typeof handle.requestPermission === "function") {
+      permission = await handle.requestPermission({ mode: "read" });
+    }
+    return permission === "granted";
+  }
+
+  async function entriesByName(handle) {
+    const entries = new Map();
+    for await (const [name, child] of handle.entries()) entries.set(name.toLowerCase(), { name, handle: child });
+    return entries;
+  }
+
+  async function worldFromDirectory(handle, segments) {
+    const entries = await entriesByName(handle);
+    const levelEntry = entries.get("level.sav");
+    if (!levelEntry || levelEntry.handle.kind !== "file") return null;
+    const optionalFile = async (name) => {
+      const entry = entries.get(name.toLowerCase());
+      if (entry?.handle.kind !== "file") return null;
+      const fileHandle = typeof handle.getFileHandle === "function" ? await handle.getFileHandle(entry.name) : entry.handle;
+      return fileHandle.getFile();
+    };
+    const levelHandle = typeof handle.getFileHandle === "function" ? await handle.getFileHandle(levelEntry.name) : levelEntry.handle;
+    const level = await levelHandle.getFile();
+    const relativePath = segments.join("/");
+    return {
+      label: segments.at(-1) || "Monde Palworld",
+      path: `${relativePath ? `${relativePath}/` : ""}Level.sav`,
+      relativePath,
+      level,
+      levelMeta: await optionalFile("LevelMeta.sav"),
+      worldOption: await optionalFile("WorldOption.sav"),
+      players: [],
+      modified: level.lastModified,
+    };
+  }
+
+  async function detectWorldsFromHandle(rootHandle) {
+    const worlds = [];
+    async function visit(handle, segments = []) {
+      const entries = await entriesByName(handle);
+      if (entries.has("level.sav")) {
+        const world = await worldFromDirectory(handle, segments);
+        if (world) worlds.push(world);
+        return;
+      }
+      for (const { name, handle: child } of entries.values()) {
+        if (child.kind !== "directory" || name.toLowerCase() === "backup") continue;
+        await visit(child, [...segments, name]);
+      }
+    }
+    await visit(rootHandle);
+    return worlds.sort((a, b) => b.modified - a.modified);
+  }
+
+  async function worldAtRelativePath(rootHandle, relativePath) {
+    let handle = rootHandle;
+    for (const segment of String(relativePath || "").split(/[\\/]/).filter(Boolean)) {
+      handle = await handle.getDirectoryHandle(segment);
+    }
+    return worldFromDirectory(handle, String(relativePath || "").split(/[\\/]/).filter(Boolean));
+  }
+
+  function directoryId(path) {
+    const parts = String(path || "").replace(/\\/g, "/").split("/").filter(Boolean);
+    if (parts.at(-1)?.toLowerCase() === "level.sav") parts.pop();
+    return (parts.at(-1) || "").toLowerCase();
+  }
+
+  function isSameWorld(currentWorld, nextWorld) {
+    return Boolean(currentWorld && nextWorld && (currentWorld.path === nextWorld.path
+      || (directoryId(currentWorld.path) && directoryId(currentWorld.path) === directoryId(nextWorld.path))));
+  }
+
+  function chooseWorldAction(worlds, preferredPath = "", previousPath = "") {
+    if (!worlds.length) return { type: "none", world: null };
+    const preferred = worlds.find((world) => world.relativePath === preferredPath)
+      || worlds.find((world) => directoryId(world.path) && directoryId(world.path) === directoryId(previousPath));
+    if (preferred) return { type: "direct", world: preferred };
+    if (worlds.length === 1) return { type: "direct", world: worlds[0] };
+    return { type: "choice", world: null };
+  }
+
+  async function prepareDetectedWorlds(worlds, preferredPath = "", previousPath = "") {
+    if (!worlds.length) {
+      error = "Aucun monde Palworld valide n’a été trouvé dans ce dossier.";
+      reconnectNeeded = false; parsing = false; operationKind = ""; render(); return;
+    }
+    progress = "Lecture des informations des mondes…"; render(false);
+    await Promise.all(worlds.map(async (world) => { world.metadata = await readWorldMetadata(world); }));
+    const action = chooseWorldAction(worlds, preferredPath, previousPath);
+    if (action.type === "direct") { await parseWorld(action.world); return; }
+    pendingWorlds = worlds; selectedWorldIndex = 0; worldModalOpen = true;
+    parsing = false; operationKind = ""; render(false);
+  }
+
+  function showSuccess(message) {
+    toast = message;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { toast = ""; render(false); }, 3600);
+  }
+
+  function showReconnectError(message) {
+    parsing = false; operationKind = ""; reconnectNeeded = true; error = message; render();
+  }
+
+  async function chooseDirectoryAndImport() {
+    if (!supportsDirectoryPicker()) { content.querySelector("[data-save-directory]")?.click(); return; }
+    try {
+      const handle = await window.showDirectoryPicker({ id: "palworld-savegames", mode: "read" });
+      directoryHandle = handle;
+      reconnectNeeded = false; error = ""; operationKind = activeWorld ? "update" : "import";
+      parsing = true; progress = "Recherche des mondes Palworld…"; render();
+      const worlds = await detectWorldsFromHandle(handle);
+      await prepareDetectedWorlds(worlds, activeWorld ? worldRelativePath : "", activeWorld?.path || "");
+    } catch (pickerError) {
+      if (pickerError?.name === "AbortError") return;
+      console.error("Échec de l’accès au dossier de sauvegarde :", pickerError);
+      showReconnectError("Impossible d’ouvrir ce dossier. Choisissez à nouveau le dossier SaveGames.");
+    }
+  }
+
+  async function updateFromRememberedDirectory() {
+    if (!directoryHandle) { await chooseDirectoryAndImport(); return; }
+    operationKind = "update"; parsing = true; error = ""; reconnectNeeded = false; progress = "Ouverture du monde mémorisé…"; render();
+    try {
+      if (!await ensureReadPermission(directoryHandle)) {
+        showReconnectError("L’accès au dossier SaveGames n’est plus autorisé. Autorisez-le ou choisissez à nouveau ce dossier."); return;
+      }
+      let world = null;
+      if (worldRelativePath) {
+        try { world = await worldAtRelativePath(directoryHandle, worldRelativePath); }
+        catch (lookupError) { if (lookupError?.name !== "NotFoundError") throw lookupError; }
+      }
+      if (world) {
+        world.metadata = await readWorldMetadata(world);
+        await parseWorld(world); return;
+      }
+      progress = "Le monde mémorisé a changé, nouvelle recherche…"; render(false);
+      const worlds = await detectWorldsFromHandle(directoryHandle);
+      await prepareDetectedWorlds(worlds, worldRelativePath, activeWorld?.path || "");
+    } catch (updateError) {
+      console.error("Échec de la mise à jour de la sauvegarde :", updateError);
+      showReconnectError("Le dossier mémorisé est introuvable ou inaccessible. Choisissez à nouveau le dossier SaveGames.");
+    }
   }
 
   async function readWorldMetadata(world) {
@@ -726,7 +904,7 @@
   }
 
   async function parseWorld(world) {
-    const replacingSameWorld = activeWorld?.path === world.path;
+    const replacingSameWorld = isSameWorld(activeWorld, world);
     const previousGoal = replacingSameWorld ? {
       target: state.target,
       selectedPassives: [...state.selectedPassives],
@@ -741,37 +919,45 @@
       if (data.type === "progress") { progress = data.stage; render(false); return; }
       if (data.type === "parse-error") {
         console.error("Échec du parsing Palworld :", data.message);
-        parsing = false; error = "La sauvegarde n’a pas pu être lue. Vérifiez qu’elle provient bien de Palworld 1.0."; worker.terminate(); render(); return;
+        parsing = false; operationKind = ""; error = "La sauvegarde n’a pas pu être lue. Vérifiez qu’elle provient bien de Palworld 1.0."; worker.terminate(); render(); return;
       }
       if (data.type === "parsed-world") {
         worker.terminate();
         roster = data.result.roster.filter((individual) => palInfo(individual.speciesId));
         activeWorld = { label: world.metadata?.name || world.label, path: world.path, modified: world.modified, players: data.result.players, parseMs: data.result.parseMs, warnings: data.result.warnings };
+        worldRelativePath = world.relativePath || "";
         refreshRosterIndexes();
         state.target = previousGoal?.target || null;
         state.selectedPassives = previousGoal ? previousGoal.selectedPassives.filter((id) => allAvailable.has(id)).slice(0, 4) : [];
         treeResult = null; targetQuery = "";
-        parsing = false; progress = ""; saveState();
-        await dbPut({ activeWorld, roster }).catch((dbError) => console.error("Échec de la sauvegarde locale du roster :", dbError));
+        const completedOperation = operationKind;
+        parsing = false; progress = ""; operationKind = ""; reconnectNeeded = false; saveState();
+        await dbPut(storedSaveRecord()).catch((dbError) => console.error("Échec de la sauvegarde locale du roster :", dbError));
+        showSuccess(completedOperation === "update" ? "Sauvegarde mise à jour avec succès" : "Sauvegarde importée avec succès");
         scheduleSolve(true);
       }
       };
-      worker.onerror = (workerError) => { console.error("Échec du worker de sauvegarde :", workerError.message || workerError); parsing = false; error = "Le module de lecture de sauvegarde n’a pas pu démarrer."; worker.terminate(); render(); };
+      worker.onerror = (workerError) => { console.error("Échec du worker de sauvegarde :", workerError.message || workerError); parsing = false; operationKind = ""; error = "Le module de lecture de sauvegarde n’a pas pu démarrer."; worker.terminate(); render(); };
       worker.postMessage({ type: "parse-world", requestId, level: buffer }, [buffer]);
     } catch (parseError) {
       console.error("Échec de la préparation de la sauvegarde :", parseError);
-      parsing = false; progress = ""; error = "Le fichier Level.sav n’a pas pu être ouvert."; render();
+      parsing = false; operationKind = ""; progress = ""; error = "Le fichier Level.sav n’a pas pu être ouvert."; render();
     }
   }
 
   async function removeSave() {
-    await dbDelete(); roster = []; activeWorld = null; refreshRosterIndexes(); treeResult = null; error = "";
+    await dbDelete(); roster = []; activeWorld = null; directoryHandle = null; worldRelativePath = ""; refreshRosterIndexes(); treeResult = null; error = ""; reconnectNeeded = false; toast = "";
     Object.assign(state, { target: null, selectedPassives: [] }); saveState(); render();
   }
 
   function handleClick(event) {
     if (!event.target.closest(".breeding-page--save")) return;
-    if (event.target.closest("[data-import-save]")) { content.querySelector("[data-save-directory]")?.click(); return; }
+    if (event.target.closest("[data-import-save]")) {
+      if (parsing) return;
+      if (activeWorld && directoryHandle && !event.target.closest("[data-reconnect-save]")) void updateFromRememberedDirectory();
+      else void chooseDirectoryAndImport();
+      return;
+    }
     if (event.target.closest("[data-copy-save-path]")) {
       const path = "%localappdata%\\Pal\\Saved\\SaveGames";
       const copy = navigator.clipboard?.writeText
@@ -823,7 +1009,7 @@
     }
     if (event.target.closest("button[data-close-passive-modal]") || (event.target.matches("[data-close-passive-modal]") && shouldCloseFromBackdrop(event.target))) { passiveModalOpen = false; modalPointerDownOnBackdrop = null; render(false); return; }
     const worldChoice = event.target.closest("[data-world-index]"); if (worldChoice) { selectedWorldIndex = Number(worldChoice.dataset.worldIndex); render(false); return; }
-    if (event.target.closest("[data-import-world]")) { const world = pendingWorlds[selectedWorldIndex]; if (world) void parseWorld(world); return; }
+    if (event.target.closest("[data-import-world]")) { const world = pendingWorlds[selectedWorldIndex]; if (world) { operationKind = activeWorld ? "update" : "import"; void parseWorld(world); } return; }
     if (event.target.closest("button[data-close-world-modal]") || (event.target.matches("[data-close-world-modal]") && shouldCloseFromBackdrop(event.target))) { worldModalOpen = false; modalPointerDownOnBackdrop = null; render(false); return; }
     if (event.target.closest("[data-clear-save-target]")) { state.target = null; activeHistoryId = null; treeResult = null; saveState(); scheduleSolve(true); return; }
   }
@@ -878,17 +1064,14 @@
 
   async function handleChange(event) {
     if (!event.target.matches("[data-save-directory]")) return;
-    pendingWorlds = detectWorlds(event.target.files);
-    if (!pendingWorlds.length) { error = "Aucun monde Palworld valide n’a été trouvé dans ce dossier."; render(); return; }
+    const worlds = detectWorlds(event.target.files);
+    operationKind = activeWorld ? "update" : "import"; parsing = true; reconnectNeeded = false; error = ""; progress = "Recherche des mondes Palworld…"; render();
     try {
-      await Promise.all(pendingWorlds.map(async (world) => {
-        [world.levelBuffer, world.metadata] = await Promise.all([world.level.arrayBuffer(), readWorldMetadata(world)]);
-      }));
-      selectedWorldIndex = 0;
-      worldModalOpen = true; render(false);
+      directoryHandle = null;
+      await prepareDetectedWorlds(worlds, "", activeWorld?.path || "");
     } catch (readError) {
       console.error("Échec de la lecture du dossier de sauvegarde :", readError);
-      error = "Impossible d’ouvrir le fichier Level.sav de ce dossier."; render();
+      parsing = false; operationKind = ""; error = "Impossible d’ouvrir le fichier Level.sav de ce dossier."; render();
     }
   }
 
@@ -907,8 +1090,11 @@
   });
 
   dbGet().then((saved) => {
-    if (!saved?.activeWorld || !Array.isArray(saved.roster)) return;
-    activeWorld = saved.activeWorld; roster = saved.roster;
+    const restored = normalizeStoredSave(saved);
+    if (!restored) return;
+    activeWorld = restored.activeWorld; roster = restored.roster;
+    directoryHandle = restored.directoryHandle;
+    worldRelativePath = restored.worldRelativePath;
     refreshRosterIndexes();
     scheduleSolve(true);
   }).catch(() => {});
@@ -956,6 +1142,16 @@
       upsertHistoryEntries,
       historyPanel,
       historyPinIcon,
+      supportsDirectoryPicker,
+      ensureReadPermission,
+      detectWorlds,
+      detectWorldsFromHandle,
+      worldAtRelativePath,
+      chooseWorldAction,
+      directoryId,
+      isSameWorld,
+      normalizeStoredSave,
+      storedSaveRecord,
     },
   };
 })();
