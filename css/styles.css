@@ -2429,6 +2429,7 @@ body[data-view="breeding"] footer { margin-top: 18px; }
 .save-primary:disabled, .save-world-status button:disabled { cursor: wait; opacity: .68; }
 .save-button-spinner { display: inline-block; width: 11px; height: 11px; margin-right: 5px; border: 2px solid rgba(220, 255, 253, .28); border-top-color: currentColor; border-radius: 50%; vertical-align: -2px; animation: save-spin .7s linear infinite; }
 .save-world-status { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 12px 15px; border: 1px solid rgba(103, 214, 216, .24); border-radius: 10px; background: linear-gradient(110deg, rgba(8, 56, 65, .67), rgba(25, 35, 60, .65)); }
+.save-world-status-wrap { display: grid; gap: 8px; }
 .save-world-status > div:first-child { display: grid; gap: 3px; }
 .save-world-status small { color: #65d9d5; font-size: .55rem; font-weight: 850; letter-spacing: .09em; text-transform: uppercase; }
 .save-world-status strong { color: #edfdfb; font-size: .9rem; }
@@ -2439,14 +2440,16 @@ body[data-view="breeding"] footer { margin-top: 18px; }
 .save-world-status > div:last-of-type { display: flex; gap: 7px; }
 .save-world-status button { min-height: 30px; padding: 0 10px; border: 1px solid rgba(109, 201, 207, .25); border-radius: 6px; background: rgba(8, 31, 40, .75); color: #b5d3d5; cursor: pointer; font: inherit; font-size: .62rem; font-weight: 800; }
 .save-world-status .save-danger { border-color: rgba(229, 116, 139, .25); color: #dc9ba8; }
+.save-update-help { padding: 10px 12px; border: 1px solid rgba(105, 211, 215, .22); border-radius: 8px; background: rgba(5, 30, 39, .75); }
+.save-update-help p { margin: 0 0 8px; color: #a8c5c7; font-size: .69rem; line-height: 1.45; }
+.save-update-help > div { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
+.save-update-help code { color: #c4e9e7; font-size: .65rem; }
+.save-update-help button { min-height: 28px; padding: 0 9px; border: 1px solid rgba(104, 211, 213, .3); border-radius: 5px; background: rgba(23, 76, 86, .58); color: #c5e4e3; cursor: pointer; font: inherit; font-size: .6rem; font-weight: 800; }
+.save-update-help .save-primary { border-color: rgba(108, 235, 230, .55); background: linear-gradient(120deg, rgba(29, 150, 163, .67), rgba(85, 77, 150, .66)); color: #f2ffff; }
 .save-progress, .save-error { padding: 9px 13px; border-radius: 8px; font-size: .7rem; }
 .save-progress { display: flex; align-items: center; gap: 8px; background: rgba(46, 162, 171, .15); color: #a7dadb; }
 .save-progress span { width: 13px; height: 13px; border: 2px solid rgba(108, 224, 222, .25); border-top-color: #6de1dd; border-radius: 50%; animation: save-spin .7s linear infinite; }
 .save-error { border: 1px solid rgba(237, 106, 132, .3); background: rgba(95, 31, 49, .25); color: #ffabbc; }
-.save-error button { display: block; margin-top: 8px; padding: 6px 10px; border: 1px solid rgba(255, 171, 188, .38); border-radius: 6px; background: rgba(58, 17, 29, .45); color: inherit; cursor: pointer; font: inherit; font-weight: 800; }
-.save-error__path { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-top: 8px; color: #ffd3dc; }
-.save-error__path button { display: inline-block; margin: 0; }
-.save-toast { position: fixed; z-index: 80; right: 22px; bottom: 22px; padding: 10px 15px; border: 1px solid rgba(100, 233, 183, .5); border-radius: 8px; background: rgba(7, 53, 48, .96); box-shadow: 0 12px 28px rgba(0, 0, 0, .34); color: #b8f5d8; font-size: .76rem; font-weight: 800; }
 @keyframes save-spin { to { transform: rotate(360deg); } }
 .breeding-layout--save { grid-template-columns: minmax(310px, 370px) minmax(0, 1fr); }
 .save-breeding-panel { height: auto; min-height: 0; }

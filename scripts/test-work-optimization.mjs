@@ -37,8 +37,9 @@ assert(config.passiveProfiles.farming.includes("WorkSuitabilityAddRank_MonsterFa
 assert(!pagesConfig.includes("data/partner-skills-fr.json"), "Le JSON partenaire doit être publié par GitHub Pages.");
 const primaryRoutes = ["#cumoir", "#capacites", "#optimisation", "#guide", "#condensation", "#memo"];
 const primaryLinks = [...indexHtml.matchAll(/<a id="(?:breeding|single|work|combat|condensation|memo)-view"[^>]+href="([^"]+)"/g)];
-assert.equal(primaryLinks.length, 6, "La navigation principale doit contenir six liens.");
-assert.deepEqual(primaryLinks.map((match) => match[1]), primaryRoutes);
+assert.equal(primaryLinks.length, 5, "La navigation principale doit contenir cinq destinations directes.");
+assert.deepEqual(primaryLinks.map((match) => match[1]), primaryRoutes.filter((route) => route !== "#guide"));
+assert.match(indexHtml, /<a id="combat-view" tabindex="0" aria-haspopup="menu">Guide pratique<\/a>/, "Guide pratique doit rester un déclencheur non navigant.");
 assert.match(indexHtml, /<a class="brand" href="#cumoir"/);
 assert(!indexHtml.includes("skills-menu"), "L’ancien menu Compétences doit être supprimé.");
 assert.match(appSource, /const viewFromHash = \(hash\) => viewRoutes\.get\(hash\) \|\| "breeding"/);
