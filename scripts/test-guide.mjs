@@ -69,6 +69,8 @@ assert.deepEqual([...indexHtml.matchAll(/site-nav__guide-menu[\s\S]*?<\/nav>/g)]
 const styles = fs.readFileSync("css/styles.css", "utf8");
 assert.match(styles, /\.site-nav__guide:hover \.site-nav__guide-menu/);
 assert.match(styles, /\.site-nav__guide:focus-within \.site-nav__guide-menu/);
+assert.match(styles, /body \.site-nav \.site-nav__guide-menu a\s*\{[^}]*min-height:\s*36px;[^}]*font-size:\s*\.8rem;/s);
+assert.match(appSource, /primaryNavigation\?\.addEventListener\("dragstart",[\s\S]*?event\.preventDefault\(\)/);
 for (const [hash, label] of [["#guide-combat", "Combat"], ["#guide-farming", "Farming"], ["#guide-fishing", "Pêche"], ["#guide-capture", "Capture"], ["#guide-exploration", "Exploration"]]) {
   assert(indexHtml.includes(`href="${hash}">${label}</a>`), `Lien direct absent : ${label}`);
   assert(appSource.includes(`["${hash}", "guide"]`), `Route directe absente : ${hash}`);

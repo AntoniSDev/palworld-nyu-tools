@@ -150,6 +150,7 @@ const combatButton = document.querySelector("#combat-view");
 const condensationButton = document.querySelector("#condensation-view");
 const breedingButton = document.querySelector("#breeding-view");
 const memoButton = document.querySelector("#memo-view");
+const primaryNavigation = document.querySelector(".site-nav");
 const guideNavigation = document.querySelector(".site-nav__guide");
 const intro = document.querySelector(".intro");
 const pageEyebrow = document.querySelector("#page-eyebrow");
@@ -1701,6 +1702,10 @@ guideNavigation?.addEventListener("pointerleave", () => {
 
 guideNavigation?.addEventListener("focusin", () => {
   guideNavigation.classList.remove("is-dismissed");
+});
+
+primaryNavigation?.addEventListener("dragstart", (event) => {
+  if (event.target.closest("a")) event.preventDefault();
 });
 
 window.addEventListener("hashchange", syncViewFromHash);

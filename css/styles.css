@@ -2862,6 +2862,17 @@ body[data-view="breeding"] .site-nav a { min-height: 54px; font-size: 1rem; font
 .site-nav a,
 body[data-view="breeding"] .site-nav a { min-height: 54px; font-size: 1.1rem; font-weight: 600; }
 
+/* Les liens du sous-menu gardent leur échelle compacte quelle que soit la vue active. */
+body .site-nav .site-nav__guide-menu a {
+  min-height: 36px;
+  font-size: .8rem;
+  font-weight: 700;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.site-nav__inner > a,
+.site-nav__guide > a { user-select: none; -webkit-user-drag: none; }
+
 .breeding-page:not(.breeding-page--save) .breeding-layout { grid-template-columns: minmax(390px, 440px) minmax(0, 1fr); gap: 16px; }
 .breeding-layout--save { grid-template-columns: minmax(320px, 350px) minmax(0, 1fr); gap: 16px; }
 .breeding-pal-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
