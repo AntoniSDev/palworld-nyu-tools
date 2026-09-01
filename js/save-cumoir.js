@@ -633,6 +633,10 @@
     return { x: (viewportWidth - treeWidth * scale) / 2, y: (viewportHeight - treeHeight * scale) / 2, scale };
   }
 
+  function centeredCamera(viewportWidth, viewportHeight, targetCenterX, targetCenterY) {
+    return { x: viewportWidth / 2 - targetCenterX, y: viewportHeight / 2 - targetCenterY, scale: 1 };
+  }
+
   function pannedCamera(origin, start, current) {
     return { x: origin.x + current.x - start.x, y: origin.y + current.y - start.y, scale: origin.scale };
   }
@@ -652,6 +656,17 @@
       if (scaleOutput) scaleOutput.value = `${Math.round(canvas.scale * 100)} %`;
     };
     const fitBreedingCanvas = () => { canvas = fittedCamera(viewport.clientWidth, viewport.clientHeight, tree.offsetWidth, tree.offsetHeight); apply(); };
+    const centerFinalPal = () => {
+      const finalNode = tree.querySelector(".save-tree-node--final");
+      if (!finalNode) return;
+      canvas = centeredCamera(
+        viewport.clientWidth,
+        viewport.clientHeight,
+        finalNode.offsetLeft + finalNode.offsetWidth / 2,
+        finalNode.offsetTop + finalNode.offsetHeight / 2,
+      );
+      apply();
+    };
     if (fit) requestAnimationFrame(fitBreedingCanvas); else apply();
     let pan = null;
     viewport.addEventListener("pointerdown", (event) => { if (event.button !== 0 || event.target.closest(".breeding-canvas__controls")) return; pan = { id: event.pointerId, x: event.clientX, y: event.clientY, ox: canvas.x, oy: canvas.y }; viewport.setPointerCapture(event.pointerId); viewport.classList.add("breeding-canvas--panning"); });
@@ -662,7 +677,7 @@
     viewport.addEventListener("wheel", (event) => { event.preventDefault(); const rect = viewport.getBoundingClientRect(); zoomAt(canvas.scale * Math.exp(-event.deltaY * .0012), { x: event.clientX - rect.left, y: event.clientY - rect.top }); }, { passive: false });
     viewport.querySelector("[data-canvas-zoom-out]")?.addEventListener("click", () => zoomAt(canvas.scale / ZOOM_STEP));
     viewport.querySelector("[data-canvas-zoom-in]")?.addEventListener("click", () => zoomAt(canvas.scale * ZOOM_STEP));
-    viewport.querySelector("[data-canvas-fit]")?.addEventListener("click", fitBreedingCanvas);
+    viewport.querySelector("[data-canvas-fit]")?.addEventListener("click", centerFinalPal);
   }
 
   function detectWorlds(files) {
@@ -915,6 +930,7 @@
       isSpeciesKnown,
       cameraAroundPoint,
       fittedCamera,
+      centeredCamera,
       pannedCamera,
       scaleLimits: { min: MIN_SCALE, max: MAX_SCALE },
       handlePointerDown,

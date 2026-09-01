@@ -262,6 +262,8 @@ if (zoomed.x !== 200 || zoomed.y !== 125 || zoomed.scale !== .5) throw new Error
 if (api.cameraAroundPoint(.01, { x: 0, y: 0 }, { x: 0, y: 0, scale: 1 }).scale !== .1) throw new Error("Camera cannot reach the 10% minimum zoom.");
 const fitted = api.fittedCamera(1600, 900, 20000, 8000);
 if (fitted.scale !== .1) throw new Error("Fit does not handle a very large tree at the 10% minimum zoom.");
+const centered = api.centeredCamera(1600, 900, 910, 170);
+if (centered.x !== -110 || centered.y !== 280 || centered.scale !== 1) throw new Error("Recenter does not restore 100% zoom around the final Pal.");
 const panned = api.pannedCamera({ x: 0, y: 0, scale: 1 }, { x: 200, y: 150 }, { x: -1800, y: 2350 });
 if (panned.x !== -2000 || panned.y !== 2200) throw new Error("Camera pan is not 1:1 or is clamped.");
 if (!activeTemplate.includes("data-canvas-zoom-out") || !activeTemplate.includes("data-canvas-zoom-in") || !activeTemplate.includes("data-canvas-fit") || !activeTemplate.includes("data-canvas-scale") || !activeTemplate.includes("Recentrer")) {
@@ -269,6 +271,9 @@ if (!activeTemplate.includes("data-canvas-zoom-out") || !activeTemplate.includes
 }
 if (!saveCumoirSource.includes("world.style.transform = `translate3d(${renderX}px, ${renderY}px, 0)`") || !saveCumoirSource.includes("tree.style.zoom = canvas.scale") || /world\.style\.zoom|world\.style\.left|world\.style\.top|scale\(\$\{canvas\.scale\}\)/.test(saveCumoirSource)) {
   throw new Error("The canvas does not separate crisp native zoom from virtual-camera translation.");
+}
+if (!saveCumoirSource.includes('tree.querySelector(".save-tree-node--final")') || !saveCumoirSource.includes('addEventListener("click", centerFinalPal)')) {
+  throw new Error("Recenter does not target the final Pal.");
 }
 if (!passiveModal.includes('data-close-passive-modal aria-label="Fermer"') || !passiveModal.includes('data-close-passive-modal>Terminer')) throw new Error("Explicit modal close controls are missing.");
 if (activeTemplate.includes("Gâteau") || activeTemplate.includes("Special Cake")) throw new Error("Cake guidance leaked into the carrier Cumoir.");
