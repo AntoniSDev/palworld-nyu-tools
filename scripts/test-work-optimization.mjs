@@ -41,6 +41,7 @@ assert.equal(primaryLinks.length, 5, "La navigation principale doit contenir cin
 assert.deepEqual(primaryLinks.map((match) => match[1]), primaryRoutes.filter((route) => route !== "#guide"));
 assert.match(indexHtml, /<a id="combat-view" tabindex="0" aria-haspopup="menu">Guide pratique<\/a>/, "Guide pratique doit rester un déclencheur non navigant.");
 assert.match(indexHtml, /<a class="brand" href="#cumoir"/);
+assert.match(indexHtml, /<small class="brand__version">v1\.0<\/small>/, "Le site doit afficher sa version 1.0 officielle.");
 assert(!indexHtml.includes("skills-menu"), "L’ancien menu Compétences doit être supprimé.");
 assert.match(appSource, /const viewFromHash = \(hash\) => viewRoutes\.get\(hash\) \|\| "breeding"/);
 for (const route of primaryRoutes) assert(appSource.includes(`["${route}",`), `Route absente : ${route}`);
