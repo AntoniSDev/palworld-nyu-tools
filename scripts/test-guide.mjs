@@ -64,7 +64,8 @@ assert(!guide.combat.partners.grass[0].effects.some((effect) => effect.label ===
 for (const section of guide.fishing) {
   for (const reference of section.partners) assert(!reference.effects.some((effect) => effect.label === "Vitesse de travail"), "Pêche ne doit pas afficher d’effet Base.");
 }
-assert.match(indexHtml, /href="#guide">Guide pratique<\/a>/);
+assert.match(indexHtml, /<a id="combat-view" tabindex="0" aria-haspopup="menu">Guide pratique<\/a>/);
+assert.doesNotMatch(indexHtml, /id="combat-view"[^>]*href=/);
 assert.deepEqual([...indexHtml.matchAll(/site-nav__guide-menu[\s\S]*?<\/nav>/g)].length, 1);
 const styles = fs.readFileSync("css/styles.css", "utf8");
 assert.match(styles, /\.site-nav__guide:hover \.site-nav__guide-menu/);

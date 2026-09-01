@@ -134,6 +134,7 @@ button { color: inherit; }
 
 .site-nav__guide { position: relative; }
 .site-nav__guide > a { height: 100%; }
+.site-nav__guide > a:not([href]) { cursor: default; }
 .site-nav__guide-menu {
   position: absolute;
   top: calc(100% - 1px);
