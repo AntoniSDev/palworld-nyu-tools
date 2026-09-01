@@ -10,6 +10,7 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_FILE = PROJECT_ROOT / "js" / "condensation-data.js"
+PARTNER_FILE = PROJECT_ROOT / "data" / "partner-skills-fr.json"
 PORTRAIT_ROOT = PROJECT_ROOT / "assets" / "pals" / "condensation"
 
 
@@ -24,6 +25,7 @@ def load_dataset() -> tuple[dict, list[dict]]:
 
 def main() -> None:
     meta, pals = load_dataset()
+    partner_skills = json.loads(PARTNER_FILE.read_text(encoding="utf-8"))["skills"]
     by_code = {pal["code"]: pal for pal in pals}
 
     assert meta["palCount"] == 298 == len(pals)
@@ -39,6 +41,8 @@ def main() -> None:
         assert len(pal["levels"]) == 5
         assert pal["partner"]["name"]
         assert pal["partner"]["description"]
+        assert pal["partner"] == partner_skills[pal["code"]], pal["code"]
+        assert (PROJECT_ROOT / pal["partner"]["icon"]).is_file(), pal["partner"]["icon"]
         for effect in pal["partner"]["effects"]:
             assert effect["label"]
             assert len(effect["values"]) == 5

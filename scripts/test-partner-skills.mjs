@@ -32,11 +32,28 @@ assert.deepEqual(skills.Sekhmet.effects.map((effect) => effect.values), [["+20%"
 
 const forbiddenEnglishStatuses = /\b(?:Burn|Burning|Wet|Wetness|Ivy Cling|Electrical|Electrified|Freeze|Frozen|Muddy|Darkness|Poison|Poisoned)\b/;
 for (const [code, skill] of Object.entries(skills)) {
+  assert(skill.name, `Nom absent pour ${code}`);
+  assert(skill.description, `Description absente pour ${code}`);
+  assert.match(skill.icon, /^assets\/partner-skills\/[A-Za-z0-9_]+\.webp$/, `Icône non locale pour ${code}`);
+  assert(fs.existsSync(skill.icon), `Fichier d’icône absent pour ${code} : ${skill.icon}`);
+  const iconBytes = fs.readFileSync(skill.icon);
+  assert.equal(iconBytes.subarray(0, 4).toString("ascii"), "RIFF", `Icône WebP invalide pour ${code}`);
+  assert.equal(iconBytes.subarray(8, 12).toString("ascii"), "WEBP", `Icône WebP invalide pour ${code}`);
   for (const effect of skill.effects) {
     assert(!forbiddenEnglishStatuses.test(effect.label), `Altération anglaise dans ${code} : ${effect.label}`);
     assert.equal(effect.values.length, 5, `Progression incomplète dans ${code} : ${effect.label}`);
   }
 }
+
+assert.match(skills.BlackPuppy.description, /Lorsqu'activée.*détecter le Chromite.*Lorsqu'il combat à vos côtés.*Chromite/s);
+assert.match(skills.GuardianDog.description, /combat à vos côtés.*même compétence passive.*exception/s);
+assert.match(skills.GhostBlackCat.description, /dans l'équipe.*capture.*derrière/s);
+assert.match(skills.FluffyBird.description, /dans l'équipe.*Gel/s);
+assert.match(skills.DandelionGirl.description, /Entrave.*dans l'équipe/s);
+assert.match(skills.CatBat.description, /Lorsqu'activée.*donjons.*coffres.*débris/s);
+assert.match(skills.SifuDog.description, /Lorsqu'il est activé.*téléporter.*Inutilisable dans les donjons/s);
+assert.match(skills.MimicDog.description, /combat à vos côtés.*ouvrir les coffres sans utiliser de clé/s);
+assert.match(skills.NightFox.description, /statues de Pal.*lorsqu'il est appelé/s);
 
 assert.match(source.meta.localizationSource, /retrieved 2026-09-01$/);
 assert.match(source.meta.scaleSource, /retrieved 2026-09-01$/);

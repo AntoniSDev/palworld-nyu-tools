@@ -18,6 +18,8 @@ const passiveIds = new Set(passives.map((passive) => passive.id));
 const palCodes = new Set(pals.map((pal) => pal.code));
 
 assert.deepEqual(Array.from(guide.categories, (category) => category.name), ["Combat", "Farming", "Pêche", "Capture", "Exploration"]);
+assert.deepEqual(Array.from(guide.categories, (category) => category.eyebrow), ["Guide de combat", "Guide de farming", "Guide de pêche", "Guide de capture", "Guide d'exploration"]);
+for (const category of guide.categories) assert(category.copy, `Texte d’en-tête absent : ${category.name}`);
 assert.equal(guide.elements.length, 9);
 const relations = Object.fromEntries(Array.from(guide.elements, (element) => [element.id, { strong: Array.from(element.strong), weak: Array.from(element.weak) }]));
 assert.deepEqual(relations, {
@@ -53,8 +55,9 @@ for (const reference of references) {
   for (const effect of reference.effects || []) {
     const label = effect.sourceLabel || effect.label;
     assert(skill.effects.some((entry) => entry.label === label), `Effet partenaire inconnu pour ${reference.pal} : ${label}`);
-    assert(!/\d/.test(effect.description), `Une description UX duplique une valeur pour ${reference.pal}.`);
+    assert.equal("description" in effect, false, `Description parallèle interdite pour ${reference.pal}.`);
   }
+  assert.equal("description" in reference, false, `Résumé partenaire interdit pour ${reference.pal}.`);
 }
 
 assert(!guide.combat.partners.grass[0].effects.some((effect) => effect.label === "Vitesse de travail"), "Combat ne doit pas afficher l’effet Base de Ribbuny Botan.");
@@ -62,10 +65,25 @@ for (const section of guide.fishing) {
   for (const reference of section.partners) assert(!reference.effects.some((effect) => effect.label === "Vitesse de travail"), "Pêche ne doit pas afficher d’effet Base.");
 }
 assert.match(indexHtml, /href="#guide">Guide pratique<\/a>/);
+assert.deepEqual([...indexHtml.matchAll(/site-nav__guide-menu[\s\S]*?<\/nav>/g)].length, 1);
+const styles = fs.readFileSync("css/styles.css", "utf8");
+assert.match(styles, /\.site-nav__guide:hover \.site-nav__guide-menu/);
+assert.match(styles, /\.site-nav__guide:focus-within \.site-nav__guide-menu/);
+for (const [hash, label] of [["#guide-combat", "Combat"], ["#guide-farming", "Farming"], ["#guide-fishing", "Pêche"], ["#guide-capture", "Capture"], ["#guide-exploration", "Exploration"]]) {
+  assert(indexHtml.includes(`href="${hash}">${label}</a>`), `Lien direct absent : ${label}`);
+  assert(appSource.includes(`["${hash}", "guide"]`), `Route directe absente : ${hash}`);
+}
 assert.match(indexHtml, /js\/guide-data\.js\?v=/);
 assert.match(appSource, /\["#guide", "guide"\]/);
 assert.match(appSource, /\["#combat", "guide"\]/);
 assert.match(appSource, /currentView === "guide"/);
-assert.match(appSource, /data-guide-combat-element/);
+assert.match(appSource, /name: "Éléments"/);
+assert.match(appSource, /name: "Aides au combat"/);
+assert.doesNotMatch(appSource, /data-guide-combat-element/);
+assert.match(appSource, /<article class="guide-element-card">/);
+assert.match(appSource, /selectedGuideCombatMode === "elements"/);
+assert.deepEqual(Array.from(guide.farming.tabs, (tab) => tab.name), ["Abattage", "Extraction", "Loot", "Ressources spéciales"]);
+for (const tab of guide.farming.tabs) assert(tab.icon && fs.existsSync(tab.icon), `Icône Farming absente : ${tab.name}`);
+assert(!fs.readFileSync("js/guide-data.js", "utf8").includes("description:"), "guide-data.js ne doit pas réécrire les pouvoirs.");
 
 console.log("Guide pratique: OK");

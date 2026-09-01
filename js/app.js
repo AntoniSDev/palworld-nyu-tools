@@ -170,6 +170,7 @@ let partnerSkillsData = null;
 let partnerSkillsError = false;
 let partnerSkillsPromise = null;
 let selectedGuideCategory = "combat";
+let selectedGuideCombatMode = "elements";
 let selectedGuideCombatFilter = "general";
 let selectedGuideFarmingTab = "logging";
 let selectedGuideLootElement = "fire";
@@ -183,6 +184,11 @@ const viewRoutes = new Map([
   ["#optimisation", "work"],
   ["#guide", "guide"],
   ["#combat", "guide"],
+  ["#guide-combat", "guide"],
+  ["#guide-farming", "guide"],
+  ["#guide-fishing", "guide"],
+  ["#guide-capture", "guide"],
+  ["#guide-exploration", "guide"],
   ["#condensation", "condensation"],
   ["#memo", "memo"],
 ]);
@@ -421,7 +427,13 @@ function formatPartnerValue(value, magnitude = false) {
 }
 
 function highlightPartnerText(text, highlights = []) {
-  return highlights.reduce(
+  const canonicalHighlights = [
+    "Lorsqu'activée", "Lorsqu'activé", "Lorsqu'il est activé", "Lorsqu'elle est activée", "lorsqu'il est dans l'équipe", "lorsqu'elle est dans l'équipe",
+    "lorsqu'il combat à vos côtés", "lorsqu'elle combat à vos côtés", "lorsqu'il est monté", "une fois monté",
+    "dans la base", "à affecter à une Ferme", "Effet non cumulable", "effet non cumulable",
+    "Chromite", "Gel", "Entrave", "Ferme",
+  ];
+  return [...new Set([...canonicalHighlights, ...highlights])].sort((a, b) => b.length - a.length).reduce(
     (html, term) => html.replaceAll(escapeHtml(term), `<strong class="partner-skill-card__keyword">${escapeHtml(term)}</strong>`),
     escapeHtml(text),
   );
@@ -454,9 +466,7 @@ function workPartnerCardTemplate(reference) {
     effect: skill?.effects?.find((entry) => entry.label === (metadata.sourceLabel || metadata.label)),
   }));
   if (!skill || !pal || resolvedEffects.some((entry) => !entry.effect)) return "";
-  const descriptions = [reference.description ? `<p>${highlightPartnerText(reference.description, reference.highlights)}</p>` : "", ...resolvedEffects
-    .map(({ metadata }) => `<p>${highlightPartnerText(metadata.description, reference.highlights)}</p>`)
-  ].filter(Boolean).join("");
+  const description = highlightPartnerText(skill.description, reference.highlights);
   const notes = [reference.note ? highlightPartnerText(reference.note, reference.highlights) : ""].filter(Boolean);
 
   return `<article class="partner-skill-card">
@@ -467,9 +477,12 @@ function workPartnerCardTemplate(reference) {
           <p>${escapeHtml(pal.name)}</p>
           ${reference.nonCumulative ? '<span class="partner-skill-card__non-cumulative">Non cumulable</span>' : ""}
         </div>
-        <h3>${escapeHtml(skill.name)}</h3>
+        <div class="partner-skill-card__skill">
+          ${skill.icon ? `<img src="${escapeHtml(skill.icon)}" alt="" />` : ""}
+          <h3>${escapeHtml(skill.name)}</h3>
+        </div>
       </header>
-      <div class="partner-skill-card__description">${descriptions}</div>
+      <div class="partner-skill-card__description"><p>${description}</p></div>
       <div class="partner-skill-card__effects">
         ${resolvedEffects.map(({ effect, metadata }) => partnerEffectTemplate(effect, metadata)).join("")}
       </div>
@@ -498,7 +511,7 @@ function partnerResultsTemplate() {
 
 function ensurePartnerSkills() {
   if (partnerSkillsData || partnerSkillsError || partnerSkillsPromise) return;
-  const partnerSkillsUrl = new URL("data/partner-skills-fr.json?v=0.9.2", document.baseURI).href;
+  const partnerSkillsUrl = new URL("data/partner-skills-fr.json?v=0.9.3", document.baseURI).href;
   partnerSkillsPromise = fetch(partnerSkillsUrl)
     .then((response) => {
       if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
@@ -625,8 +638,11 @@ function condensationPartnerTemplate(pal, stars) {
   return `
     <div class="condensation-partner">
       <div class="condensation-partner__eyebrow"><span>Compétence partenaire</span><small>${stars}★</small></div>
-      <h3>${escapeHtml(partner.name)}</h3>
-      <p class="condensation-partner__description">${escapeHtml(partner.description)}</p>
+      <div class="condensation-partner__title">
+        ${partner.icon ? `<img src="${escapeHtml(partner.icon)}" alt="" />` : ""}
+        <h3>${escapeHtml(partner.name)}</h3>
+      </div>
+      <p class="condensation-partner__description">${highlightPartnerText(partner.description)}</p>
       ${
         effects
           ? `<div class="condensation-partner__effects">${effects}</div>`
@@ -759,7 +775,7 @@ function updateCondensationState() {
 
 function guideTabsTemplate(items, selected, attribute, label, withIcons = false) {
   return `<nav class="guide-tabs ${withIcons ? "guide-tabs--icons" : ""}" aria-label="${escapeHtml(label)}">
-    ${items.map((item) => `<button type="button" data-${attribute}="${item.id}" class="${selected === item.id ? "active" : ""}" aria-pressed="${selected === item.id}" style="--guide-accent:${item.color || "#63ebe4"}">
+    ${items.map((item) => `<button type="button" data-${attribute}="${item.id}" class="${selected === item.id ? "active" : ""}" aria-pressed="${selected === item.id}"${withIcons ? ` aria-label="${escapeHtml(item.name)}" title="${escapeHtml(item.name)}"` : ""} style="--guide-accent:${item.color || "#63ebe4"}">
       ${withIcons && item.icon ? `<img src="${item.icon}" alt="" />` : ""}<span>${escapeHtml(item.name)}</span>
     </button>`).join("")}
   </nav>`;
@@ -783,22 +799,26 @@ function guideElementMatrixTemplate() {
     ? ids.map((id) => { const element = byId.get(id); return `<span><img src="${element.icon}" alt="" />${escapeHtml(element.name)}</span>`; }).join("")
     : `<span class="guide-element-card__none">${empty}</span>`;
   return `<section class="guide-element-panel" aria-labelledby="guide-elements-title">
-    <header><h2 id="guide-elements-title">Affinités élémentaires</h2><p>Cliquez sur un élément pour afficher les aides associées.</p></header>
+    <header><h2 id="guide-elements-title">Affinités élémentaires</h2><p>Consultez rapidement les forces et faiblesses des neuf éléments.</p></header>
     <div class="guide-element-grid">
-      ${guideData.elements.map((element) => `<button type="button" class="guide-element-card ${selectedGuideCombatFilter === element.id ? "selected" : ""}" data-guide-combat-element="${element.id}">
+      ${guideData.elements.map((element) => `<article class="guide-element-card">
         <span class="guide-element-card__identity"><img src="${element.icon}" alt="" /><strong>${escapeHtml(element.name)}</strong></span>
         <span class="guide-element-card__relation"><small>Fort contre</small>${relation(element.strong)}</span>
         <span class="guide-element-card__relation"><small>Faible contre</small>${relation(element.weak)}</span>
-      </button>`).join("")}
+      </article>`).join("")}
     </div>
   </section>`;
 }
 
 function guideCombatTemplate() {
+  const modes = [{ id: "elements", name: "Éléments" }, { id: "helpers", name: "Aides au combat" }];
+  if (selectedGuideCombatMode === "elements") {
+    return `${guideTabsTemplate(modes, selectedGuideCombatMode, "guide-combat-mode", "Rubrique de combat")}${guideElementMatrixTemplate()}`;
+  }
   const filters = [{ id: "general", name: "Général" }, ...guideData.elements];
   const passives = guideData.combat.passives[selectedGuideCombatFilter] || [];
   const partners = guideData.combat.partners[selectedGuideCombatFilter] || [];
-  return `${guideElementMatrixTemplate()}
+  return `${guideTabsTemplate(modes, selectedGuideCombatMode, "guide-combat-mode", "Rubrique de combat")}
     ${guideTabsTemplate(filters, selectedGuideCombatFilter, "guide-combat-filter", "Filtrer les aides de combat", true)}
     <div class="guide-results">${guidePassiveSectionTemplate(passives)}${guidePartnerSectionTemplate("Pals / compétences partenaires", partners)}</div>`;
 }
@@ -810,7 +830,7 @@ function guideLootPartners() {
   const label = `Objets obtenus sur les Pals de ${element.name}`;
   return Object.entries(partnerSkillsData.skills)
     .filter(([pal, skill]) => pal !== "NegativeKoala" && skill.effects?.some((effect) => effect.label === label))
-    .map(([pal]) => ({ pal, nonCumulative: true, effects: [{ label, description: `Augmente les objets obtenus en battant des Pals de type ${element.name}.` }] }));
+    .map(([pal]) => ({ pal, nonCumulative: true, effects: [{ label }] }));
 }
 
 function guideLootSectionTemplate() {
@@ -825,7 +845,7 @@ function guideFarmingTemplate() {
   const tabs = guideData.farming.tabs;
   const current = guideData.farming[selectedGuideFarmingTab] || {};
   const loot = selectedGuideFarmingTab === "loot";
-  return `${guideTabsTemplate(tabs, selectedGuideFarmingTab, "guide-farming-tab", "Objectif de farming")}
+  return `<div class="guide-farming-picker">${guideTabsTemplate(tabs, selectedGuideFarmingTab, "guide-farming-tab", "Objectif de farming", true)}</div>
     ${loot ? guideTabsTemplate(guideData.elements, selectedGuideLootElement, "guide-loot-element", "Type de Pal ciblé", true) : ""}
     <div class="guide-results">
       ${guidePassiveSectionTemplate(current.passives || [])}
@@ -843,6 +863,7 @@ function guideExplorationTemplate() {
 }
 
 function guidePageTemplate() {
+  const category = guideData.categories.find((entry) => entry.id === selectedGuideCategory) || guideData.categories[0];
   const categoryContent = {
     combat: guideCombatTemplate,
     farming: guideFarmingTemplate,
@@ -851,7 +872,7 @@ function guidePageTemplate() {
     exploration: guideExplorationTemplate,
   }[selectedGuideCategory]?.() || "";
   return `<section class="guide-page">
-    <header class="guide-header"><p class="eyebrow">Aides hors de la base</p><p>Choisissez votre objectif pour retrouver les passifs et Pals qui peuvent réellement vous aider.</p></header>
+    <header class="guide-header"><p class="eyebrow">${escapeHtml(category.eyebrow)}</p><p>${escapeHtml(category.copy)}</p></header>
     ${guideTabsTemplate(guideData.categories, selectedGuideCategory, "guide-category", "Catégorie du Guide pratique")}
     <div class="guide-content">${categoryContent}</div>
   </section>`;
@@ -1239,6 +1260,11 @@ function switchView(nextView) {
 }
 
 function syncViewFromHash() {
+  const guideCategoryRoutes = {
+    "#guide": "combat", "#combat": "combat", "#guide-combat": "combat", "#guide-farming": "farming",
+    "#guide-fishing": "fishing", "#guide-capture": "capture", "#guide-exploration": "exploration",
+  };
+  if (guideCategoryRoutes[window.location.hash]) selectedGuideCategory = guideCategoryRoutes[window.location.hash];
   const nextView = viewFromHash(window.location.hash);
   if (nextView === "condensation" && currentView !== "condensation") {
     selectedCondensationPalId = null;
@@ -1375,13 +1401,22 @@ content.addEventListener("click", (event) => {
   const guideCategoryButton = event.target.closest("[data-guide-category]");
   if (guideCategoryButton) {
     selectedGuideCategory = guideCategoryButton.dataset.guideCategory;
+    const hash = selectedGuideCategory === "combat" ? "#guide" : `#guide-${selectedGuideCategory}`;
+    if (window.location.hash === hash) render();
+    else window.location.hash = hash;
+    return;
+  }
+
+  const guideCombatModeButton = event.target.closest("[data-guide-combat-mode]");
+  if (guideCombatModeButton) {
+    selectedGuideCombatMode = guideCombatModeButton.dataset.guideCombatMode;
     render();
     return;
   }
 
-  const guideCombatButton = event.target.closest("[data-guide-combat-filter], [data-guide-combat-element]");
+  const guideCombatButton = event.target.closest("[data-guide-combat-filter]");
   if (guideCombatButton) {
-    selectedGuideCombatFilter = guideCombatButton.dataset.guideCombatFilter || guideCombatButton.dataset.guideCombatElement;
+    selectedGuideCombatFilter = guideCombatButton.dataset.guideCombatFilter;
     render();
     return;
   }
@@ -1651,6 +1686,5 @@ document.addEventListener("keydown", (event) => {
 
 window.addEventListener("hashchange", syncViewFromHash);
 window.addEventListener("DOMContentLoaded", () => {
-  currentView = viewFromHash(window.location.hash);
-  render();
+  syncViewFromHash();
 }, { once: true });

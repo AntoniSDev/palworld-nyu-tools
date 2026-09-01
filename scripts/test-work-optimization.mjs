@@ -62,7 +62,7 @@ for (const entries of Object.values(config.partnerActivities)) {
     for (const effect of entry.effects) {
       const sourceLabel = effect.sourceLabel || effect.label;
       assert(skill.effects.some((sourceEffect) => sourceEffect.label === sourceLabel), `Effet absent pour ${entry.pal} : ${sourceLabel}`);
-      assert(!/\d/.test(effect.description), `La description de ${entry.pal} ne doit pas dupliquer les valeurs de progression.`);
+      assert.equal("description" in effect, false, `Description parallèle interdite pour ${entry.pal}.`);
     }
     if (entry.note) assert(!/\d/.test(entry.note), `La note UX de ${entry.pal} ne doit pas dupliquer de valeur numérique.`);
   }
@@ -81,8 +81,8 @@ for (const [code, palName] of [["JellyfishFairy", "Jelliette"], ["JellyfishGhost
   const effect = reference.effects[0];
   assert.equal(effect.label, `Vitesse d’arrosage de ${palName}`);
   assert.equal(effect.sourceLabel, "Vitesse de travail");
-  assert(effect.description.includes(palName), `${palName} doit être présenté comme bénéficiaire personnel.`);
-  assert(effect.description.includes("Jelliette et Jellroy"), `La condition du duo doit être indiquée pour ${palName}.`);
+  assert(partnerSource[code].description.includes(palName), `${palName} doit être présenté comme bénéficiaire personnel.`);
+  assert(partnerSource[code].description.includes("Jelliette et Jellroy"), `La condition du duo doit être indiquée pour ${palName}.`);
   assert(reference.note.includes("Jelliette et Jellroy"));
   assert.equal(reference.nonCumulative, true);
   assert.deepEqual(
@@ -111,5 +111,7 @@ assert.deepEqual(
 assert.match(appSource, /\(reference\.effects \|\| \[\]\)\.map/, "Le rendu partenaire doit accepter plusieurs effets.");
 assert.match(appSource, /if \(magnitude\) formatted = formatted\.replace/, "Les réductions doivent afficher une grandeur positive.");
 assert.match(appSource, /notes\.length \? `<div class="partner-skill-card__notes">/, "Un bloc notes ne doit être rendu que lorsqu’une note existe.");
+assert.match(appSource, /highlightPartnerText\(skill\.description/, "Le rendu doit utiliser le texte canonique.");
+assert(!fs.readFileSync("js/work-optimization-data.js", "utf8").includes("description:"), "La configuration ne doit pas réécrire les pouvoirs.");
 
 console.log("Work optimization data: OK");

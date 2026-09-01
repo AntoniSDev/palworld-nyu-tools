@@ -1,5 +1,5 @@
 (() => {
-  const effect = (label, description, options = {}) => ({ label, description, ...options });
+  const effect = (label, options = {}) => ({ label, ...options });
   const partner = (pal, effects = [], options = {}) => ({ pal, effects, ...options });
 
   const elements = [
@@ -29,73 +29,73 @@
 
   window.GUIDE_DATA = {
     categories: [
-      { id: "combat", name: "Combat" },
-      { id: "farming", name: "Farming" },
-      { id: "fishing", name: "Pêche" },
-      { id: "capture", name: "Capture" },
-      { id: "exploration", name: "Exploration" },
+      { id: "combat", name: "Combat", eyebrow: "Guide de combat", copy: "Comprenez les forces élémentaires et trouvez les compétences et Pals utiles en combat." },
+      { id: "farming", name: "Farming", eyebrow: "Guide de farming", copy: "Trouvez les compétences et Pals utiles pour l'abattage, l'extraction, le loot et les ressources spéciales." },
+      { id: "fishing", name: "Pêche", eyebrow: "Guide de pêche", copy: "Améliorez vos parties de pêche, vos récompenses et vos chances de trouver des Pals talentueux." },
+      { id: "capture", name: "Capture", eyebrow: "Guide de capture", copy: "Augmentez vos chances de capture, économisez vos sphères et recherchez plus facilement les passifs souhaités." },
+      { id: "exploration", name: "Exploration", eyebrow: "Guide d'exploration", copy: "Retrouvez les Pals utiles pour vous déplacer, planer, détecter des ressources et explorer Palpagos." },
     ],
     elements,
     combat: {
       passives: combatPassives,
       partners: {
-        fire: [partner("StuffedShark_Fire", [effect("Dégâts de Feu aux points faibles", "Augmente les dégâts de Feu infligés aux points faibles.")], { nonCumulative: true })],
-        grass: [partner("PinkRabbit_Grass", [effect("Dégâts de Herbe aux points faibles", "Augmente les dégâts de Herbe infligés aux points faibles.")], { nonCumulative: true })],
-        ground: [partner("TentacleTurtle_Ground", [effect("Dégâts de Terre aux points faibles", "Augmente les dégâts de Terre infligés aux points faibles.")], { nonCumulative: true })],
+        fire: [partner("StuffedShark_Fire", [effect("Dégâts de Feu aux points faibles")], { nonCumulative: true })],
+        grass: [partner("PinkRabbit_Grass", [effect("Dégâts de Herbe aux points faibles")], { nonCumulative: true })],
+        ground: [partner("TentacleTurtle_Ground", [effect("Dégâts de Terre aux points faibles")], { nonCumulative: true })],
       },
     },
     farming: {
       tabs: [
-        { id: "logging", name: "Abattage" },
-        { id: "mining", name: "Extraction" },
-        { id: "loot", name: "Loot" },
-        { id: "special", name: "Ressources spéciales" },
+        { id: "logging", name: "Abattage", icon: "assets/work-suitabilities/06.webp" },
+        { id: "mining", name: "Extraction", icon: "assets/work-suitabilities/07.webp" },
+        { id: "loot", name: "Loot", icon: "assets/partner-skills/T_icon_skill_pal_014.webp" },
+        { id: "special", name: "Ressources spéciales", icon: "assets/guide-chromite.webp" },
       ],
       logging: {
         passives: ["TrainerLogging_up1"],
         partners: [
           partner("PlantSlime", [
-            effect("Efficacité d’abattage", "Augmente les dégâts du joueur lors de l’abattage."),
-            effect("Réduction du poids des objets", "Réduit le poids des différents types de bois.")
+            effect("Efficacité d’abattage"),
+            effect("Réduction du poids des objets")
           ], { nonCumulative: true }),
-          partner("Deer", [effect("Efficacité d’abattage", "Augmente l’efficacité contre les arbres lorsque le Pal est monté.")]),
+          partner("Deer", [effect("Efficacité d’abattage")]),
         ],
       },
       mining: {
         passives: ["TrainerMining_up1"],
         partners: [
           partner("CuteMole", [
-            effect("Efficacité d’extraction", "Augmente les dégâts d’extraction du joueur."),
-            effect("Réduction du poids des objets", "Réduit le poids de la Pierre.")
+            effect("Efficacité d’extraction"),
+            effect("Réduction du poids des objets")
           ], { nonCumulative: true }),
-          partner("Boar", [effect("Efficacité d’extraction", "Augmente l’efficacité contre les rochers lorsque le Pal est monté.")]),
+          partner("Boar", [effect("Efficacité d’extraction")]),
         ],
       },
       special: {
-        partners: [partner("BlackPuppy", [effect("Rendement de collecte", "Détecte le Chromite et augmente la quantité obtenue.")], { nonCumulative: true, highlights: ["Chromite"] })],
+        partners: [partner("BlackPuppy", [effect("Rendement de collecte")], { nonCumulative: true, highlights: ["Chromite"] })],
       },
     },
     fishing: [
       {
         title: "Faciliter la pêche",
         partners: [
-          partner("IceNarwhal", [effect("Progression initiale de pêche", "Remplit davantage la jauge au début du mini-jeu."), effect("Progression de la jauge de pêche", "Accélère la jauge lorsque les barres sont superposées.")], { nonCumulative: true }),
-          partner("IceNarwhal_Fire", [effect("Progression initiale de pêche", "Remplit davantage la jauge au début du mini-jeu."), effect("Progression de la jauge de pêche", "Accélère la jauge lorsque les barres sont superposées.")], { nonCumulative: true }),
-          partner("OctopusGirl", [effect("Réduction des échecs de pêche", "Réduit la perte de jauge lorsque les barres ne sont pas superposées.")], { nonCumulative: true }),
+          partner("IceNarwhal", [effect("Progression initiale de pêche"), effect("Progression de la jauge de pêche")], { nonCumulative: true }),
+          partner("IceNarwhal_Fire", [effect("Progression initiale de pêche"), effect("Progression de la jauge de pêche")], { nonCumulative: true }),
+          partner("OctopusGirl", [effect("Réduction des échecs de pêche")], { nonCumulative: true }),
         ],
       },
       {
         title: "Loot de pêche",
         partners: [
-          partner("JellyfishFairy", [effect("Objets supplémentaires obtenus en pêche", "Augmente les objets obtenus à la pêche."), effect("Butin supplémentaire sur les ennemis pêchés", "Augmente le butin des ennemis pêchés.")], { nonCumulative: true }),
-          partner("JellyfishGhost", [effect("Objets de récupération obtenus en pêche", "Augmente les objets obtenus par récupération.")], { nonCumulative: true }),
+          partner("JellyfishFairy", [effect("Objets supplémentaires obtenus en pêche"), effect("Butin supplémentaire sur les ennemis pêchés")], { nonCumulative: true }),
+          partner("JellyfishGhost", [effect("Objets de récupération obtenus en pêche")], { nonCumulative: true }),
         ],
       },
       {
         title: "Pals talentueux",
         partners: [
-          partner("KingSunfish", [effect("Chance d’obtenir un Pal talentueux en pêche", "Augmente les chances de pêcher un Pal talentueux.")]),
-          partner("KingSunfish_Thunder", [effect("Chance d’obtenir un Pal talentueux en pêche", "Augmente les chances de pêcher un Pal talentueux.")]),
+          partner("KingSunfish", [effect("Chance d’obtenir un Pal talentueux en pêche")]),
+          partner("KingSunfish_Thunder", [effect("Chance d’obtenir un Pal talentueux en pêche")]),
         ],
       },
     ],
@@ -103,21 +103,21 @@
       {
         title: "Augmenter les chances de capture",
         partners: [
-          partner("DandelionGirl", [effect("Bonus de capture sur une cible entravée", "Augmente les chances de capture d’une cible sous Entrave.")], { nonCumulative: true }),
-          partner("FluffyBird", [effect("Bonus de capture sur une cible gelée", "Augmente les chances de capture d’une cible sous Gel.")], { nonCumulative: true }),
-          partner("GhostBlackCat", [effect("Bonus de capture furtive", "Augmente le bonus de capture lors d’une attaque par derrière.")], { nonCumulative: true }),
+          partner("DandelionGirl", [effect("Bonus de capture sur une cible entravée")], { nonCumulative: true }),
+          partner("FluffyBird", [effect("Bonus de capture sur une cible gelée")], { nonCumulative: true }),
+          partner("GhostBlackCat", [effect("Bonus de capture furtive")], { nonCumulative: true }),
         ],
       },
       {
         title: "Sphères",
         partners: [
-          partner("CatMage", [effect("Récupération des Sphères", "Donne une chance que la sphère lancée ne soit pas consommée.")], { nonCumulative: true }),
-          partner("Mutant", [effect("Capacité de charge", "Rend les sphères téléguidées et augmente la capacité de charge.")], { nonCumulative: true }),
+          partner("CatMage", [effect("Récupération des Sphères")], { nonCumulative: true }),
+          partner("Mutant", [effect("Capacité de charge")], { nonCumulative: true }),
         ],
       },
       {
         title: "Chasse aux passifs",
-        partners: [partner("GuardianDog", [effect("Chance de rencontrer un Pal avec la même compétence passive", "Augmente les chances de rencontrer des Pals avec la même compétence passive.")])],
+        partners: [partner("GuardianDog", [effect("Chance de rencontrer un Pal avec la même compétence passive")])],
       },
     ],
     exploration: {
@@ -128,28 +128,28 @@
         { id: "utilities", name: "Utilitaires" },
       ],
       movement: [
-        partner("Deer", [], { description: "Monture dotée d’un double saut et spécialisée dans l’abattage." }),
-        partner("KendoFrog", [effect("Attaque", "Propulse le joueur en hauteur et augmente son attaque jusqu’à l’atterrissage.")]),
-        partner("Mutant", [effect("Capacité de charge", "Augmente la limite de poids portée par le joueur.")], { nonCumulative: true }),
+        partner("Deer"),
+        partner("KendoFrog", [effect("Attaque")]),
+        partner("Mutant", [effect("Capacité de charge")], { nonCumulative: true }),
       ],
       gliders: [
-        partner("Eagle", [], { description: "Plane rapidement et permet de tirer avec l’arme tenue en main droite." }),
-        partner("FlyingManta", [effect("Réduction des dégâts de chute", "Plane rapidement pendant une longue durée et annule les dégâts de chute.")]),
-        partner("FlyingManta_Thunder", [effect("Réduction des dégâts de chute", "Plane rapidement pendant une longue durée et annule les dégâts de chute.")]),
-        partner("NegativeOctopus", [], { description: "Permet de flotter doucement pendant une longue durée." }),
-        partner("NegativeOctopus_Neutral", [], { description: "Permet de flotter doucement pendant une longue durée." }),
-        partner("WindChimes", [], { description: "Permet de s’élever lentement pendant le vol plané." }),
-        partner("WindChimes_Ice", [], { description: "Permet de s’élever lentement pendant le vol plané." }),
+        partner("Eagle"),
+        partner("FlyingManta", [effect("Réduction des dégâts de chute")]),
+        partner("FlyingManta_Thunder", [effect("Réduction des dégâts de chute")]),
+        partner("NegativeOctopus"),
+        partner("NegativeOctopus_Neutral"),
+        partner("WindChimes"),
+        partner("WindChimes_Ice"),
       ],
       detection: [
-        partner("NightFox", [], { description: "Détecte les statues de Pal à proximité." }),
-        partner("CatBat", [], { description: "Détecte les donjons, coffres et débris à proximité." }),
-        partner("BlackPuppy", [effect("Rendement de collecte", "Détecte le Chromite et augmente la quantité obtenue.")], { nonCumulative: true, highlights: ["Chromite"] }),
+        partner("NightFox"),
+        partner("CatBat"),
+        partner("BlackPuppy", [effect("Rendement de collecte")], { nonCumulative: true, highlights: ["Chromite"] }),
       ],
       utilities: [
-        partner("MimicDog", [], { description: "Ouvre les coffres sans utiliser de clé." }),
-        partner("SifuDog", [], { description: "Permet de se téléporter vers la base la plus proche hors des donjons." }),
-        partner("Mutant", [effect("Capacité de charge", "Augmente la limite de poids portée et rend les sphères téléguidées.")], { nonCumulative: true }),
+        partner("MimicDog"),
+        partner("SifuDog"),
+        partner("Mutant", [effect("Capacité de charge")], { nonCumulative: true }),
       ],
     },
   };

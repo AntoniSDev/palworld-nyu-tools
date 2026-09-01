@@ -14,6 +14,7 @@ import html
 import json
 import re
 from pathlib import Path
+from urllib.parse import urlparse
 
 
 LABELS_FR = {
@@ -159,6 +160,18 @@ def text_content(fragment: str) -> str:
     return re.sub(r"\s+([.,;:])", r"\1", text)
 
 
+PARTNER_ICON_PREFIX = "https://cdn.paldb.cc/image/Pal/Texture/UI/InGame/"
+
+
+def local_partner_icon(url: str) -> str:
+    if not url.startswith(PARTNER_ICON_PREFIX):
+        return ""
+    filename = Path(urlparse(url).path).name
+    if not re.fullmatch(r"T_icon_skill_pal_[A-Za-z0-9_]+\.webp", filename):
+        return ""
+    return f"assets/partner-skills/{filename}"
+
+
 def parse_french_skills(source: str) -> dict[str, dict[str, str]]:
     result: dict[str, dict[str, str]] = {}
     for block in source.split('<div class="col"><div class="card itemPopup">')[1:]:
@@ -170,12 +183,18 @@ def parse_french_skills(source: str) -> dict[str, dict[str, str]]:
         if code in result:
             continue
         after_skill = block[skill_match.end():]
+        icon_match = re.search(
+            r'<img[^>]+src="([^"]+)"[^>]*class="size64 rounded-circle border"',
+            after_skill,
+            re.I,
+        )
         descriptions = re.findall(r'<div class="flex-grow-1 ms-2">(.*?)</div>\s*</div>', after_skill, re.S)
         description = text_content(descriptions[-1]) if descriptions else ""
         description = re.sub(r"\s*Technologies\s+\d+\s*$", "", description).strip()
         result[code] = {
             "name": text_content(skill_match.group(1)),
             "description": description,
+            "icon": local_partner_icon(icon_match.group(1)) if icon_match else "",
         }
     return result
 

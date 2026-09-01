@@ -132,6 +132,30 @@ button { color: inherit; }
 
 .site-nav__inner::-webkit-scrollbar { display: none; }
 
+.site-nav__guide { position: relative; }
+.site-nav__guide > a { height: 100%; }
+.site-nav__guide-menu {
+  position: absolute;
+  top: calc(100% - 1px);
+  left: 50%;
+  z-index: 30;
+  display: grid;
+  width: 174px;
+  padding: 6px;
+  visibility: hidden;
+  border: 1px solid rgba(105, 218, 222, 0.25);
+  border-radius: 0 0 10px 10px;
+  background: rgba(5, 24, 32, 0.98);
+  box-shadow: 0 18px 34px rgba(0, 5, 10, 0.42);
+  opacity: 0;
+  transform: translate(-50%, -4px);
+  transition: opacity 120ms ease, transform 120ms ease, visibility 120ms;
+}
+.site-nav__guide:hover .site-nav__guide-menu,
+.site-nav__guide:focus-within .site-nav__guide-menu { visibility: visible; opacity: 1; transform: translate(-50%, 0); }
+.site-nav__guide-menu a { min-height: 36px; padding: 0 11px; border-radius: 6px; font-size: 0.8rem; }
+.site-nav__guide-menu a:hover { background: rgba(81, 204, 207, 0.13); color: #eaffff; }
+
 .site-nav a {
   display: flex;
   align-items: center;
@@ -1018,6 +1042,9 @@ tbody tr:hover { background: linear-gradient(90deg, rgba(91, 218, 223, 0.055), r
   line-height: 1.25;
 }
 
+.partner-skill-card__skill { display: flex; min-width: 0; align-items: center; gap: 7px; }
+.partner-skill-card__skill > img { width: 28px; height: 28px; flex: 0 0 auto; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.28)); }
+
 .partner-skill-card__description {
   display: grid;
   align-content: start;
@@ -1217,6 +1244,14 @@ body[data-view="jobs"] .capabilities-picker { margin-bottom: 18px; }
 .guide-tabs--icons button { padding-inline: 12px; }
 .guide-tabs--icons img { width: 23px; height: 23px; object-fit: contain; }
 
+.guide-farming-picker .guide-tabs--icons button {
+  width: 62px;
+  min-height: 58px;
+  padding: 7px;
+}
+.guide-farming-picker .guide-tabs--icons button img { width: 37px; height: 37px; }
+.guide-farming-picker .guide-tabs--icons button span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
 .guide-content,
 .guide-results {
   display: grid;
@@ -1254,13 +1289,12 @@ body[data-view="jobs"] .capabilities-picker { margin-bottom: 18px; }
   border-radius: 9px;
   background: linear-gradient(135deg, rgba(7, 29, 38, 0.9), rgba(36, 31, 62, 0.32));
   color: #dff6f4;
-  cursor: pointer;
+  cursor: default;
   text-align: left;
   transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
 }
 
-.guide-element-card:hover { transform: translateY(-2px); border-color: rgba(103, 230, 226, 0.42); box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16); }
-.guide-element-card.selected { border-color: rgba(102, 238, 231, 0.68); box-shadow: inset 0 0 0 1px rgba(102, 238, 231, 0.22), 0 0 16px rgba(72, 222, 218, 0.12); }
+.guide-element-card:hover { border-color: rgba(103, 230, 226, 0.28); }
 .guide-element-card__identity { display: flex; align-items: center; gap: 9px; min-width: 0; }
 .guide-element-card__identity > img { width: 42px; height: 42px; object-fit: contain; }
 .guide-element-card__identity strong { font-size: 0.86rem; line-height: 1.2; }
@@ -1906,6 +1940,8 @@ body {
   letter-spacing: 0;
 }
 .condensation-partner h3 { margin: 0; color: #dff5f3; font-size: 1rem; }
+.condensation-partner__title { display: flex; align-items: center; gap: 8px; }
+.condensation-partner__title img { width: 30px; height: 30px; object-fit: contain; }
 .condensation-partner__description {
   margin: 6px 0 0;
   color: #a5bdc1;
@@ -2527,6 +2563,18 @@ footer a { color: #75aaa9; }
 /* v0.9 — passe finale de lisibilité du Cumoir */
 body[data-view="breeding"] .page-shell { width: calc(100% - 16px); max-width: none; }
 body[data-view="breeding"] .site-nav a { font-size: .92rem; font-weight: 700; }
+.site-nav .site-nav__guide-menu a {
+  min-height: 36px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.site-nav .site-nav__guide-menu a:hover { background: rgba(81, 204, 207, 0.13); }
+.site-nav .site-nav__guide-menu a::before,
+.site-nav .site-nav__guide-menu a::after { display: none; content: none; }
 .breeding-page--save .eyebrow { font-weight: 700; }
 .breeding-page--save > .breeding-source { width: fit-content; max-width: 100%; grid-template-columns: max-content minmax(260px, 340px); justify-content: start; gap: 16px; }
 .breeding-page--save > .breeding-source > .eyebrow { font-size: .76rem; }
