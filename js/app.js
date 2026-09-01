@@ -873,7 +873,6 @@ function guidePageTemplate() {
   }[selectedGuideCategory]?.() || "";
   return `<section class="guide-page">
     <header class="guide-header"><p class="eyebrow">${escapeHtml(category.eyebrow)}</p><p>${escapeHtml(category.copy)}</p></header>
-    ${guideTabsTemplate(guideData.categories, selectedGuideCategory, "guide-category", "Catégorie du Guide pratique")}
     <div class="guide-content">${categoryContent}</div>
   </section>`;
 }
@@ -1398,15 +1397,6 @@ content.addEventListener("click", (event) => {
     partnerSkillsPromise = null;
     render();
     ensurePartnerSkills();
-    return;
-  }
-
-  const guideCategoryButton = event.target.closest("[data-guide-category]");
-  if (guideCategoryButton) {
-    selectedGuideCategory = guideCategoryButton.dataset.guideCategory;
-    const hash = selectedGuideCategory === "combat" ? "#guide" : `#guide-${selectedGuideCategory}`;
-    if (window.location.hash === hash) render();
-    else window.location.hash = hash;
     return;
   }
 
