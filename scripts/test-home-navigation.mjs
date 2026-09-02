@@ -27,7 +27,12 @@ for (const asset of [
   "assets/ui/technology-book-g2.webp",
   "assets/ui/treasure-map-01.webp",
   "assets/ui/palbox.png",
-  "assets/structures/pal-essence-condenser.jpg",
+  "assets/structures/pal-essence-condenser-icon.png",
 ]) assert(fs.existsSync(asset), `Asset d’accueil absent : ${asset}`);
+
+assert.match(app, /icons: jobs\.map\(\(job\) => job\.icon\)/);
+assert.match(css, /\.home-tool-card__visual--mosaic\s*\{[^}]*place-content:\s*center;/s);
+assert.match(css, /\.home-tool-card:nth-child\(5\)[^}]*object-fit:\s*contain;/s);
+assert.match(css, /\.tool-nav\s*\{[^}]*width:\s*min\(1180px, 100%\);[^}]*margin:\s*-18px auto 24px;/s);
 
 console.log("Accueil et navigation des outils : OK");

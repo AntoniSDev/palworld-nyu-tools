@@ -195,7 +195,7 @@ const tools = [
   { view: "jobs", href: "#capacites", name: "Capacités de travail", description: "Efficacité des niveaux de capacité de travail, de 1 à 10.", icons: jobs.map((job) => job.icon) },
   { view: "work", href: "#optimisation", name: "Optimisation de la base", description: "Passifs et compétences partenaires liés au travail des Pals dans la base.", icon: "assets/ui/palbox.png" },
   { view: "guide", href: "#guide", name: "Guide pratique", description: "Combat, farming, pêche, capture et exploration.", icon: "assets/ui/technology-book-g2.webp" },
-  { view: "condensation", href: "#condensation", name: "Condensation des Pals", description: "Coûts et progression selon le niveau de condensation.", icon: "assets/structures/pal-essence-condenser.jpg" },
+  { view: "condensation", href: "#condensation", name: "Condensation des Pals", description: "Coûts et progression selon le niveau de condensation.", icon: "assets/structures/pal-essence-condenser-icon.png" },
   { view: "memo", href: "#memo", name: "Mémo", description: "Objectifs et tâches à garder sous la main pendant la partie.", icon: "assets/ui/treasure-map-01.webp" },
 ];
 let viewTransitionTimer;
@@ -939,6 +939,8 @@ function guidePageTemplate() {
       mining: "Passifs et compétences partenaires utiles à l’extraction des minerais.",
       loot: "Bonus et compétences liés aux butins obtenus en jeu.",
     }[selectedGuideFarmingTab],
+    fishing: "Compétences partenaires liées à la pêche, à ses récompenses et aux Pals talentueux.",
+    capture: "Compétences partenaires liées aux chances de capture, aux sphères et à la recherche de passifs.",
     exploration: {
       movement: "Passifs et compétences partenaires liés à la vitesse et aux déplacements.",
       gliders: "Pals et compétences partenaires utilisables pour le déplacement en planeur.",
@@ -1320,7 +1322,7 @@ function updateIntro() {
   );
 
   pageEyebrow.textContent = "Guide rapide de la base";
-  pageCopy.textContent = "Compare l’efficacité de chaque niveau de capacité de travail, de 1 à 10.";
+  pageCopy.textContent = "Efficacité de chaque niveau de capacité de travail, de 1 à 10.";
 }
 
 function switchView(nextView) {
