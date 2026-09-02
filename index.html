@@ -6,46 +6,27 @@
     <meta name="description" content="Tableaux et outils pratiques en français pour Palworld." />
     <title>Palworld Nyu Tools</title>
     <link rel="icon" href="assets/favicon.ico" sizes="any" />
-    <link rel="stylesheet" href="css/styles.css?v=0.9.62" />
+    <link rel="stylesheet" href="css/styles.css?v=1.0.1" />
     <script src="js/condensation-data.js?v=0.9.1" defer></script>
     <script src="js/egg-size-data.js?v=0.9.14" defer></script>
     <script src="js/breeding-data.js?v=0.9.1" defer></script>
     <script src="js/passive-data.js?v=0.9" defer></script>
     <script src="js/work-optimization-data.js?v=0.9.5" defer></script>
     <script src="js/guide-data.js?v=0.9.5" defer></script>
-    <script src="js/app.js?v=0.9.29" defer></script>
+    <script src="js/app.js?v=1.0.1" defer></script>
     <script src="js/carrier-breeding-solver.js?v=0.9.1" defer></script>
-    <script src="js/save-cumoir.js?v=0.9.44" defer></script>
+    <script src="js/save-cumoir.js?v=1.0.1" defer></script>
   </head>
-  <body data-view="breeding">
+  <body data-view="home">
     <header class="topbar">
-      <a class="brand" href="#cumoir" aria-label="Palworld Nyu Tools — accueil">
+      <a class="brand" href="#accueil" aria-label="Palworld Nyu Tools — accueil">
         <span class="brand__mark" aria-hidden="true">N</span>
         <span class="brand__name"><strong>Palworld</strong><b>Nyu Tools</b><small class="brand__version">v1.0</small></span>
       </a>
     </header>
 
-    <nav class="site-nav" aria-label="Navigation principale">
-      <div class="site-nav__inner">
-        <a id="breeding-view" class="active" href="#cumoir" aria-current="page">Cumoir à Pals</a>
-        <a id="single-view" href="#capacites">Capacités de travail</a>
-        <a id="work-view" href="#optimisation">Optimisation de la base</a>
-        <div class="site-nav__guide">
-          <a id="combat-view" tabindex="0" aria-haspopup="menu">Guide pratique</a>
-          <nav class="site-nav__guide-menu" aria-label="Rubriques du Guide pratique">
-            <a href="#guide-combat">Combat</a>
-            <a href="#guide-farming">Farming</a>
-            <a href="#guide-fishing">Pêche</a>
-            <a href="#guide-capture">Capture</a>
-            <a href="#guide-exploration">Exploration</a>
-          </nav>
-        </div>
-        <a id="condensation-view" href="#condensation">Condensation des Pals</a>
-        <a id="memo-view" href="#memo">Mémo</a>
-      </div>
-    </nav>
-
     <main class="page-shell" id="top">
+      <div id="tool-navigation"></div>
       <section class="intro hidden">
         <div>
           <p id="page-eyebrow" class="eyebrow">Guide rapide de la base</p>

@@ -36,22 +36,19 @@ assert(config.passiveProfiles.farming.includes("WorkSuitabilityAddRank_MonsterFa
 assert(config.passiveProfiles.farming.includes("WorkSuitabilityAddRank_MonsterFarm_1"));
 assert(!pagesConfig.includes("data/partner-skills-fr.json"), "Le JSON partenaire doit être publié par GitHub Pages.");
 const primaryRoutes = ["#cumoir", "#capacites", "#optimisation", "#guide", "#condensation", "#memo"];
-const primaryLinks = [...indexHtml.matchAll(/<a id="(?:breeding|single|work|combat|condensation|memo)-view"[^>]+href="([^"]+)"/g)];
-assert.equal(primaryLinks.length, 5, "La navigation principale doit contenir cinq destinations directes.");
-assert.deepEqual(primaryLinks.map((match) => match[1]), primaryRoutes.filter((route) => route !== "#guide"));
-assert.match(indexHtml, /<a id="combat-view" tabindex="0" aria-haspopup="menu">Guide pratique<\/a>/, "Guide pratique doit rester un déclencheur non navigant.");
-assert.match(indexHtml, /<a class="brand" href="#cumoir"/);
+assert.doesNotMatch(indexHtml, /class="site-nav"/, "La grande navigation persistante doit être supprimée.");
+assert.match(indexHtml, /<a class="brand" href="#accueil"/);
 assert.match(indexHtml, /<small class="brand__version">v1\.0<\/small>/, "Le site doit afficher sa version 1.0 officielle.");
 assert(!indexHtml.includes("skills-menu"), "L’ancien menu Compétences doit être supprimé.");
-assert.match(appSource, /const viewFromHash = \(hash\) => viewRoutes\.get\(hash\) \|\| "breeding"/);
+assert.match(appSource, /const viewFromHash = \(hash\) => viewRoutes\.get\(hash\) \|\| "home"/);
 for (const route of primaryRoutes) assert(appSource.includes(`["${route}",`), `Route absente : ${route}`);
 assert(appSource.includes('["#combat", "guide"]'), "#combat doit rester un alias du Guide pratique.");
 assert(!appSource.includes("brand.addEventListener"), "Le logo doit conserver son comportement natif de lien.");
 assert(!appSource.includes('title="${escapeHtml(activity.name)}"'), "Les icônes ne doivent plus dépendre du title natif.");
 assert.match(appSource, /data-job-tooltip=/);
 assert.match(appSource, /aria-label=/);
-assert.match(indexHtml, />Optimisation de la base<\/a>/, "Le libellé de navigation doit être explicite.");
-assert.match(indexHtml, />Guide pratique<\/a>/, "La navigation doit présenter le Guide pratique.");
+assert.match(appSource, /name: "Optimisation de la base"/, "Le libellé de navigation doit être explicite.");
+assert.match(appSource, /name: "Guide pratique"/, "La navigation doit présenter le Guide pratique.");
 
 const partnerCodes = Object.values(config.partnerActivities).flat().map((entry) => entry.pal);
 assert(!partnerCodes.includes("NegativeKoala"), "Depresso doit rester exclu.");

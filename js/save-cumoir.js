@@ -623,7 +623,7 @@
   }
 
   function render(fit = true) {
-    if (!content || document.querySelector("#breeding-view")?.classList.contains("active") !== true) return;
+    if (!content || document.body.dataset.view !== "breeding") return;
     content.innerHTML = template();
     bindCanvas(fit);
     const search = content.querySelector("[data-passive-search]");

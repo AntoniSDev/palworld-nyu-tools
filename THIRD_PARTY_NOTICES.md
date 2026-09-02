@@ -41,6 +41,11 @@ Palworld interface icons distributed by
 under CC BY-SA 4.0. They complement the same local icon family already used by
 the passive-skills page.
 
+The home-page Breeding Farm, Innovative Technical Manual and Treasure Map
+icons are extracted Palworld interface assets distributed by
+[`paldb.cc`](https://paldb.cc/) and stored locally. Palworld imagery belongs
+to Pocketpair, Inc.
+
 ## Breeding planner references
 
 Palbreed / Palpath was consulted as a public conceptual and behavioural

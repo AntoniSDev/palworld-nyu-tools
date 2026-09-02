@@ -144,18 +144,10 @@ const specialPartnerActivities = [
 const partnerActivities = [...jobs, ...specialPartnerActivities];
 const picker = document.querySelector("#job-picker");
 const content = document.querySelector("#content");
-const singleButton = document.querySelector("#single-view");
-const workButton = document.querySelector("#work-view");
-const combatButton = document.querySelector("#combat-view");
-const condensationButton = document.querySelector("#condensation-view");
-const breedingButton = document.querySelector("#breeding-view");
-const memoButton = document.querySelector("#memo-view");
-const primaryNavigation = document.querySelector(".site-nav");
-const guideNavigation = document.querySelector(".site-nav__guide");
+const toolNavigation = document.querySelector("#tool-navigation");
 const intro = document.querySelector(".intro");
 const pageEyebrow = document.querySelector("#page-eyebrow");
 const pageCopy = document.querySelector("#page-copy");
-const primaryNavLinks = [breedingButton, singleButton, workButton, combatButton, condensationButton, memoButton];
 const jobTooltip = document.createElement("div");
 jobTooltip.id = "work-job-tooltip";
 jobTooltip.className = "work-job-tooltip";
@@ -181,6 +173,8 @@ let selectedCondensationPalId = null;
 let condensationStars = 0;
 let condensationQuery = "";
 const viewRoutes = new Map([
+  ["", "home"],
+  ["#accueil", "home"],
   ["#cumoir", "breeding"],
   ["#capacites", "jobs"],
   ["#optimisation", "work"],
@@ -194,14 +188,63 @@ const viewRoutes = new Map([
   ["#condensation", "condensation"],
   ["#memo", "memo"],
 ]);
-const viewFromHash = (hash) => viewRoutes.get(hash) || "breeding";
+const viewFromHash = (hash) => viewRoutes.get(hash) || "home";
 let currentView = viewFromHash(window.location.hash);
+const tools = [
+  { view: "breeding", href: "#cumoir", name: "Cumoir à Pals", description: "Planification des élevages, transmission des passifs et exploitation de la sauvegarde.", icon: "assets/ui/breeding-farm.webp" },
+  { view: "jobs", href: "#capacites", name: "Capacités de travail", description: "Efficacité des niveaux de capacité de travail, de 1 à 10.", icons: jobs.map((job) => job.icon) },
+  { view: "work", href: "#optimisation", name: "Optimisation de la base", description: "Passifs et compétences partenaires liés au travail des Pals dans la base.", icon: "assets/ui/palbox.png" },
+  { view: "guide", href: "#guide", name: "Guide pratique", description: "Combat, farming, pêche, capture et exploration.", icon: "assets/ui/technology-book-g2.webp" },
+  { view: "condensation", href: "#condensation", name: "Condensation des Pals", description: "Coûts et progression selon le niveau de condensation.", icon: "assets/structures/pal-essence-condenser.jpg" },
+  { view: "memo", href: "#memo", name: "Mémo", description: "Objectifs et tâches à garder sous la main pendant la partie.", icon: "assets/ui/treasure-map-01.webp" },
+];
 let viewTransitionTimer;
 let draggedMemoId = null;
 let memoDragPlaceholder = null;
 let memoDragGhost = null;
 let memoDragOffset = { x: 0, y: 0 };
 let memoDragPointerId = null;
+
+function homeTemplate() {
+  return `<section class="home-page" aria-labelledby="home-title">
+    <header class="home-hero">
+      <h1 id="home-title">Palworld Nyu Tools</h1>
+      <p>Élevage, optimisation, farming et progression réunis dans une même boîte à outils.</p>
+      <p>Des repères pratiques pour préparer les Pals, organiser la base et gagner du temps en jeu.</p>
+    </header>
+    <div class="home-tools">
+      ${tools.map((tool) => `<a class="home-tool-card" href="${tool.href}">
+        <span class="home-tool-card__visual${tool.icons ? " home-tool-card__visual--mosaic" : ""}" aria-hidden="true">
+          ${tool.icons ? tool.icons.map((icon) => `<img src="${icon}" alt="" />`).join("") : `<img src="${tool.icon}" alt="" />`}
+        </span>
+        <span class="home-tool-card__body"><strong>${tool.name}</strong><span>${tool.description}</span></span>
+      </a>`).join("")}
+    </div>
+  </section>`;
+}
+
+function toolNavigationTemplate() {
+  const current = tools.find((tool) => tool.view === currentView);
+  if (!current) return "";
+  return `<nav class="tool-nav" aria-label="Navigation des outils">
+    <a class="tool-nav__home" href="#accueil">← Accueil</a>
+    <span class="tool-nav__current">${current.name}</span>
+    <div class="tool-switcher">
+      <button type="button" data-tool-switcher aria-haspopup="menu" aria-expanded="false">Changer d’outil <span aria-hidden="true">▾</span></button>
+      <div class="tool-switcher__menu" role="menu" hidden>
+        ${tools.map((tool) => `<a href="${tool.href}" role="menuitem"${tool.view === currentView ? ' class="active" aria-current="page"' : ""}>
+          <img src="${tool.icon || tool.icons[0]}" alt="" /><span>${tool.name}</span>
+        </a>`).join("")}
+      </div>
+    </div>
+  </nav>`;
+}
+
+function addToolNavigation() {
+  toolNavigation.innerHTML = currentView === "home" ? "" : toolNavigationTemplate();
+}
+
+window.addToolNavigation = addToolNavigation;
 
 const memoStorageKey = "palworld-nyu-tools:memo";
 const breedingStorageKey = "palworld-nyu-tools:breeding-v0.8";
@@ -536,8 +579,8 @@ function ensurePartnerSkills() {
 function workPageTemplate() {
   const partnerMode = workMode === "partners";
   const description = partnerMode
-    ? "Présente les compétences partenaires qui améliorent ou influencent le travail des Pals dans la base."
-    : "Présente les compétences passives utiles pour optimiser le travail des Pals dans la base.";
+    ? "Les compétences partenaires qui améliorent le travail des Pals dans la base."
+    : "Les compétences passives utiles pour optimiser le travail des Pals dans la base.";
   return `<section class="work-optimization-page">
     <header class="work-optimization-header">
       <p class="eyebrow">Optimisation du travail</p>
@@ -786,12 +829,12 @@ function guideTabsTemplate(items, selected, attribute, label, withIcons = false,
   </nav>`;
 }
 
-function guidePartnerSectionTemplate(title, references) {
+function guidePartnerSectionTemplate(title, references, description = "") {
   if (!references?.length) return "";
   if (partnerSkillsError) return `<section class="guide-section"><h2>${escapeHtml(title)}</h2><div class="work-empty work-empty--error"><strong>Données indisponibles</strong><span>Les compétences partenaires n’ont pas pu être chargées.</span><button type="button" data-work-partner-retry>Réessayer</button></div></section>`;
   if (!partnerSkillsData) return `<section class="guide-section"><h2>${escapeHtml(title)}</h2><div class="work-empty"><strong>Chargement des données…</strong></div></section>`;
   const cards = references.map(workPartnerCardTemplate).filter(Boolean).join("");
-  return cards ? `<section class="guide-section"><h2>${escapeHtml(title)}</h2><div class="partner-list">${cards}</div></section>` : "";
+  return cards ? `<section class="guide-section"><h2>${escapeHtml(title)}</h2>${description ? `<p class="guide-section__copy">${escapeHtml(description)}</p>` : ""}<div class="partner-list">${cards}</div></section>` : "";
 }
 
 function guidePassiveSectionTemplate(skillIds = []) {
@@ -860,7 +903,15 @@ function guideFarmingTemplate() {
 }
 
 function guideDirectSectionsTemplate(sections) {
-  return `<div class="guide-results">${sections.map((section) => guidePartnerSectionTemplate(section.title, section.partners)).join("")}</div>`;
+  const descriptions = {
+    "Faciliter la pêche": "Bonus et compétences partenaires qui influencent les mécaniques de pêche.",
+    "Loot de pêche": "Bonus liés aux ressources et récompenses obtenues par la pêche.",
+    "Pals talentueux": "Pals disposant d’effets particulièrement utiles pour la pêche.",
+    "Augmenter les chances de capture": "Bonus et effets liés aux chances de capture des Pals.",
+    "Sphères": "Effets et mécaniques liés à l’utilisation des sphères de Pal.",
+    "Chasse aux passifs": "Effets utiles pour rechercher et capturer des Pals avec les passifs souhaités.",
+  };
+  return `<div class="guide-results">${sections.map((section) => guidePartnerSectionTemplate(section.title, section.partners, descriptions[section.title] || "")).join("")}</div>`;
 }
 
 function guideExplorationTemplate() {
@@ -881,18 +932,18 @@ function guidePageTemplate() {
   const category = guideData.categories.find((entry) => entry.id === selectedGuideCategory) || guideData.categories[0];
   const contextualCopy = {
     combat: selectedGuideCombatMode === "elements"
-      ? "Affiche le tableau des forces et faiblesses élémentaires."
-      : "Regroupe les compétences passives et partenaires utiles au combat, notamment selon les éléments.",
+      ? "Forces, faiblesses et interactions entre les différents éléments."
+      : "Passifs et compétences partenaires utiles au combat, classés par élément.",
     farming: {
-      logging: "Présente les passifs et compétences partenaires utiles à l’abattage.",
-      mining: "Présente les passifs et compétences partenaires utiles à l’extraction.",
-      loot: "Recense les compétences partenaires qui améliorent le loot, notamment selon les éléments.",
+      logging: "Passifs et compétences partenaires utiles à l’abattage du bois.",
+      mining: "Passifs et compétences partenaires utiles à l’extraction des minerais.",
+      loot: "Bonus et compétences liés aux butins obtenus en jeu.",
     }[selectedGuideFarmingTab],
     exploration: {
-      movement: "Présente les passifs et compétences partenaires utiles au déplacement.",
-      gliders: "Présente les compétences partenaires liées aux planeurs.",
-      detection: "Présente les compétences partenaires utiles à la détection.",
-      utilities: "Regroupe les compétences partenaires utilitaires pour l’exploration.",
+      movement: "Passifs et compétences partenaires liés à la vitesse et aux déplacements.",
+      gliders: "Pals et compétences partenaires utilisables pour le déplacement en planeur.",
+      detection: "Compétences permettant de repérer ressources, objets ou points d’intérêt.",
+      utilities: "Compétences partenaires offrant des effets pratiques pendant l’exploration.",
     }[selectedGuideExplorationTab],
   }[selectedGuideCategory] || category.copy;
   const categoryContent = {
@@ -903,6 +954,9 @@ function guidePageTemplate() {
     exploration: guideExplorationTemplate,
   }[selectedGuideCategory]?.() || "";
   return `<section class="guide-page">
+    <nav class="guide-category-nav" aria-label="Rubriques du Guide pratique">
+      ${guideData.categories.map((entry) => `<a href="#guide-${entry.id}" class="${entry.id === selectedGuideCategory ? "active" : ""}"${entry.id === selectedGuideCategory ? ' aria-current="page"' : ""}>${escapeHtml(entry.name)}</a>`).join("")}
+    </nav>
     <header class="guide-header"><p class="eyebrow">${escapeHtml(category.eyebrow)}</p><p>${escapeHtml(contextualCopy)}</p></header>
     <div class="guide-content">${categoryContent}</div>
   </section>`;
@@ -1362,25 +1416,18 @@ function render() {
   document.body.dataset.view = currentView;
   renderPicker();
   updateIntro();
-  const activeLink = {
-    jobs: singleButton,
-    work: workButton,
-    guide: combatButton,
-    condensation: condensationButton,
-    breeding: breedingButton,
-    memo: memoButton,
-  }[currentView];
-  primaryNavLinks.forEach((link) => {
-    const active = link === activeLink;
-    link.classList.toggle("active", active);
-    if (active) link.setAttribute("aria-current", "page");
-    else link.removeAttribute("aria-current");
-  });
+  addToolNavigation();
   picker.classList.toggle("hidden", currentView !== "jobs");
+
+  if (currentView === "home") {
+    content.innerHTML = homeTemplate();
+    return;
+  }
 
   if (currentView === "condensation") {
     content.innerHTML = `<section class="standalone-page" aria-label="Condensation des Pals">
       <p class="eyebrow">Amélioration des Pals</p>
+      <p class="standalone-page__copy">Coûts et progression selon le niveau de condensation.</p>
       ${condensationTemplate()}
     </section>`;
     renderCondensationSearchResults();
@@ -1708,23 +1755,34 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") hideJobTooltip();
 });
 
-guideNavigation?.addEventListener("click", (event) => {
-  const link = event.target.closest(".site-nav__guide-menu a");
-  if (!link) return;
-  guideNavigation.classList.add("is-dismissed");
-  link.blur();
+document.addEventListener("click", (event) => {
+  const trigger = event.target.closest("[data-tool-switcher]");
+  const switcher = event.target.closest(".tool-switcher");
+  document.querySelectorAll(".tool-switcher").forEach((item) => {
+    if (item !== switcher || !trigger) {
+      item.querySelector("[data-tool-switcher]")?.setAttribute("aria-expanded", "false");
+      const menu = item.querySelector(".tool-switcher__menu");
+      if (menu) menu.hidden = true;
+    }
+  });
+  if (!trigger) return;
+  const menu = trigger.nextElementSibling;
+  const open = trigger.getAttribute("aria-expanded") !== "true";
+  trigger.setAttribute("aria-expanded", String(open));
+  menu.hidden = !open;
 });
 
-guideNavigation?.addEventListener("pointerleave", () => {
-  guideNavigation.classList.remove("is-dismissed");
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape") return;
+  document.querySelectorAll("[data-tool-switcher][aria-expanded=true]").forEach((trigger) => {
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.nextElementSibling.hidden = true;
+    trigger.focus();
+  });
 });
 
-guideNavigation?.addEventListener("focusin", () => {
-  guideNavigation.classList.remove("is-dismissed");
-});
-
-primaryNavigation?.addEventListener("dragstart", (event) => {
-  if (event.target.closest("a")) event.preventDefault();
+document.addEventListener("dragstart", (event) => {
+  if (event.target.closest(".tool-nav a, .home-tool-card")) event.preventDefault();
 });
 
 window.addEventListener("hashchange", syncViewFromHash);
